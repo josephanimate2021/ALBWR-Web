@@ -47,14 +47,14 @@ To use this application, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/isaka-james/chunks-to-file.git
+   git clone https://github.com/josephanimate2021/ALBWR-Web.git
    ```
    On side note, you can also download this source code as a zip file by going to Code -> Download ZIP and then extracting the downloaded zip file to get the same outcome.
 
 2. Enter into the project folder:
 
    ```bash
-   cd albwr-web
+   cd ALBWR-Web
    ```
 3. Install the dependencies:
 ```bash
