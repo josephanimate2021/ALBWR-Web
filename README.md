@@ -1,17 +1,10 @@
 <div align="center">
-<h1 align="center"> Chunks to File - NodeJs Application </h1>
-
-<img  src="https://cdn.freebiesupply.com/logos/large/2x/nodejs-1-logo-png-transparent.png" alt="Project Image" width="200">
-<br/>
-<img align="center"  src="https://komarev.com/ghpvc/?username=chunks-to-file&label=Chunks%20To%20File&color=0e75b6&style=flat" alt="since 16 April,2024" />
-
+  <h1>
+    The Legend Of Zelda A Link Between Worlds Randomizer (Web Interface)
+  </h1>
+  <img src="https://cdn.freebiesupply.com/logos/large/2x/nodejs-1-logo-png-transparent.png" alt="Project Image" width="200">
+  <p>A Node.js application for uploading file chunks and combining them into a single file on the server.</p>
 </div>
-<br/>
-
-
-A Node.js application for uploading file chunks and combining them into a single file on the server.
-
-Speeding your application **5x Faster** than the uploading you are currently using!.
 
 ## Table of Contents
 
@@ -24,32 +17,25 @@ Speeding your application **5x Faster** than the uploading you are currently usi
 
 ## Introduction
 
-In many scenarios, uploading large files to a server can be challenging due to limitations in file size or network conditions. This project provides a solution by allowing the client to split a large file into smaller chunks and upload them individually to the server. Once all chunks are received, the server combines them into a single file.
+You may have seen videos of people playing The Legend Of Zelda A Link Between Worlds Randomizer on youtube and said to yourself: 
+```
+I want to play the randomizer for myself to see what the hype is about
+```
+And this is where this source code, including the actual albw randomizer source codes come in. You may use all to your advantage to randomize your legally dumped North America Rom file of A Link Between Worlds. Read below for more instructions.
 
-<details>
-<summary><h3></h3><b>Click to see how it works:</b></h3></summary>
-  <p>
-    <a href="https://github.com/isaka-james/top">
-      <img src="https://github.com/isaka-james/chunks-to-file/assets/76619967/9b2b0c89-c608-4fbc-8320-1fa0e6fabce1" width="900"/>
-    </a>
-  </p>
-</details>
+
+## How It Works
+
+The source code takes the info from the Web UI and hands it off to either the z17 or albw randomizer source codes and uses Node.JS's shell interface to tell the source codes to randomize away with provided user input. For an idea of how your game will get randomized, you may click [here](https://github.com/rickfay/z17-randomizer/tree/master?tab=readme-ov-file#running-the-randomizer).
 
 
 ## Features
 
-- Split large files into smaller chunks for easier uploading.
-- Upload chunks to the server asynchronously.
-- Combine uploaded chunks into a single file on the server.
-- Accepts all types of files.
+- Original settings are fetched from the z17 and albw randomizer source code presets (and user presets as well) so that it's easier for you to change them without having to modify their files localy.
+- Uploads your rom file into chunks for the server to process and then the server turns those chunks back into a single file to make for a fast and efficient file uploading process using [isaka's source code](https://github.com/isaka-james/chunks-to-file) to do most of the work.
+- Allows you to select which source code version is used to randomize your game.
+- Allows you to share your own settings presets with anybody if you wanted to.
 - Simple and easy-to-use interface.
-
-
-### Simplified Pros Commentary:
->*JavaScript on front-end divides the user's selected file into smaller segments and transmits them simultaneously to the server through the `/documents` route. These segments are then stored in a temporary location known as `temps` folder on the server. Following successful storage, the browser prompts the server to aggregate these segments via the `/combine` route. Utilizing binary methods, the server adeptly merges the segmented data, On completion, file being will be securely stored within the `uploads` directory. So, all the broken pieces of data come together nicely to make one complete file on the server.*
-
-### Preview:
->![image](https://github.com/isaka-james/chunks-to-file/assets/76619967/ce76e9c8-4b7f-4d2a-beb6-e595e9af665a)
 
 
 ## Installation
@@ -61,18 +47,19 @@ To use this application, follow these steps:
    ```bash
    git clone https://github.com/isaka-james/chunks-to-file.git
    ```
+   On side note, you can also download this source code as a zip file by going to Code -> Download ZIP and then extracting the downloaded zip file to get the same outcome.
 
 2. Enter into the project folder:
 
    ```bash
-   cd chunks-to-file
+   cd albwr-web
    ```
 3. Install the dependencies:
 ```bash
    npm install
 ```
 
-## Usage
+## Usage (YOU ONLY NEED TO DO STEPS 3 AND 4 ONCE)
 
 1. Start the server:
 
@@ -81,9 +68,12 @@ To use this application, follow these steps:
    ```
 
 2. Open your web browser and navigate to `http://localhost/`.
-3. Select a file using the provided input field.
-4. Click the "Upload" button to initiate the upload process.
-5. The server will receive the file chunks and combine them into a single file inside the `uploads` folder.
+3. Select a rom file to upload using the provided input field.
+4. Click the "Upload" button to initiate the rom file upload process.
+5. The server will receive the file chunks and combine them into a single file inside the `romUploads` folder.
+6. Once the file is uploaded, you will be shown a list of options you can change to randomize your game.
+7. Once all of the options are selected, you may click on the "Randomize Game" button. From there, the server will know that your game is ready to be randomized and will trigger either one of the randomizer codes to randomize your game.
+8. Once your game is randomized, you will get a download link of the randomized game where you can use the files to play the randomized copy of your game. You may refer [here](https://github.com/rickfay/z17-randomizer/tree/master?tab=readme-ov-file#installing-seeds) if you need help installing your randomized game seed.
 
 ## Contributing
 
@@ -92,6 +82,3 @@ Contributions are welcome! If you find any issues or have suggestions for improv
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-```
-
-Feel free to customize the content and add more details specific to your project. If you have any questions or need further assistance, let me know!
