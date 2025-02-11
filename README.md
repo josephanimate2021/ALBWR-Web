@@ -2,8 +2,8 @@
   <h1>
     The Legend Of Zelda A Link Between Worlds Randomizer (Web Interface)
   </h1>
-  <img src="https://cdn.freebiesupply.com/logos/large/2x/nodejs-1-logo-png-transparent.png" alt="Project Image" width="200">
-  <p>A Node.js application for uploading file chunks and combining them into a single file on the server.</p>
+  <img src="https://www.nicepng.com/png/full/336-3365377_the-legend-of-zelda-a-link-between-worlds.png" alt="A Link Between Worlds">
+  <p>A Node.js application meant to randomize your game using the original albw randomizer sources codes and Node.JS's shell interface.</p>
 </div>
 
 ## Table of Contents
