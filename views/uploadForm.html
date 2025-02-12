@@ -1,28 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chunks to File - NodeJS system </title>
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Chunks to File</h1>
-        <label for="fileInput" style="display: none;">Choose a file</label>
-        <input type="file" id="fileInput" name="file" accept=".*" style="display: none;">
-        <div id="dropArea" style="border: 2px dashed #ccc; padding: 20px; text-align: center;">
-            <p>Drag and drop files here or click to select</p>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>The Legend Of Zelda: A Link Between Worlds Randomizer - Web UI</title>
+        <link rel="stylesheet" href="/css/style.css">
+    </head>
+    <body>
+        <div class="container">
+            <h1>
+                The Legend Of Zelda
+                <br>
+                A Link Between Worlds Randomizer
+            </h1>
+            <div id="step01" style="display: none;">
+                <h2>North America ALBW Rom File</h2>
+                <p>
+                    This file is required in order to run the randomizer. 
+                    Don't worry, this step can only be completed once. 
+                    If you uploaded the wrong file on accident, you may come back here to try again.
+                </p>
+                <label for="fileInput" style="display: none;">Choose a file</label>
+                <input type="file" id="fileInput" name="file" accept=".3ds" style="display: none;">
+                <div id="dropArea" style="border: 2px dashed #ccc; padding: 20px; text-align: center;">
+                    <p>Drag and drop files here or click to select</p>
+                </div>
+                <div id="fileName" style="margin: 10%;"></div>
+                <button type="button" disabled id="uploadButtonChunk">Upload</button>
+                <div id="progressBar" class="progressBarClass" style="display: none;">
+                    <div id="progressBarInner"></div>
+                </div>
+            </div>
+            <div id="step02" style="display: none;">
+                <h2>Randomizer Settings</h2>
+                <p>You have uploaded a North America Rom File for A Legend Of Zelda: A Link Between Worlds. Now you may ranomize away!</p>
+            </div>
         </div>
-        <div id="fileName" style="margin: 10%;"></div>
-        <button type="button" id="uploadButtonChunk">Upload</button>
-        <div id="progressBar" class="progressBarClass" style="display: none;">
-            <div id="progressBarInner"></div>
-        </div>
-    </div>
-    
-    <script src="/js/form.js"></script>
-    <script src="/js/script.js"></script>
-
-</body>
+        <script src="/js/form.js"></script>
+        <script src="/js/script.js"></script>
+    </body>
 </html>

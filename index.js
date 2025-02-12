@@ -5,6 +5,10 @@ const path = require('path');
 const { promisify } = require('util');
 
 const app = express();
+app.use((req, res, next) => {
+    console.log(req.method, req.url, req.query);
+    next();
+});
 
 // The folder having the views
 app.use(express.static(path.join(__dirname, 'views')));
@@ -27,7 +31,24 @@ app.use(express.static(publicDirectoryPath, {
 // Define routes
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'uploadForm.html'));
-});
+}).get('/settings', (req, res) => {
+    const presets = [];
+    for (const file of fs.readdirSync('./uploads').filter(i => i.startsWith(`settingsPreset-${req.query.v}-`) && i.endsWith(".json"))) {
+        presets.unshift(JSON.parse(fs.readFileSync(`./uploads/${file}`)));
+    }
+    const presetsPath = `./${req.query.v}-randomizer/presets`;
+    switch (req.query.v) {
+        case "albw": {
+            const toml = fs.readFileSync(`${presetsPath}/Standord.toml`).toString('utf-8');
+            console.log(toml);
+            break;
+        } case "z17": {
+            presets.unshift(JSON.parse(fs.readFileSync(`./examples/settingsPreset-z17-defaultTemplate.json`)))
+            break;
+        }
+    }
+    res.json(presets.reverse());
+})
 
 
 // Multer storage configuration
@@ -41,7 +62,7 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 const temporary = multer({ dest: 'temps/' });
 
 const readdir = promisify(fs.readdir);
@@ -51,12 +72,14 @@ const appendFile = promisify(fs.appendFile);
 
 // Route for receiving file chunks
 app.post('/documents', upload.single('file'), (req, res) => {
-    console.log(`Chunk "${req.body.chunkNumber}" received successfully`);
+    const msg = `Chunk "${req.body.chunkNumber}" received successfully`;
+
+    console.log(msg);
 
     // Here if you have the database you can use it to store the files that have been saved in the 'temps' folder
     //..
 
-    res.send(`Chunk "${req.body.chunkNumber}" received successfully`);
+    res.send(msg);
 
 });
 
@@ -66,15 +89,6 @@ app.get('/combine', upload.array('files'), async (req, res) => {
     const tempFolder = 'temps/';
     const uploadFolder = 'uploads/';
     const combinedFileName = req.query.filename;
-
-    // Combine is very easy if you have a database like Redis!
-    //..
-
-    /*              >>>>>>>>>>>>>>>>>>>  TRICK  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-     *  If you like using a DATABASE, when the user uploads the chunks you save them to your server and also,
-     *  to your database with their chunkNumber so when he comes here you just retrieve from the database and combine them.
-     *  Remember I didn't delete the chunks but you may delete them if you want!
-    */
 
 
     try {
@@ -90,20 +104,19 @@ app.get('/combine', upload.array('files'), async (req, res) => {
             const numB = parseInt(b.split('-.-.')[0]);
             return numA - numB;
         });
-
-        // Combine files into a single PDF
+        // Combine chunks into a single file
         for (const file of numberedFiles) {
             const filePath = path.join(tempFolder, file);
             const data = await readFile(filePath);
             await appendFile(path.join(uploadFolder, combinedFileName), data);
+            fs.unlinkSync(filePath);
         }
-
         res.status(200).send('Files combined and saved successfully.');
     } catch (error) {
         console.error('Error combining files:', error);
         res.status(500).send('Internal Server Error');
     }
-});
+})
 
 
 const PORT = process.env.PORT || 80;

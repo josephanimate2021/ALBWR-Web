@@ -1,12 +1,32 @@
 let fileChunks = [];
 let fileName = ''; // Variable to store the name of the original file
-const totalChunks = 5; // Variable to store the number of chunks
+const totalChunks = 100; // Variable to store the number of chunks
 
-// The form variables
-//const fileInput = document.getElementById('fileInput');
+if (localStorage.uploadedFileId) loadSettings('z17', () => {
+    document.getElementById('step02').style.display = 'block';
+})
+else document.getElementById(`step01`).style.display = 'block';
 
+function handleError(t = 'Upload failed! Please try again.', e) { // handles an error
+    const progressBar = document.getElementById('progressBar');
+    const progressBarInner = document.getElementById('progressBarInner');
 
+    progressBar.style.display = 'none';
+    progressBar.classList.remove('progressBarClass');
+    progressBar.innerHTML = `<p> ${t} ${e ? e.toString() : ''} </p>`;
+    progressBarInner.style.width = `0%`;
 
+    document.getElementById('uploadButtonChunk').disabled = false;
+    document.getElementById('uploadButtonChunk').innerHTMML = 'Upload';
+    console.error(t, e)
+}
+
+// loads randomizer settings
+function loadSettings(id, callback) {
+    fetch(`/settings?v=${id}`).then(res => res.json()).then(callback);
+}
+
+// The file input event handler
 function handleFileSelect(event) {
     const file = event.target.files[0];
     const fileSize = file.size;
@@ -31,24 +51,22 @@ function handleFileSelect(event) {
 
 // Function to check if a file was uploaded
 function isFileUploaded() {
-    // Check if files were selected
-    if (fileInput.files.length > 0) {
-        return true; // File was uploaded
-    } else {
-        return false; // No file was uploaded
-    }
+    return fileInput.files.length == 1;
 }
 
 async function uploadChunks() {
     console.log('Uploading chunks...');
+
+    const id = (Math.random()).toString().substring(2);
+    const ext = fileName.substring(fileName.lastIndexOf("."));
 
     // Create an array to hold all the upload promises
     const uploadPromises = [];
 
     for (let i = 0; i < totalChunks; i++) {
         const formData = new FormData();
-        formData.append('file', fileChunks[i], `${i+1}-.-.`+fileName);
-        formData.append('filename',fileName);
+        formData.append('file', fileChunks[i], `${i+1}-.-.`+id+ext);
+        formData.append('filename',id+ext);
         formData.append('totalChunks', totalChunks);
         formData.append('chunkNumber', i + 1);
 
@@ -56,10 +74,9 @@ async function uploadChunks() {
         const uploadPromise = uploadChunk(formData,i+1);
 
         uploadPromise.then(() => {
-            var percentage = ((i + 1) / totalChunks) * 100;
-            // The '100' puts complete so wait for server to put complete '100'
-            if(percentage===100){
-                percentage=99;
+            var percentage = ((i + 1) / totalChunks) * 101;
+            if(percentage===101){
+                percentage=100;
             }
             setBar(percentage); // Call setBar function with the percentage
         });
@@ -71,23 +88,20 @@ async function uploadChunks() {
     await Promise.all(uploadPromises);
     console.log('All chunks uploaded successfully.');
 
-    const filename = fileName; 
-
-    fetch(`/combine?filename=${encodeURIComponent(filename)}`)
+    fetch(`/combine?filename=${encodeURIComponent(id+ext)}`)
         .then(response => {
-            if (!response.ok) {
-            throw new Error('Network response was not ok');
-            }
+            if (!response.ok) return handleError();
             return response.text(); // The response from server(in texts)
         })
         .then(data => {
             // The data from the server
             console.log(`The final response from server: ${data}`);
-            setBar(100);
+            localStorage.setItem("uploadedFileId", id);
+            setBar(101);
         })
         .catch(error => {
             // Display errors when failed to get response from the server
-            console.error('Fetch error:', error);
+            handleError('Fetch error:', error);
         });
 
     
@@ -103,7 +117,7 @@ async function uploadChunk(formData,progress) {
         console.log(`Client Response: The file ${progress} sent to server!`);
         console.log('Server response:', result); // Log the response from the server
     } catch (error) {
-        console.error('Error uploading chunk:', error);
+        handleError('Error uploading file chunk:', error);
     }
 }
 
@@ -111,10 +125,13 @@ async function uploadChunk(formData,progress) {
 document.getElementById('uploadButtonChunk').addEventListener('click', function(event) {
         // Check if a file was uploaded
     if (isFileUploaded()) {
+        setBar(0);
+        event.target.disabled = true;
+        event.target.innerHTML = 'Uploading File...';
         uploadChunks();
     } else {
         // Do some other actions or show an error message
-        console.log('No file was chosen!.');
+        handleError('No file was chosen!.');
     }
 
 });

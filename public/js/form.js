@@ -1,6 +1,6 @@
 document.getElementById('fileInput').addEventListener('change', function() {
-    var fileName = this.files[0].name;
-    document.getElementById('fileName').innerHTML = `<p>Selected file:</p>`+`<p style="font-weight: 500 !important;">${fileName}</p>`;
+    document.getElementById('fileName').innerHTML = this.files?.length == 1 ? selectedFileHTML(this.files[0].name) : '';
+    document.getElementById('uploadButtonChunk').disabled = this.files?.length < 1;
 });
 
 const dropArea = document.getElementById('dropArea');
@@ -16,6 +16,10 @@ function handleDragOver(event) {
     dropArea.style.backgroundColor = '#f0f0f0';
 }
 
+function selectedFileHTML(fileName) {
+    return `<p>Selected file:</p>` + `<p style="font-weight: 500 !important;">${fileName}</p>`
+}
+
 function handleDragLeave(event) {
     event.preventDefault();
     dropArea.style.backgroundColor = '';
@@ -25,13 +29,13 @@ function handleDrop(event) {
     event.preventDefault();
     dropArea.style.backgroundColor = '';
     const files = event.dataTransfer.files;
-    if (files.length > 0) {
-        const fileName = files[0].name;
-        document.getElementById('fileName').innerHTML = `<p>Selected file:</p>` + `<p style="font-weight: 500 !important;">${fileName}</p>`;
+    document.getElementById('fileName').innerHTML = files?.length == 1 ? selectedFileHTML(files[0].name) : '';
+    document.getElementById('uploadButtonChunk').disabled = files?.length < 1;
+    if (files.length == 1) {
         fileInput.files = files; // Set files for the input element
         
         handleFileSelect({ target: { files: files } }); // Call handleFileSelect function with the files
-    }
+    } else if (fileInput.files) delete fileInput.files;
 }
 
 function setBar(percent) {
@@ -40,9 +44,10 @@ function setBar(percent) {
 
     progressBar.style.display = 'block';
 
-    if (percent === 100) {
+    if (percent === 101) {
         progressBar.classList.remove('progressBarClass');
-        progressBar.innerHTML = `<p> Upload complete! </p>`;
+        progressBar.innerHTML = `<p> Upload complete! Refreshing the page... </p>`;
+        window.location.reload();
         return;
     }
 
