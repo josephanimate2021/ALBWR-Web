@@ -19,10 +19,8 @@
 
 ## Introduction
 
-You may have seen videos of people playing The Legend Of Zelda A Link Between Worlds Randomizer on youtube and said to yourself: 
-```
-I want to play the randomizer for myself to see what the hype is about
-```
+You may have seen videos of people playing The Legend Of Zelda A Link Between Worlds Randomizer on youtube and said to yourself:<br>
+`I want to play the randomizer for myself to see what the hype is about.`
 And this is where this source code, including the actual albw randomizer source codes come in. You may use all to your advantage to randomize your legally dumped North America Rom file of A Link Between Worlds. Read below for more instructions.
 
 
@@ -72,7 +70,7 @@ To use this application, follow these steps:
 2. Open your web browser and navigate to `http://localhost/`.
 3. Select a rom file to upload using the provided input field.
 4. Click the "Upload" button to initiate the rom file upload process.
-5. The server will receive the file chunks and combine them into a single file inside the `romUploads` folder.
+5. The server will receive the file chunks and combine them into a single file inside the `uploads` folder.
 6. Once the file is uploaded, you will be shown a list of options you can change to randomize your game.
 7. Once all of the options are selected, you may click on the "Randomize Game" button. From there, the server will know that your game is ready to be randomized and will trigger either one of the randomizer codes to randomize your game.
 8. Once your game is randomized, you will get a download link of the randomized game where you can use the files to play the randomized copy of your game. You may refer [here](https://github.com/rickfay/z17-randomizer/tree/master?tab=readme-ov-file#installing-seeds) if you need help installing your randomized game seed.
