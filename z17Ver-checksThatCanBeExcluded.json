@@ -1,0 +1,220 @@
+{
+    "Dungeons": {
+        "Dark Palace": {
+            "[PD] (1F) Right Pit": {},
+            "[PD] (1F) Left Pit": {},
+            "[PD] (1F) Switch Puzzle": {},
+            "[PD] (1F) Hidden Room (Upper)": {},
+            "[PD] (1F) Hidden Room (Lower)": {},
+            "[PD] (B1) Fall From 1F": {},
+            "[PD] (B1) Maze": {},
+            "[PD] (B1) Helmasaur Room": {},
+            "[PD] (B1) Helmasaur Room (Fall)": {},
+            "[PD] (2F) Big Chest (Hidden)": {},
+            "[PD] (2F) Alcove": {},
+            "[PD] (1F) Fall From 2F": {},
+            "[PD] (2F) South Hidden Room": {},
+            "[PD] (B1) Big Chest (Switches)": {},
+            "[PD] Gemesaur King": {},
+            "Dark Palace Prize": {}
+        },
+        "Desert Palace": {
+            "[DP] (1F) Entrance": {},
+
+            "[DP] (1F) Sand Room (South)": {},
+            "[DP] (1F) Sand Switch Room": {},
+            "[DP] (1F) Sand Room (North)": {},
+            "[DP] (1F) Behind Rocks": {},
+            "[DP] (1F) Big Chest (Behind Wall)": {},
+
+            "[DP] (2F) Under Rock (Left)": {},
+            "[DP] (2F) Beamos Room": {},
+            "[DP] (2F) Under Rock (Right)": {},
+            "[DP] (2F) Under Rock (Ball Room)": {},
+            "[DP] (2F) Big Chest (Puzzle)": {},
+            "[DP] (2F) Red/Blue Switches": {},
+
+            "[DP] (2F) Leever Room": {},
+
+            "[DP] (3F) Behind Falling Sand": {},
+            "[DP] (3F) Armos Room": {},
+
+            "Zaganaga": {},
+            "Desert Palace Prize": {}
+        },
+        "Eastern Palace": {
+            "[EP] (1F) Merge Chest": {},
+            "[EP] (1F) Left Door Chest": {},
+            "[EP] (1F) Popo Room": {},
+            "[EP] (1F) Secret Room": {},
+            "[EP] (1F) Switch Room": {},
+            "[EP] (2F) Ball Room": {},
+            "[EP] (2F) Defeat Popos": {},
+            "[EP] (2F) Switch Room": {},
+            "[EP] (2F) Big Chest": {},
+            "[EP] Yuga (1)": {},
+            "[EP] Yuga (2)": {},
+            "[EP] (3F) Escape Chest": {},
+            "[EP] (1F) Escape Chest": {},
+            "Eastern Palace Prize": {
+                "comment": "@Event(FieldLight/FieldLight_1B_Sahasrahla[0x17])"
+            }
+        },
+        "Graveyard": {
+            "Dampe": {},
+            "Graveyard Ledge Cave": {},
+            "Sanctuary Pegs": {},
+            "[HS] Entrance": {},
+            "[HS] Ledge": {},
+            "[HS] Lower Chest": {},
+            "[HS] Upper Chest": {},
+            "[Mai] Hyrule Graveyard Wall": {},
+            "[Mai] Sanctuary Wall": {},
+
+            "Graveyard Peninsula": {},
+            "Philosopher's Cave": {},
+            "[LS] Entrance Chest": {},
+            "[LS] Ledge": {},
+            "[LS] Lower Chest": {},
+            "[LS] Upper Chest": {},
+            "[Mai] Lorule Graveyard Big Rock": {},
+            "[Mai] Lorule Graveyard Tree": {},
+            "[Mai] Lorule Graveyard Wall": {}
+        },
+        "House of Gales": {
+            "[HG] (1F) Torches": {},
+            "[HG] (1F) Switch Room": {},
+            "[HG] (1F) Fire Bubbles": {},
+            "[HG] (1F) West Room": {},
+            "[HG] (1F) West Room Secret": {},
+            "[HG] (2F) Big Chest": {},
+            "[HG] (2F) Narrow Ledge": {},
+            "[HG] (2F) Fire Ring": {},
+            "[HG] (3F) Rat Room": {},
+            "[HG] (3F) Fire Bubbles": {},
+            "[HG] Margomill": {},
+            "House of Gales Prize": {}
+        },
+        "Hyrule Castle": {
+            "Hyrule Castle West Wing": {},
+            "Hyrule Castle Battlement": {},
+            "Hyrule Castle Prize": {}
+        },
+        "Ice Ruins": {
+            "[IR] (1F) Hidden Chest": {},
+            "[IR] (B3) Grate Chest (Left)": {},
+            "[IR] (B3) Grate Chest (Right)": {},
+            "[IR] (B4) Ice Pillar": {},
+            "[IR] (B5) Big Chest": {},
+            "[IR] (B1) East Chest": {},
+            "[IR] (B1) Narrow Ledge": {},
+            "[IR] (B1) Upper Chest": {},
+            "[IR] (B3) Big Chest (Puzzle)": {},
+            "[IR] (B4) Switches": {},
+            "[IR] (B4) Southwest Chest (Fall)": {},
+            "[IR] (B4) Narrow Platform": {},
+            "[IR] (B2) Long Merge Chest": {},
+            "[IR] (B4) Southeast Chest (Fall)": {},
+            "[IR] Dharkstare": {},
+            "Ice Ruins Prize": {}
+        },
+        "Lorule Castle": {
+            "[LC] (1F) Ledge": {},
+            "[LC] (1F) Center": {
+                "comment": "Two actors representing one chest, idfk"
+            },
+            "[LC] (2F) Near Torches": {},
+            "[LC] (2F) Hidden Path": {},
+            "[LC] (2F) Ledge": {},
+            "[LC] (4F) Center": {},
+            "[LC] (4F) Hidden Path": {},
+            "[LC] (3F) Bomb Trial Center Chest": {},
+            "[LC] (3F) Big Bomb Flower Chest": {},
+            "[LC] (3F) Merge Trial Free Chest": {},
+            "[LC] (3F) Spike Ball Chest": {},
+            "[LC] (4F) Lamp Trial Chest": {},
+            "[LC] (4F) Lava Switch Chest": {},
+            "[LC] (4F) Eyeball Chest": {},
+            "Zelda": {}
+        },
+        "Skull Woods": {
+            "[SW] (B1) Gibdo Room (Lower)": {},
+            "[SW] (B1) South Chest": {},
+            "[SW] (B1) Gibdo Room (Hole)": {},
+            "[SW] (B1) Grate Room": {},
+            "[SW] (B2) Moving Platform Room": {},
+            "[SW] (B1) Big Chest (Upper)": {},
+            "Skull Woods Outdoor Chest": {},
+            "[SW] (B1) Big Chest (Eyes)": {},
+            "[SW] Knucklemaster": {},
+            "Skull Woods Prize": {}
+        },
+        "Swamp Palace": {
+            "[SP] (B1) Center": {},
+            "[SP] (B1) Raft Room (Left)": {},
+            "[SP] (B1) Raft Room (Right)": {},
+            "[SP] (B1) Raft Room (Pillar)": {},
+            "[SP] (B1) Gyorm": {},
+            "[SP] (B1) Waterfall Room": {},
+            "[SP] (B1) Big Chest (Secret)": {},
+
+            "[SP] (1F) Water Puzzle": {},
+            "[SP] (1F) East Room": {},
+            "[SP] (1F) West Room": {},
+            "[SP] (1F) Big Chest (Fire)": {},
+
+            "[SP] Arrghus": {},
+            "Swamp Palace Prize": {}
+        },
+        "Thieves' Hideout": {
+            "[T'H] (B1) Jail Cell": {},
+            "[T'H] (B1) Grate Chest": {},
+            "[T'H] (B2) Grate Chest (Fall)": {},
+            "[T'H] (B2) Switch Puzzle Room": {},
+            "[T'H] (B2) Jail Cell": {},
+            "[T'H] (B2) Eyegores": {},
+            "[T'H] (B1) Behind Wall": {},
+            "[T'H] (B1) Big Chest (Entrance)": {},
+            "[T'H] (B3) Underwater": {},
+            "[T'H] (B3) Big Chest (Hidden)": {},
+            "Stalblind": {},
+            "Thieves' Hideout Prize": {}
+        },
+        "Tower of Hera": {
+            "[TH] (1F) Outside": {},
+            "[TH] (1F) Center": {},
+            "[TH] (3F) Platform": {},
+            "[TH] (5F) Red/Blue Switches": {},
+            "[TH] (6F) Left Mole": {},
+            "[TH] (6F) Right Mole": {},
+            "[TH] (7F) Outside (Ledge)": {},
+            "[TH] (8F) Fairy Room": {},
+            "[TH] (11F) Big Chest": {},
+            "[TH] Moldorm": {},
+            "Tower of Hera Prize": {}
+        },
+        "Turtle Rock": {
+            "[TR] (1F) Center": {},
+            "[TR] (1F) Grate Chest": {},
+            "[TR] (1F) Portal Room NW": {},
+            "[TR] (1F) Northeast Ledge": {},
+            "[TR] (1F) Southeast Chest": {},
+            "[TR] (1F) Defeat Flamolas": {},
+            "Turtle Rock Left Balcony": {},
+
+            "[TR] (1F) Under Center": {},
+            "[TR] (B1) Under Center": {},
+
+            "[TR] (B1) Northeast Room": {},
+            "[TR] (B1) Platform": {},
+            "[TR] (B1) Grate Chest (Small)": {},
+            "[TR] (B1) Big Chest (Center)": {},
+            "[TR] (B1) Big Chest (Top)": {},
+
+            "[TR] Grinexx": {},
+            "Turtle Rock Prize": {}
+        }
+    },
+    "Hyrule": {},
+    "Lorule": {}
+}
