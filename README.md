@@ -66,7 +66,7 @@ To use this application, follow these steps (Please Install [Node.JS](https://no
    ```bash
    npm start
    ```
-y
+   
 2. Open your web browser and navigate to `http://localhost/`.
 3. Select a rom file to upload using the provided input field.
 4. Click the "Upload" button to initiate the rom file upload process.
