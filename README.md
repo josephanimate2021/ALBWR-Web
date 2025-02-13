@@ -1,6 +1,6 @@
 <div align="center">
   <h1>
-    The Legend Of Zelda A Link Between Worlds Randomizer 
+    The Legend Of Zelda: A Link Between Worlds Randomizer 
     <br>
     (Web Interface)
   </h1>
@@ -19,7 +19,7 @@
 
 ## Introduction
 
-You may have seen videos of people playing The Legend Of Zelda A Link Between Worlds Randomizer on youtube and said to yourself:<br>
+You may have seen videos of people playing The Legend Of Zelda: A Link Between Worlds Randomizer on youtube and said to yourself:<br>
 `I want to play the randomizer for myself to see what the hype is about.`
 And this is where this source code, including the actual albw randomizer source codes come in. You may use all to your advantage to randomize your legally dumped North America Rom file of A Link Between Worlds. Read below for more instructions.
 
@@ -40,7 +40,7 @@ The source code takes the info from the Web UI and hands it off to either the z1
 
 ## Installation
 
-To use this application, follow these steps:
+To use this application, follow these steps (Please Install [Node.JS](https://nodejs.org) and [Rust](https://www.rust-lang.org/) if you haven't already in order for this application to work for you):
 
 1. Clone the repository:
 
@@ -59,14 +59,14 @@ To use this application, follow these steps:
    npm install
 ```
 
-## Usage (YOU ONLY NEED TO DO STEPS 3 AND 4 ONCE)
+## Usage (YOU ONLY NEED TO DO STEPS 3, 4, 5, AND 6 ONCE BECAUSE AFTERWARDS THE APPLICATION WILL LOAD THE RANDOMIZER PAGE BY DEFAULT (Unless you delete the cookie that keeps track of the id of the uploaded file))
 
 1. Start the server:
 
    ```bash
    npm start
    ```
-
+y
 2. Open your web browser and navigate to `http://localhost/`.
 3. Select a rom file to upload using the provided input field.
 4. Click the "Upload" button to initiate the rom file upload process.
