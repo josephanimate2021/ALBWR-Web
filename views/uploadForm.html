@@ -31,10 +31,22 @@
                     <div id="progressBarInner"></div>
                 </div>
             </div>
-            <div id="step02" style="display: none;">
+            <form id="step02" style="display: none;" action="javascript:;">
+                <div id="presets" style="float: left; display: none;">
+                    <label for="presetsSelection">Setting Presets</label>
+                    <select id="presetsSelection" onchange="loadSettingPreset(this)"></select>
+                </div>
+                <div style="float: right;">
+                    <label for="version">Randomizer Version</label>
+                    <select id="version" onchange="loadSettings(this.value, appendSettings)" name="v">
+                        <option value="z17">z17</option>
+                        <option value="albw">albw</option>
+                    </select>
+                </div>
                 <h2>Randomizer Settings</h2>
                 <p>You have uploaded a North America Rom File for A Legend Of Zelda: A Link Between Worlds. Now you may ranomize away!</p>
-            </div>
+                <div id="randoSettings"></div>
+            </form>
         </div>
         <script src="/js/form.js"></script>
         <script src="/js/script.js"></script>

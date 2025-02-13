@@ -2,8 +2,9 @@ let fileChunks = [];
 let fileName = ''; // Variable to store the name of the original file
 const totalChunks = 100; // Variable to store the number of chunks
 
-if (localStorage.uploadedFileId) loadSettings('z17', () => {
+if (localStorage.uploadedFileId) loadSettings(document.getElementById('version').value, s => {
     document.getElementById('step02').style.display = 'block';
+    appendSettings(s);
 })
 else document.getElementById(`step01`).style.display = 'block';
 
@@ -24,6 +25,16 @@ function handleError(t = 'Upload failed! Please try again.', e) { // handles an 
 // loads randomizer settings
 function loadSettings(id, callback) {
     fetch(`/settings?v=${id}`).then(res => res.json()).then(callback);
+}
+// converts the JSON contents from settings to HTML
+function appendSettings(s) {
+    document.getElementById('presets').style.display = 'none';
+    document.getElementById('presetsSelection').innerHTML = '';
+    let html = '';
+    for (const d of s) {
+        document.getElementById('presetsSelection').insertAdjacentHTML('afterbegin', `<option value="${d.id}">${d.presetName}</option>`);
+    }
+    document.getElementById('presets').style.display = 'block';
 }
 
 // The file input event handler

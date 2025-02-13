@@ -34,16 +34,123 @@ app.get('/', (req, res) => {
 }).get('/settings', (req, res) => {
     const presets = [];
     for (const file of fs.readdirSync('./uploads').filter(i => i.startsWith(`settingsPreset-${req.query.v}-`) && i.endsWith(".json"))) {
-        presets.unshift(JSON.parse(fs.readFileSync(`./uploads/${file}`)));
+        const info = JSON.parse(fs.readFileSync(`./uploads/${file}`));
+        info.id = file.split("-")[2];
+        presets.unshift(info);
     }
     const presetsPath = `./${req.query.v}-randomizer/presets`;
+    const newLine = process.platform == "win32" ? "\r" : "" + "\n";
     switch (req.query.v) {
         case "albw": {
-            const toml = fs.readFileSync(`${presetsPath}/Standord.toml`).toString('utf-8');
-            console.log(toml);
+            const info = {
+                presetName: "Default ALBWR Template",
+                id: "albwDefaultTemplate",
+                notes: [],
+                settings: {}
+            };
+            let toml = fs.readFileSync(`${presetsPath}/Standard.toml`).toString('utf-8'), settingCat;
+            const wordOptions = {
+                captains_sword: ['Unchanged', 'Shuffled', 'Skip'],
+                borrowed_sword: ['Unchanged', 'Shuffled'],
+                lamp: ['Unchanged', 'Shuffled'],
+                first_bracelet: ['Unchanged', 'Shuffled', 'Skip'],
+                barrier: ['Unchanged', 'Start']
+            }
+            let p1 = toml.indexOf("## ");
+            while (p1 > -1) {
+                const [c, s] = toml.substring(p1).split(newLine);
+                const setting = s.split("\n")[1]
+                if (setting.startsWith("[") && setting.endsWith("]")) {
+                    settingCat = setting.split("[")[1].split("]")[0] 
+                    info.settings[settingCat] = {
+                        comment: c.substring(3)
+                    };
+                } else if (settingCat == "exclude") {
+                    Object.assign(info.settings[settingCat], {
+                        tip: c.substring(3),
+                        defaultValue: {},
+                        userCanAddNewLines: true,
+                        allOptions: JSON.parse(fs.readFileSync('./albwrVer-checksThatCanBeExcluded.json'))
+                    });
+                    const line = setting.split("# ")[1].split(newLine)[0]
+                    const key = line.split("[")[1].split("]")[0].split(".")[1];
+                    info.settings[settingCat].defaultValue[key] = {};
+                    const stuff = toml.substring(p1 + c.length);
+                    let p2 = stuff.indexOf("# ");
+                    while (p2 > -1) {
+                        const n = p2 + 2;
+                        const stuff2 = stuff.substring(n);
+                        if (!stuff2.startsWith("[") && !stuff2.endsWith("]")) {
+                            const unparsedArray = stuff2.split(' = ')[1].split('# ').join('');
+                            const words = unparsedArray.split('[' + newLine)[1].split(']')[0].split(',').map(word => word.trim().slice(0, -1).substring(1));
+                            words.splice(words.length - 1, 1)
+                            info.settings[settingCat].defaultValue[key][stuff2.split("'")[1].split("'")[0]] = words; 
+                            p2 = -1;
+                        } else p2 = stuff.indexOf("# ", n);
+                    }
+                } else if (setting.startsWith("# ") && setting.includes(" =") && settingCat) {
+                    const info2 = {
+                        comment: c.substring(3),
+                        defaultValue: setting.split(" = ")[1].split(newLine)[0]
+                    }
+                    const name = setting.split("# ")[1].split(" =")[0];
+                    if (wordOptions[name]) info2.allOptions = wordOptions[name];
+                    else info2.useBooleanOptions = true;
+                    info.settings[settingCat][name] = info2
+                }
+                toml = toml.split(c).join("");
+                p1 = toml.indexOf("## ", p1 + 3);
+            }
+            presets.unshift(info);
             break;
         } case "z17": {
-            presets.unshift(JSON.parse(fs.readFileSync(`./examples/settingsPreset-z17-defaultTemplate.json`)))
+            const info = {
+                presetName: "Default z17 ALBWR Template",
+                id: "z17DefaultTemplate"
+            };
+            let json = fs.readFileSync(`${presetsPath}/Example.json`).toString('utf-8');
+            const wordOptions = {
+                logic_mode: ["Normal", "Hard", "Glitched", "AdvGlitched", "Hell", "NoLogic"],
+                ped_requirement: ["Vanilla", "Charmed", "Standard"],
+                hyrule_castle_setting: ["EarlyLoruleCastle" , "Closed"],
+                lc_requirement: 7,
+                hint_ghost_price: 9999
+            }
+            const comments = [];
+            let commentCount = 1;
+            let pos = json.indexOf("// ");
+            while (pos > -1) {
+                const c = json.substring(pos).split(newLine)[0];
+                comments.push(c.substring(3));
+                json = json.split(c).join("")
+                pos = json.indexOf("// ", pos + 3);
+            }
+            info.notes = [comments[0]];
+            info.settings = JSON.parse(json);
+            for (const settingCat in info.settings) {
+                for (const settingName in info.settings[settingCat]) {
+                    const defaultValue = info.settings[settingCat][settingName];
+                    const info2 = {
+                        comment: comments[commentCount],
+                        defaultValue
+                    }
+                    switch (typeof info.settings[settingCat][settingName]) {
+                        case "boolean": {
+                            info2.useBooleanOptions = true;
+                            break;
+                        } 
+                        case "number": info2.allOptions = ["random"];
+                        default: {
+                            if (
+                                wordOptions[settingName]
+                            ) info2[typeof info.settings[settingCat][settingName] == "number" ? 'rangeNumOptionsTo' : 'allOptions'] = wordOptions[settingName]
+                        }
+                    }
+                    info.settings[settingCat][settingName] = info2;
+                    commentCount++
+                }
+            }
+            presets.unshift(info);
             break;
         }
     }
