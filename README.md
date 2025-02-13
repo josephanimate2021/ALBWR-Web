@@ -77,7 +77,7 @@ To use this application, follow these steps:
 
 ## Contributing
 
-Contributions are welcome! If you find any issues or have suggestions for improvement, please open an issue or submit a pull request.
+Contributions are welcome! If you find have suggestions for improvement, please submit a pull request.
 
 ## License
 
