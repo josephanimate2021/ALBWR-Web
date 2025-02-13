@@ -67,7 +67,7 @@ To use this application, follow these steps (Please Install [Node.JS](https://no
    npm start
    ```
    
-2. Open your web browser and navigate to `http://localhost/`.
+2. Open your web browser and navigate to `http://localhost:3000`.
 3. Select a rom file to upload using the provided input field.
 4. Click the "Upload" button to initiate the rom file upload process.
 5. The server will receive the file chunks and combine them into a single file inside the `uploads` folder.
