@@ -2,13 +2,15 @@ let fileChunks = [];
 let fileName = ''; // Variable to store the name of the original file
 const totalChunks = 100; // Variable to store the number of chunks
 
+// shows an element to the uuser depending on whatever or not the user uploaded the file.
 if (localStorage.uploadedFileId) loadSettings(document.getElementById('version').value, s => {
     document.getElementById('step02').style.display = 'block';
     appendSettings(s);
 })
 else document.getElementById(`step01`).style.display = 'block';
 
-function handleError(t = 'Upload failed! Please try again.', e) { // handles an error
+// handles an error
+function handleError(t = 'Upload failed! Please try again.', e) {
     const progressBar = document.getElementById('progressBar');
     const progressBarInner = document.getElementById('progressBarInner');
 
@@ -26,14 +28,140 @@ function handleError(t = 'Upload failed! Please try again.', e) { // handles an 
 function loadSettings(id, callback) {
     fetch(`/settings?v=${id}`).then(res => res.json()).then(callback);
 }
+
+// creates one uppercase letter in the beginning of the text
+function captializeBegLetterInWord(word) {
+    return word.charAt(0).toUpperCase() + word.substring(1);
+}
+
+// converts a string to a boolean
+const stringToBoolean = (stringValue) => {
+    if (typeof stringValue == "boolean") return stringValue;
+    else switch(stringValue?.toLowerCase()?.trim()) {
+        case "true": 
+        case "yes": 
+        case "1": 
+          return true;
+
+        case "false": 
+        case "no": 
+        case "0": 
+        case null: 
+        case undefined:
+          return false;
+
+        default: 
+          return JSON.parse(stringValue);
+    }
+}
+
+// Appends the options to a select element without the use of an array
+function appendOptionsWithoutArray(object, prevSetting) {
+    let option = '';
+    for (const setting in object) {
+        if (typeof object[setting] == "object") {
+            if (Array.isArray(object[setting])) option += object[setting].map(v => `<option value="${prevSetting}[${setting}][${v}]">${setting} ${v}</option>`).join('')
+            else if (!object[setting].comment && !object[setting].isChoice) option += `<optgroup label="${setting}">${appendOptionsWithoutArray(object[setting], setting)}</optgroup>`
+            else option += `<option value="${setting}"${object[setting].comment ? ` title="${object[setting].comment}"` : ''}>${setting}</option>`;
+        }
+    }
+    return option;
+}
+
+// loads randomizer settings based off of a user's selected preset.
+function randomizerSettings(d) {
+    document.getElementById('randoSettings').innerHTML = '';
+    const booleans = [true, false];
+    for (const setting in d.settings) {
+        let html = '';
+        switch (setting) {
+            case "exclude": {
+                html += `<h3>${setting.split("_").map(captializeBegLetterInWord).join(" ")}</h3>`;
+                appendRandoSettings(setting, d.settings, true);
+                break;
+            } default: {
+                html += `<h3>${captializeBegLetterInWord(setting)}</h3>${d.settings[setting].comment ? `<p>${d.settings[setting].comment}</p>` : ''}<hr>`;
+                for (const setting2 in d.settings[setting]) if (setting2 != "comment") appendRandoSettings(setting2, d.settings[setting]);
+                break;
+            }
+        }
+        function appendRandoSettings(setting2, json, noSetting2 = false) {
+            const info = json[setting2];
+            if (setting2 != setting) html += `<h4>${setting2.split("_").map(captializeBegLetterInWord).join(" ")}</h4>`;
+            if (info.comment) html += `<p>${info.comment}</p>`;
+            function createSelectBox(n, elemId) {
+                let select = ''
+                select += `<select${info.rangeNumOptionsTo ? ` onchange="check4RandomNumber(this)"` : ''} name="settings[${setting}]${
+                    !noSetting2 ? `[${setting2}]` : ''
+                }${
+                    n && typeof n == "number" ? `[${n - 1}]` : ''
+                }"${elemId && n ? ` id="${elemId}.${n - 1}"` : ''}>`;
+                if (info.useBooleanOptions) select += booleans.map(boolean => `<option value="${boolean}"${
+                    boolean == stringToBoolean(info.defaultValue) ? ' selected' : ''
+                }>${boolean}</option>`).join("");
+                else if (info.rangeNumOptionsTo) {
+                    for (var i = 0; i <= info.rangeNumOptionsTo; i++) select += `<option value="${i}"${
+                        parseInt(info.defaultValue) == i ? ' selected' : ''
+                    }>${i}</option>`;
+                    select += `<option value="random">Random</option>`;
+                } else if (info.allOptions) {
+                    if (Array.isArray(info.allOptions)) select += info.allOptions.map(option => `<option value="${option}"${
+                        option == info.defaultValue ? ' selected' : ''
+                    }>${option}</option>`).join("");
+                    else select += appendOptionsWithoutArray(info.allOptions);
+                }
+                select += `</select><br>`;
+                return select;
+            }
+            if (!info.userCanAddNewLines) html += createSelectBox() + '<hr>';
+            else {
+                let n = 1;
+                const optionId = `myOptions.${setting}${!noSetting2 ? `.${setting2}` : ''}`;
+                html += `<div id="${optionId}"></div><hr>`
+                const newOptionBtn = document.createElement('button');
+                newOptionBtn.textContent = 'Add New Option';
+                newOptionBtn.style.float = "left";
+                newOptionBtn.addEventListener("click", function(e) {
+                    document.getElementById(optionId).insertAdjacentHTML('beforeend', createSelectBox(n++, optionId));
+                });
+                document.getElementById('randoSettings').appendChild(newOptionBtn);
+                const removeOptionBtn = document.createElement('button');
+                removeOptionBtn.textContent = 'Remove Option';
+                removeOptionBtn.style.float = "right";
+                removeOptionBtn.addEventListener("click", function() {
+                    const elem = document.getElementById(optionId + `.${(n--) - 2}`);
+                    const elem2 = elem.nextSibling;
+                    if (elem && elem2) {
+                        elem2.remove();
+                        elem.remove();
+                    }
+                });
+                document.getElementById('randoSettings').appendChild(removeOptionBtn);
+            }
+        }
+        document.getElementById('randoSettings').insertAdjacentHTML('beforeend', html)
+    }
+}
+
 // converts the JSON contents from settings to HTML
 function appendSettings(s) {
+    // Loads the presets
+    function listener(evt) {
+        randomizerSettings(s[evt.target.value])
+    }
     document.getElementById('presets').style.display = 'none';
     document.getElementById('presetsSelection').innerHTML = '';
-    let html = '';
-    for (const d of s) {
-        document.getElementById('presetsSelection').insertAdjacentHTML('afterbegin', `<option value="${d.id}">${d.presetName}</option>`);
+    document.getElementById('presetsSelection').removeEventListener("change", listener);
+    document.getElementById('presetsSelection').addEventListener("change", listener);
+    for (var i = 0; i < s.length; i++) {
+        document.getElementById('presetsSelection').insertAdjacentHTML('afterbegin', `<option value="${i}">${s[i].presetName}</option>`);
+        if (i == 0) listener({
+            target: {
+                value: i
+            }
+        });
     }
+    // shows user presets after they have been appended
     document.getElementById('presets').style.display = 'block';
 }
 
@@ -65,6 +193,7 @@ function isFileUploaded() {
     return fileInput.files.length == 1;
 }
 
+// Uploads the file chunks to the server
 async function uploadChunks() {
     console.log('Uploading chunks...');
 
@@ -118,6 +247,7 @@ async function uploadChunks() {
     
 }
 
+// Uploads a single file chunk to the server using the provided form data and progress of the file upload.
 async function uploadChunk(formData,progress) {
     try {
         const response = await fetch('/documents', {

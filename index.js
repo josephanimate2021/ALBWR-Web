@@ -89,9 +89,11 @@ app.get('/', (req, res) => {
                         } else p2 = stuff.indexOf("# ", n);
                     }
                 } else if (setting.startsWith("# ") && setting.includes(" =") && settingCat) {
+                    let val = setting.split(" = ")[1].split(newLine)[0]
+                    if (val.startsWith("'") && val.endsWith("'")) val = val.substring(1, val.length - 1);
                     const info2 = {
                         comment: c.substring(3),
-                        defaultValue: setting.split(" = ")[1].split(newLine)[0]
+                        defaultValue: val
                     }
                     const name = setting.split("# ")[1].split(" =")[0];
                     if (wordOptions[name]) info2.allOptions = wordOptions[name];
@@ -133,6 +135,10 @@ app.get('/', (req, res) => {
                     const info2 = {
                         comment: comments[commentCount],
                         defaultValue
+                    }
+                    if (settingName == "exclusions") {
+                        info2.userCanAddNewLines = true;
+                        info2.allOptions = JSON.parse(fs.readFileSync('./z17Ver-checksThatCanBeExcluded.json'));
                     }
                     switch (typeof info.settings[settingCat][settingName]) {
                         case "boolean": {

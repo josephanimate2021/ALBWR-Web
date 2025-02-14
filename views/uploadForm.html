@@ -33,8 +33,8 @@
             </div>
             <form id="step02" style="display: none;" action="javascript:;">
                 <div id="presets" style="float: left; display: none;">
-                    <label for="presetsSelection">Setting Presets</label>
-                    <select id="presetsSelection" onchange="loadSettingPreset(this)"></select>
+                    <label for="presetsSelection" title="Click me to create your own preset with your current settings" onclick="settingsPresetMaker()">Setting Presets</label>
+                    <select id="presetsSelection"></select>
                 </div>
                 <div style="float: right;">
                     <label for="version">Randomizer Version</label>
@@ -45,6 +45,7 @@
                 </div>
                 <h2>Randomizer Settings</h2>
                 <p>You have uploaded a North America Rom File for A Legend Of Zelda: A Link Between Worlds. Now you may ranomize away!</p>
+                <hr>
                 <div id="randoSettings"></div>
             </form>
         </div>
