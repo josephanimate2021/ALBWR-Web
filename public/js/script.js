@@ -3,7 +3,7 @@ let exclusionOptions;
 let fileName = ''; // Variable to store the name of the original file
 const totalChunks = 100; // Variable to store the number of chunks
 
-// shows an element to the uuser depending on whatever or not the user uploaded the file.
+// shows an element to the user depending on whatever or not the user uploaded the file.
 if (localStorage.uploadedFileId) loadSettings(document.getElementById('version').value, s => {
     const elem = document.getElementById('step02');
     elem.addEventListener("submit", randomizeGame);
