@@ -3,6 +3,8 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
+const {exec} = require("child_process");
+let ramdomizerCmds = '';
 
 const app = express();
 app.use((req, res, next) => {
@@ -144,9 +146,7 @@ app.get('/', (req, res) => {
                         case "boolean": {
                             info2.useBooleanOptions = true;
                             break;
-                        } 
-                        case "number": info2.allOptions = ["random"];
-                        default: {
+                        } default: {
                             if (
                                 wordOptions[settingName]
                             ) info2[typeof info.settings[settingCat][settingName] == "number" ? 'rangeNumOptionsTo' : 'allOptions'] = wordOptions[settingName]
@@ -160,7 +160,19 @@ app.get('/', (req, res) => {
             break;
         }
     }
-    res.json(presets.reverse());
+    res.json(presets);
+}).post('/randomize', (req, res) => {
+    const presetsPath = `./${req.query.v}-randomizer/presets`;
+    switch (req.query.v) {
+        case "albw": {
+            break;
+        } case "z17": {
+            const id = (Math.random()).toString().substring(2);
+            fs.writeFileSync(`${presetsPath}/${id}.json`, JSON.stringify(req.query.settings, null, "\t"))
+        }
+    }
+}).get('/randomizationStatus', (req, res) => {
+    res.send(ramdomizerCmds);
 })
 
 

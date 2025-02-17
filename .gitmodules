@@ -1,6 +1,0 @@
-[submodule "z17-randomizer"]
-	path = z17-randomizer
-	url = https://github.com/rickfay/z17-randomizer.git
-[submodule "albw-randomizer"]
-	path = albw-randomizer
-	url = https://gitlab.com/marsolk/albw-randomizer.git

@@ -7,7 +7,7 @@ body {
     justify-content: center;
     align-items: center;
 }
-.container {
+div.container {
     padding: 20px;
     background-color: #fff;
     border-radius: 8px;
@@ -34,7 +34,7 @@ label {
 label:hover {
     background-color: #0056b3;
 }
-#uploadButtonChunk {
+button.styledButton {
     background-color: #28a745;
     color: #fff;
     padding: 10px 20px;
@@ -43,7 +43,7 @@ label:hover {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-#uploadButtonChunk:hover {
+button.styledButton:hover {
     background-color: #218838;
 }
 #fileName {
@@ -51,7 +51,7 @@ label:hover {
     font-size: 14px;
     color: #888;
 }
-.progressBarClass {
+div.progressBarClass {
     width: 100%;
     height: 10px;
     background-color: #ddd;

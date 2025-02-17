@@ -1,13 +1,31 @@
 let fileChunks = [];
+let exclusionOptions;
 let fileName = ''; // Variable to store the name of the original file
 const totalChunks = 100; // Variable to store the number of chunks
 
 // shows an element to the uuser depending on whatever or not the user uploaded the file.
 if (localStorage.uploadedFileId) loadSettings(document.getElementById('version').value, s => {
-    document.getElementById('step02').style.display = 'block';
+    const elem = document.getElementById('step02');
+    elem.addEventListener("submit", randomizeGame);
+    elem.style.display = 'block';
     appendSettings(s);
 })
 else document.getElementById(`step01`).style.display = 'block';
+
+// Randomizes ALBW
+function randomizeGame(evt) {
+    evt.submitter.textContent = "Randomizing Game...";
+    evt.submitter.setAttribute("disabled", "");
+    const formData = new FormData(evt.currentTarget);
+    const params = new URLSearchParams();
+    
+    for (const [key, value] of formData.entries()) params.append(key, value);
+    fetch(`/randomize?${params.toString()}`, {
+        method: "POST"
+    }).then(res => res.json()).then(d => {
+
+    })
+}
 
 // handles an error
 function handleError(t = 'Upload failed! Please try again.', e) {
@@ -19,7 +37,7 @@ function handleError(t = 'Upload failed! Please try again.', e) {
     progressBar.innerHTML = `<p> ${t} ${e ? e.toString() : ''} </p>`;
     progressBarInner.style.width = `0%`;
 
-    document.getElementById('uploadButtonChunk').disabled = false;
+    document.getElementById('uploadButtonChunk').removeAttribute("disabled")
     document.getElementById('uploadButtonChunk').innerHTMML = 'Upload';
     console.error(t, e)
 }
@@ -56,16 +74,61 @@ const stringToBoolean = (stringValue) => {
 }
 
 // Appends the options to a select element without the use of an array
-function appendOptionsWithoutArray(object, prevSetting) {
+function appendOptionsWithoutArray(object, prevSetting = '', val) {
+    console.log(val)
     let option = '';
     for (const setting in object) {
         if (typeof object[setting] == "object") {
-            if (Array.isArray(object[setting])) option += object[setting].map(v => `<option value="${prevSetting}[${setting}][${v}]">${setting} ${v}</option>`).join('')
-            else if (!object[setting].comment && !object[setting].isChoice) option += `<optgroup label="${setting}">${appendOptionsWithoutArray(object[setting], setting)}</optgroup>`
-            else option += `<option value="${setting}"${object[setting].comment ? ` title="${object[setting].comment}"` : ''}>${setting}</option>`;
+            if (Array.isArray(object[setting])) option += object[setting].map(v => `<option value="${prevSetting}${setting}->${v}"${
+                v == val ? ' selected' : ''
+            }>${setting} ${v}</option>`).join('')
+            else if (!object[setting].comment && !object[setting].isChoice) option += `<optgroup label="${setting}">${appendOptionsWithoutArray(object[setting], (prevSetting ? (prevSetting + '@' + setting) : setting) + '@', val)}</optgroup>`
+            else option += `<option value="${setting}"${object[setting].comment ? ` title="${object[setting].comment}"` : ''}${
+                setting == val ? ` selected` : ''
+            }>${setting}</option>`;
         }
     }
     return option;
+}
+
+// generates a random number for a select box based off of it's id or name
+function genRandomNumber(type, attrVal, max) {
+    const num = Math.floor(Math.random() * (Number(max) + 1));
+    switch (type) {
+        case "id": {
+            document.getElementById(attrVal).value = num;
+            break;
+        } case "name": {
+            for (const tag of document.getElementsByTagName('input')) if (tag.name == attrVal) tag.value = num
+            break;
+        }
+    }
+}
+
+// digs thorugh some JSON code to find the user's request info from a value
+function findJsonInfoFrom(json, val, isAttr = false) {
+    if (json[val]) return json[val]
+    else {
+        let info;
+        for (const key in json) {
+            if (isAttr) {
+                if (json[key].hasOwnProperty(val)) info = json[key][val];
+                else if (key == val) info = json[key];
+            } else if (json[key] == val) info = json[key];
+            else info = findJsonInfoFrom(json[key], val, isAttr)
+        }
+        return info
+    }
+}
+
+// checks the select element to ensure that options the user added are not overlapping with each other to prevent breaking the randomizer
+function check4SameExcludeOptions(o) {
+    const dom = [];
+    for (const tag of document.getElementsByTagName('select')) {
+        if (!tag.name.startsWith("settings[exclu")) continue;
+        dom.push(tag);
+    }
+    console.log(dom)
 }
 
 // loads randomizer settings based off of a user's selected preset.
@@ -89,44 +152,73 @@ function randomizerSettings(d) {
             const info = json[setting2];
             if (setting2 != setting) html += `<h4>${setting2.split("_").map(captializeBegLetterInWord).join(" ")}</h4>`;
             if (info.comment) html += `<p>${info.comment}</p>`;
-            function createSelectBox(n, elemId) {
+            function createSelectBox(n, elemId, val) {
                 let select = ''
-                select += `<select${info.rangeNumOptionsTo ? ` onchange="check4RandomNumber(this)"` : ''} name="settings[${setting}]${
-                    !noSetting2 ? `[${setting2}]` : ''
-                }${
-                    n && typeof n == "number" ? `[${n - 1}]` : ''
-                }"${elemId && n ? ` id="${elemId}.${n - 1}"` : ''}>`;
-                if (info.useBooleanOptions) select += booleans.map(boolean => `<option value="${boolean}"${
-                    boolean == stringToBoolean(info.defaultValue) ? ' selected' : ''
-                }>${boolean}</option>`).join("");
-                else if (info.rangeNumOptionsTo) {
-                    for (var i = 0; i <= info.rangeNumOptionsTo; i++) select += `<option value="${i}"${
-                        parseInt(info.defaultValue) == i ? ' selected' : ''
-                    }>${i}</option>`;
-                    select += `<option value="random">Random</option>`;
-                } else if (info.allOptions) {
-                    if (Array.isArray(info.allOptions)) select += info.allOptions.map(option => `<option value="${option}"${
-                        option == info.defaultValue ? ' selected' : ''
-                    }>${option}</option>`).join("");
-                    else select += appendOptionsWithoutArray(info.allOptions);
+                const name = `settings[${setting}]${!noSetting2 ? `[${setting2}]` : ''}${n && typeof n == "number" ? `[${n - 1}]` : ''}`;
+                if (info.rangeNumOptionsTo) select += `<input type="button" value="Generate Random Number" onclick="genRandomNumber('${
+                    elemId ? 'id' : 'name'
+                }', '${elemId ? `${elemId}.${n - 1}` : name}', '${info.rangeNumOptionsTo}')"/><input type="number" name="${name}" min="0" value="${info.defaultValue}" max="${info.rangeNumOptionsTo}"/>`;
+                else {
+                    select += `<select${setting2 == "exclude" || setting2 == "exclusions" ? ' onchange="excludeOptionSelected(this)"' : ''} name="settings[${setting}]${
+                        !noSetting2 ? `[${setting2}]` : ''
+                    }${
+                        n && typeof n == "number" ? `[${n - 1}]` : ''
+                    }"${elemId && n ? ` id="${elemId}.${n - 1}"` : ''}>`;
+                    if (info.useBooleanOptions) select += booleans.map(boolean => `<option value="${boolean}"${
+                        boolean == stringToBoolean(info.defaultValue) ? ' selected' : ''
+                    }>${boolean}</option>`).join("");
+                    else if (info.allOptions) {
+                        if (Array.isArray(info.allOptions)) select += info.allOptions.map(option => `<option value="${option}"${
+                            option == info.defaultValue ? ' selected' : ''
+                        }>${option}</option>`).join("");
+                        else select += appendOptionsWithoutArray(info.allOptions, '', val);
+                    }
+                    select += `</select>`;
                 }
-                select += `</select><br>`;
+                select += '<br>';
                 return select;
             }
             if (!info.userCanAddNewLines) html += createSelectBox() + '<hr>';
             else {
                 let n = 1;
                 const optionId = `myOptions.${setting}${!noSetting2 ? `.${setting2}` : ''}`;
-                html += `<div id="${optionId}"></div><hr>`
-                const newOptionBtn = document.createElement('button');
-                newOptionBtn.textContent = 'Add New Option';
+                html += `<div id="${optionId}">${
+                    (() => {
+                        let html = '';
+                        if (info.defaultValue) {
+                            function append(j) {
+                                for (var I = 0; I < j.length; I++) html += createSelectBox(I + 1, optionId, j[I]);
+                            }
+                            switch (typeof info.defaultValue) {
+                                case "object": {
+                                    if (Array.isArray(info.defaultValue)) append(info.defaultValue);
+                                    else {
+                                        function c(k) {
+                                            for (const i in k) {
+                                                if (Array.isArray(k[i])) append(k[i])
+                                                else c(k[i]);
+                                            }
+                                        }
+                                        c(info.defaultValue);
+                                    }
+                                }
+                            }
+                        }
+                        return html;
+                    })()
+                }</div><hr>`
+                const newOptionBtn = document.createElement('input');
+                newOptionBtn.type = "button";
+                newOptionBtn.value = 'Add New Option';
                 newOptionBtn.style.float = "left";
                 newOptionBtn.addEventListener("click", function(e) {
                     document.getElementById(optionId).insertAdjacentHTML('beforeend', createSelectBox(n++, optionId));
+                    check4SameExcludeOptions(info.allOptions);
                 });
                 document.getElementById('randoSettings').appendChild(newOptionBtn);
-                const removeOptionBtn = document.createElement('button');
-                removeOptionBtn.textContent = 'Remove Option';
+                const removeOptionBtn = document.createElement('input');
+                removeOptionBtn.type = "button";
+                removeOptionBtn.value = 'Remove Option';
                 removeOptionBtn.style.float = "right";
                 removeOptionBtn.addEventListener("click", function() {
                     const elem = document.getElementById(optionId + `.${(n--) - 2}`);
@@ -267,7 +359,7 @@ document.getElementById('uploadButtonChunk').addEventListener('click', function(
         // Check if a file was uploaded
     if (isFileUploaded()) {
         setBar(0);
-        event.target.disabled = true;
+        event.target.setAttribute("disabled", "");
         event.target.innerHTML = 'Uploading File...';
         uploadChunks();
     } else {
