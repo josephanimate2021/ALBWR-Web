@@ -3,8 +3,9 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
-const {exec} = require("child_process");
-let ramdomizerCmds = '';
+const {spawn} = require("child_process");
+const JSZip = require("jszip");
+let scriptOutput = '', okay2spitscript = false, userIsRandomizingGame = false;
 
 const app = express();
 app.use((req, res, next) => {
@@ -34,23 +35,23 @@ app.use(express.static(publicDirectoryPath, {
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'uploadForm.html'));
 }).get('/settings', (req, res) => {
+    const info = {};
     const presets = [];
     for (const file of fs.readdirSync('./uploads').filter(i => i.startsWith(`settingsPreset-${req.query.v}-`) && i.endsWith(".json"))) {
         const info = JSON.parse(fs.readFileSync(`./uploads/${file}`));
         info.id = file.split("-")[2];
         presets.unshift(info);
     }
-    const presetsPath = `./${req.query.v}-randomizer/presets`;
+    const randoPath = `./sourcecodes/stable/${req.query.v}-randomizer`;
     const newLine = process.platform == "win32" ? "\r" : "" + "\n";
     switch (req.query.v) {
         case "albw": {
-            const info = {
+            Object.assign(info, {
                 presetName: "Default ALBWR Template",
-                id: "albwDefaultTemplate",
                 notes: [],
                 settings: {}
-            };
-            let toml = fs.readFileSync(`${presetsPath}/Standard.toml`).toString('utf-8'), settingCat;
+            });
+            let toml = fs.readFileSync(`${randoPath}/source/presets/Standard.toml`).toString('utf-8'), settingCat;
             const wordOptions = {
                 captains_sword: ['Unchanged', 'Shuffled', 'Skip'],
                 borrowed_sword: ['Unchanged', 'Shuffled'],
@@ -72,7 +73,7 @@ app.get('/', (req, res) => {
                         tip: c.substring(3),
                         defaultValue: {},
                         userCanAddNewLines: true,
-                        allOptions: JSON.parse(fs.readFileSync('./albwrVer-checksThatCanBeExcluded.json'))
+                        allOptions: JSON.parse(fs.readFileSync('./albwrVer-excludableChecksList.json'))
                     });
                     const line = setting.split("# ")[1].split(newLine)[0]
                     const key = line.split("[")[1].split("]")[0].split(".")[1];
@@ -108,11 +109,8 @@ app.get('/', (req, res) => {
             presets.unshift(info);
             break;
         } case "z17": {
-            const info = {
-                presetName: "Default z17 ALBWR Template",
-                id: "z17DefaultTemplate"
-            };
-            let json = fs.readFileSync(`${presetsPath}/Example.json`).toString('utf-8');
+            info.presetName = "Default z17 ALBWR Template";
+            let json = fs.readFileSync(`${randoPath}/presets/Example.json`).toString('utf-8');
             const wordOptions = {
                 logic_mode: ["Normal", "Hard", "Glitched", "AdvGlitched", "Hell", "NoLogic"],
                 ped_requirement: ["Vanilla", "Charmed", "Standard"],
@@ -140,7 +138,7 @@ app.get('/', (req, res) => {
                     }
                     if (settingName == "exclusions") {
                         info2.userCanAddNewLines = true;
-                        info2.allOptions = JSON.parse(fs.readFileSync('./z17Ver-checksThatCanBeExcluded.json'));
+                        info2.allOptions = JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`));
                     }
                     switch (typeof info.settings[settingCat][settingName]) {
                         case "boolean": {
@@ -162,18 +160,140 @@ app.get('/', (req, res) => {
     }
     res.json(presets);
 }).post('/randomize', (req, res) => {
-    const presetsPath = `./${req.query.v}-randomizer/presets`;
+    if (userIsRandomizingGame) return res.json({
+        error: {
+            message: "Someone else is randomizing their game right now. Please wait for a few minutes."
+        }
+    })
+    userIsRandomizingGame = true;
+    scriptOutput = '';
+    okay2spitscript = false;
+    const randoPath = `./sourcecodes/stable/${req.query.v}-randomizer`;
+    function handleError(err, stderr) {
+        console.error(err, stderr)
+        res.status(500).json({
+            error: {
+                message: stderr || err != null ? err.toString() : "Unknown error",
+                data: err
+            }
+        });
+    }
     switch (req.query.v) {
         case "albw": {
             break;
         } case "z17": {
-            const id = (Math.random()).toString().substring(2);
-            fs.writeFileSync(`${presetsPath}/${id}.json`, JSON.stringify(req.query.settings, null, "\t"))
+            if (req.query.settings && typeof req.query.settings == "object") {
+                function string2boolean(s) {
+                    switch (s) {
+                        case "true": return true;
+                        case "false": return false;
+                        default: {
+                            if (isNaN(Number(s))) return s;
+                            return Number(s);
+                        }
+                    }
+                }
+                function c(j) {
+                    for (const i in j) {
+                        if (typeof j[i] == "object") c(j[i])
+                        else j[i] = string2boolean(j[i]);
+                    }
+                }
+                c(req.query.settings);
+                const presetFile = `${randoPath}/presets/${req.query.id}.json`;
+                if (req.query.id && !fs.existsSync(presetFile)) fs.writeFileSync(presetFile, JSON.stringify(req.query.settings, null, "\t"));
+            }
+            const config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
+            if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`)
+            try {
+                fs.copyFileSync(`./uploads/${req.query.fileId}.3ds`, `${randoPath}/${config.rom}`);
+
+                const liveOutput = spawn(`cd`, [randoPath, "&&", "albw-randomizer", "--preset", req.query.id], {
+                    shell: true
+                });
+
+                liveOutput.stdout.setEncoding('utf8');
+                liveOutput.stdout.on('data', function(data) {
+                    console.log('stdout: ' + data);
+                    
+                    scriptOutput+=data.toString();
+                    okay2spitscript = true
+                });
+
+                liveOutput.stderr.setEncoding('utf8');
+                liveOutput.stderr.on('data', function(data) {
+                    console.log('stderr: ' + data);
+                    
+                    scriptOutput+=data.toString();
+                    okay2spitscript = true
+                });
+
+                liveOutput.on('close', function(code) {
+                    console.log('closing code: ' + code);
+
+                    console.log('Full output of script: ',scriptOutput);
+                });
+
+                liveOutput.on('error', function(code) {
+                    console.log('error: ' + code);
+
+                    console.log('Full output of script: ',scriptOutput);
+                });
+
+                res.json({
+                    isRandomizing: true,
+                    data: req.query
+                })
+            } catch (e) {
+                handleError(e);
+            }
+            break;
         }
     }
 }).get('/randomizationStatus', (req, res) => {
-    res.send(ramdomizerCmds);
-})
+    const interval = setInterval(() => {
+        if (okay2spitscript) okay2spitscript = false, clearInterval(interval), res.send(scriptOutput);
+    }, 1)
+}).post('/genZipFromRandomizedGame', async (req, res) => {
+    try {
+        if (!userIsRandomizingGame) return res.json({
+            message: "Someone needs to randomize ALBW in order to generate a zip file."
+        })
+        const zip = new JSZip();
+        const fs = require('fs');
+        const randoPath = `./sourcecodes/stable/${req.query.v}-randomizer`;
+        switch (req.query.v) {
+            case "z17": {
+                const config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
+                const generatedRomFolder = `${randoPath}/${config.output}`;
+                function c(l, k) {
+                    for (const file of fs.readdirSync(l)) {
+                        const fileStats = fs.lstatSync(`${l}/${file}`);
+                        if (fileStats.isDirectory()) c(`${l}/${file}`, k.folder(file))
+                        else k.file(file, fs.readFileSync(`${l}/${file}`))
+                    }
+                }
+                c(generatedRomFolder, zip);
+                userIsRandomizingGame = false;
+                fs.rmSync(generatedRomFolder, {
+                    recursive: true, 
+                    force: true 
+                });
+                fs.unlinkSync(`${randoPath}/${config.rom}`);
+                const presetFile = `${randoPath}/presets/${req.query.id}.json`;
+                if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
+                break;
+            }
+        }
+        res.end(await zip.generateAsync({type:"nodebuffer"}));
+    } catch (e) {
+        console.log(e);
+        res.json({
+            message: e.toString(),
+            data: e
+        });
+    }
+});
 
 
 // Multer storage configuration

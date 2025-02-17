@@ -13,17 +13,67 @@ if (localStorage.uploadedFileId) loadSettings(document.getElementById('version')
 else document.getElementById(`step01`).style.display = 'block';
 
 // Randomizes ALBW
-function randomizeGame(evt) {
+function randomizeGame(evt, deletePresetAfterRandomization = true) {
     evt.submitter.textContent = "Randomizing Game...";
     evt.submitter.setAttribute("disabled", "");
+    document.getElementById('randoSettings').style.display = 'none';
+    const output = document.getElementById('randoOutput');
+    output.style.display = 'block';
+    document.getElementById('presets').style.display = 'none';
+    document.getElementById('randoVer').style.display = 'none';
+    const term = new Terminal({convertEol: true});
+    term.open(output);
+    term.write('Running Randomizer...')
     const formData = new FormData(evt.currentTarget);
     const params = new URLSearchParams();
     
     for (const [key, value] of formData.entries()) params.append(key, value);
-    fetch(`/randomize?${params.toString()}`, {
+    fetch(`/randomize?${params.toString()}&id=${(Math.random()).toString().substring(2)}&fileId=${localStorage.uploadedFileId}`, {
         method: "POST"
     }).then(res => res.json()).then(d => {
-
+        if (d.isRandomizing) (async () => {
+            async function c() {
+                const res = await fetch(`/randomizationStatus`);
+                const status = await res.text();
+                const doneText = "Press Enter to continue...";
+                term.clear();
+                term.write(status.split(doneText).join(''));
+                if (!status.includes(doneText)) await c();
+                else {
+                    term.write('Retrieving Your Randomized Game...\r\n');
+                    const res = await fetch(`/genZipFromRandomizedGame?v=${d.data.v}&id=${d.data.id}&deletePreset=${deletePresetAfterRandomization}`, {
+                        method: "POST"
+                    });
+                    const blob = await res.blob();
+                    const back2randobtn = document.createElement('button');
+                    back2randobtn.textContent = "<- Back To The Randomizer";
+                    back2randobtn.addEventListener("click", () => {
+                        evt.submitter.textContent = "Randomize Game";
+                        evt.submitter.removeAttribute("disabled");
+                        output.innerHTML = '';
+                        output.style.display = 'none';
+                        document.getElementById('presets').style.display = 'block';
+                        document.getElementById('randoVer').style.display = 'block';
+                        document.getElementById('randoSettings').style.display = 'block';
+                        document.getElementById('randomizedGameDownload').remove();
+                    });
+                    back2randobtn.className = "styledButton";
+                    output.appendChild(back2randobtn);
+                    if (blob) {
+                        evt.submitter.textContent = "Game Randomization Successful";
+                        const buttonName = "Download Your Randomized Game"
+                        term.write(`Your randomized game was retrieved successfully! To download it, click on the "${buttonName}" button below.`);
+                        output.insertAdjacentHTML('afterend', `<a class="styledButton" id="randomizedGameDownload" href="${
+                            URL.createObjectURL(blob)
+                        }" download="albw-randomized.zip">${buttonName} -></a>`);
+                    } else {
+                        evt.submitter.textContent = "Game Randomization Failed";
+                        term.write(`Randomizer Error ${JSON.stringify(await res.json(), null, "\t")}`);
+                    }
+                }
+            }
+            await c();
+        })()
     })
 }
 
@@ -187,7 +237,7 @@ function randomizerSettings(d) {
                         let html = '';
                         if (info.defaultValue) {
                             function append(j) {
-                                for (var I = 0; I < j.length; I++) html += createSelectBox(I + 1, optionId, j[I]);
+                                for (var I = 0; I < j.length; I++) html += createSelectBox(n, optionId, j[I]), n++;
                             }
                             switch (typeof info.defaultValue) {
                                 case "object": {
@@ -221,11 +271,12 @@ function randomizerSettings(d) {
                 removeOptionBtn.value = 'Remove Option';
                 removeOptionBtn.style.float = "right";
                 removeOptionBtn.addEventListener("click", function() {
-                    const elem = document.getElementById(optionId + `.${(n--) - 2}`);
+                    const elem = document.getElementById(optionId + `.${n - 2}`);
                     const elem2 = elem.nextSibling;
                     if (elem && elem2) {
                         elem2.remove();
                         elem.remove();
+                        n--
                     }
                 });
                 document.getElementById('randoSettings').appendChild(removeOptionBtn);
@@ -233,6 +284,7 @@ function randomizerSettings(d) {
         }
         document.getElementById('randoSettings').insertAdjacentHTML('beforeend', html)
     }
+    document.getElementById('randoSettings').style.display = 'block';
 }
 
 // converts the JSON contents from settings to HTML

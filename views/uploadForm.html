@@ -5,6 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>The Legend Of Zelda: A Link Between Worlds Randomizer - Web UI</title>
         <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/5.5.0/xterm.css" integrity="sha512-AbNrj/oSHJaILgcdnkYm+DQ08SqVbZ8jlkJbFyyS1WDcAaXAcAfxJnCH69el7oVgTwVwyA5u5T+RdFyUykrV3Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/5.5.0/xterm.js" integrity="sha512-Gujw5GajF5is3nMoGv9X+tCMqePLL/60qvAv1LofUZTV9jK8ENbM9L+maGmOsNzuZaiuyc/fpph1KT9uR5w3CQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     </head>
     <body>
         <div class="container">
@@ -36,7 +38,7 @@
                     <label for="presetsSelection" title="Click me to create your own preset with your current settings" onclick="settingsPresetMaker()">Setting Presets</label>
                     <select id="presetsSelection"></select>
                 </div>
-                <div style="float: right;">
+                <div style="float: right;" id="randoVer">
                     <label for="version">Randomizer Version</label>
                     <select id="version" onchange="loadSettings(this.value, appendSettings)" name="v">
                         <option value="z17">z17</option>
@@ -46,8 +48,9 @@
                 <h2>Randomizer Settings</h2>
                 <p>You have uploaded a North America Rom File for A Legend Of Zelda: A Link Between Worlds. Now you may ranomize away!</p>
                 <hr>
-                <div id="randoSettings"></div>
+                <div id="randoSettings" style="display: none;"></div>
                 <button type="submit" class="styledButton" id="gameRandomizeBtn">Randomize Game</button>
+                <div id="randoOutput" style="text-align: left;"></div>
             </form>
         </div>
         <script src="/js/form.js"></script>
