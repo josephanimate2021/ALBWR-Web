@@ -2,3 +2,5 @@ package-lock.json
 node_modules
 temps
 uploads
+ALBW.3ds
+generated
