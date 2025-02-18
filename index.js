@@ -171,20 +171,28 @@ app.get('/', (req, res) => {
     scriptOutput = '';
     okay2spitscript = false;
     const randoPath = `./sourcecodes/stable/${req.query.v}-randomizer`;
-    function handleError(err, stderr) {
-        console.error(err, stderr)
-        res.status(500).json({
-            error: {
-                message: stderr || err != null ? err.toString() : "Unknown error",
-                data: err
-            }
-        });
+    function handleError(err) {
+        if (err) {
+            console.error(err)
+            res.status(500).json({
+                error: {
+                    message: err.toString(),
+                    data: err
+                }
+            });
+        }
     }
+    const presetFile = `${randoPath}/presets/${req.query.id}`;
     switch (req.query.v) {
         case "albw": {
-            file += '-dev -v';
+            file += '-a0.0.2 --verbose';
             if (!fs.existsSync(`${randoPath}/generated`)) fs.mkdirSync(`${randoPath}/generated`);
             fs.copyFile(`./uploads/${req.query.fileId}.3ds`, `${randoPath}/albw.3ds`, handleError);
+            if (req.query.settings && typeof req.query.settings == "object") {
+                let toml = '';
+                if (req.query.id && !fs.existsSync(`${presetFile}.toml`)) fs.writeFileSync(`${presetFile}.toml`, toml);
+                req.query.id = 'Standard'
+            }
             break;
         } case "z17": {
             if (req.query.settings && typeof req.query.settings == "object") {
@@ -205,8 +213,7 @@ app.get('/', (req, res) => {
                     }
                 }
                 c(req.query.settings);
-                const presetFile = `${randoPath}/presets/${req.query.id}.json`;
-                if (req.query.id && !fs.existsSync(presetFile)) fs.writeFileSync(presetFile, JSON.stringify(req.query.settings, null, "\t"));
+                if (req.query.id && !fs.existsSync(`${presetFile}.json`)) fs.writeFileSync(`${presetFile}.json`, JSON.stringify(req.query.settings, null, "\t"));
             }
             const config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
             if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
@@ -236,14 +243,16 @@ app.get('/', (req, res) => {
 
     liveOutput.on('close', function(code) {
         console.log('closing code: ' + code);
-
+        scriptOutput += "The command closed unexpectedly with code: " + code + "." + "Press Enter to continue...";
         console.log('Full output of script: ',scriptOutput);
+        okay2spitscript = true;
     });
 
     liveOutput.on('error', function(code) {
         console.log('error: ' + code);
-
+        scriptOutput += "The command errored out with: " + code + "." + "Press Enter to continue...";
         console.log('Full output of script: ',scriptOutput);
+        okay2spitscript = true;
     });
 
     res.json({
@@ -255,10 +264,13 @@ app.get('/', (req, res) => {
         if (okay2spitscript) okay2spitscript = false, clearInterval(interval), res.send(scriptOutput);
     }, 1)
 }).post('/genZipFromRandomizedGame', async (req, res) => {
+    function handleError(e) {
+        console.error(e);
+        res.end();
+    }
+    if (!userIsRandomizingGame) return handleError("Someone needs to randomize ALBW in order to generate a zip file.")
+    userIsRandomizingGame = false;
     try {
-        if (!userIsRandomizingGame) return res.json({
-            message: "Someone needs to randomize ALBW in order to generate a zip file."
-        })
         const zip = new JSZip();
         const fs = require('fs');
         const randoPath = `./sourcecodes/stable/${req.query.v}-randomizer`;
@@ -295,14 +307,9 @@ app.get('/', (req, res) => {
                 break;
             }
         }
-        userIsRandomizingGame = false;
         res.end(await zip.generateAsync({type:"nodebuffer"}));
     } catch (e) {
-        console.log(e);
-        res.json({
-            message: e.toString(),
-            data: e
-        });
+        handleError(e);
     }
 });
 

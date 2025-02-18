@@ -40,7 +40,7 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                 term.write(status.split(doneText).join(''));
                 if (!status.includes(doneText)) await c();
                 else {
-                    term.write('Retrieving Your Randomized Game...\r\n');
+                    term.write('\r\nRetrieving Your Randomized Game...\r\n');
                     const res = await fetch(`/genZipFromRandomizedGame?v=${d.data.v}&id=${d.data.id}&deletePreset=${deletePresetAfterRandomization}`, {
                         method: "POST"
                     });
@@ -68,7 +68,7 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                         }" download="albw-randomized.zip">${buttonName} -></a>`);
                     } else {
                         evt.submitter.textContent = "Game Randomization Failed";
-                        term.write(`Randomizer Error ${JSON.stringify(await res.json(), null, "\t")}`);
+                        term.write(`Could not get your randomized game due to an unknown error. Please try randomizing your game again.`);
                     }
                 }
             }
