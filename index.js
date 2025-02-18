@@ -208,7 +208,7 @@ app.get('/', (req, res) => {
             try {
                 fs.copyFileSync(`./uploads/${req.query.fileId}.3ds`, `${randoPath}/${config.rom}`);
 
-                const liveOutput = spawn(`cd`, [randoPath, "&&", "albw-randomizer", "--preset", req.query.id], {
+                const liveOutput = spawn(`cd`, [randoPath, "&& albw-randomizer --preset", req.query.id], {
                     shell: true
                 });
 
