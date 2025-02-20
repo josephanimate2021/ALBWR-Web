@@ -1,0 +1,13 @@
+{
+    "0.0.8": {
+        "versionName": "Z17R Alpha 0.0.8",
+        "desc": "Enable 'Night Mode' when starting a new file. This will last until visiting Lorule.\r\nReceive Bracelet from Bow Item Slot gift on start, unless shuffle_bracelet is set to true\r\nNuke Standard Mode and its misc options\r\nShady Guy Trigger activated from game start\r\nRavio's Sign trigger already activated from game start\r\nReturn Bombs to their Regular variety\r\nFix Hyrule Hotfoot placement logic\r\nAlways start with Y Button Enabled"
+    },
+    "0.0.9": {
+        "versionName": "Z17R Alpha 0.0.9",
+        "desc": "Implement auto-retry for seed generation\r\nGlitched Logic now guarantees 10 Maiamai are available for Nice Bombs\r\nFully remove golden bee option from logic\r\nNight Mode is now an experimental option that can be toggled\r\nPremium Milk actors added, can now show up in Shop or Merchant\r\nGreatly improve UX logging",
+        "removeOptions": [
+            "logic.require_golden_bee_for_sale"
+        ]
+    }
+}

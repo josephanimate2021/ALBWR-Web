@@ -28,7 +28,7 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
     const params = new URLSearchParams();
     
     for (const [key, value] of formData.entries()) params.append(key, value);
-    fetch(`/randomize?${params.toString()}&id=${(Math.random()).toString().substring(2)}&fileId=${localStorage.uploadedFileId}`, {
+    fetch(`/randomize/${(Math.random()).toString().substring(2)}/${localStorage.uploadedFileId}?${params.toString()}`, {
         method: "POST"
     }).then(res => res.json()).then(d => {
         if (d.isRandomizing) (async () => {
@@ -44,7 +44,6 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                     const res = await fetch(`/genZipFromRandomizedGame?v=${d.data.v}&id=${d.data.id}&deletePreset=${deletePresetAfterRandomization}`, {
                         method: "POST"
                     });
-                    const blob = await res.blob();
                     const back2randobtn = document.createElement('button');
                     back2randobtn.textContent = "<- Back To The Randomizer";
                     back2randobtn.addEventListener("click", () => {
@@ -59,16 +58,17 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                     });
                     back2randobtn.className = "styledButton";
                     output.appendChild(back2randobtn);
-                    if (blob) {
+                    if (res.ok) {
+                        const blob = await res.blob();
                         evt.submitter.textContent = "Game Randomization Successful";
                         const buttonName = "Download Your Randomized Game"
-                        term.write(`Your randomized game was retrieved successfully! To download it, click on the "${buttonName}" button below.`);
+                        term.write(`Your randomized game was retrieved successfully!\r\nTo download it, click on the "${buttonName}" button below.`);
                         output.insertAdjacentHTML('afterend', `<a class="styledButton" id="randomizedGameDownload" href="${
                             URL.createObjectURL(blob)
                         }" download="albw-randomized.zip">${buttonName} -></a>`);
                     } else {
                         evt.submitter.textContent = "Game Randomization Failed";
-                        term.write(`Could not get your randomized game due to an unknown error. Please try randomizing your game again.`);
+                        term.write(`Could not get your randomized game due to an error: ${await res.text()}. Please try randomizing your game again.`);
                     }
                 }
             }
@@ -92,9 +92,92 @@ function handleError(t = 'Upload failed! Please try again.', e) {
     console.error(t, e)
 }
 
+// when a version selector gets created, this function may sometimes be called.
+function versionsChecker(obj) {
+    const array = [];
+    for (const e of obj.children) {
+        e.removeAttribute('selected')
+        if (e.value != obj.value) continue;
+        e.setAttribute('selected', '')
+        for (var i = 0; i < presets.length; i++) {
+            const preset = presets[i];;
+            const infoPlaceholder = {
+                presetName: preset.presetName + ` Version ${e.value}`,
+                notes: [],
+                settings: {}
+            }
+            if (e.getAttribute('data-versionoptions')) {
+                array[i] = array[i] || infoPlaceholder
+                const info = JSON.parse(e.getAttribute('data-versionoptions'));
+                for (const settingCat in preset.settings) array[i].settings[settingCat] = array[i].settings[settingCat] || preset.settings[settingCat]
+                for (const settingCat in info) array[i].settings[settingCat] = info[settingCat]
+            } 
+            if (e.getAttribute('data-versionoptionstoremove')) {
+                array[i] = array[i] || infoPlaceholder;
+                const info = JSON.parse(e.getAttribute('data-versionoptionstoremove'));
+                for (const settingCat in preset.settings) {
+                    array[i].settings[settingCat] = array[i].settings[settingCat] || preset.settings[settingCat];
+                    for (const setting in array[i].settings[settingCat]) {
+                        if (setting == "comment") continue;
+                        const option = info.find(i => i == `${settingCat}.${setting}`);
+                        if (option && array[i].settings[settingCat][setting]) delete array[i].settings[settingCat][setting];
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    appendSettings(array.length == 0 ? presets : array);
+}
+
 // loads randomizer settings
 function loadSettings(id, callback) {
-    fetch(`/settings?v=${id}`).then(res => res.json()).then(callback);
+    const settings = document.getElementById('randoSettings');
+    settings.innerHTML = '';
+    let typeInTitle = '', type;
+    function versionsCreator(d, v, presetName) { // create a div element containing the versions selector
+        if (!document.getElementById('versionSelect')) {
+            const div = document.createElement('div');
+            const script = document.createElement('script');
+            script.textContent = `const presets = ${JSON.stringify(v)};`;
+            div.appendChild(script);
+            div.insertAdjacentHTML("beforeend", `<h3>${typeInTitle} Executable Version</h3>`);
+            div.insertAdjacentHTML("beforeend", `<p>The version that will be used to randomize your game with the ${type} randomizer.</p>`);
+            div.id = "versionSelect";
+            div.insertAdjacentHTML("beforeend", `<select name="execVersion" onchange="versionsChecker(this, '${presetName}')">${(() => {
+                let html = ''
+                for (const key in d) { // adds in the version options
+                    html += `<option value="${key}" title="${d[key].desc}${
+                        d[key].warn ? `\r\nWARNING: ${d[key].warn}` : ''
+                    }"${d[key].addOptions ? ` data-versionoptions='${JSON.stringify(d[key].addOptions)}'` : ''}${d[key].removeOptions ? ` data-versionoptionstoremove='${JSON.stringify(d[key].removeOptions)}'` : ''}>${d[key].versionName}</option>`;
+                }
+                return html;
+            })()}`);
+            div.insertAdjacentHTML("beforeend", `</select><hr>`);
+            settings.appendChild(div);
+        }
+        callback(v);
+    }
+    fetch(`/settings/${id}`).then(res => res.json()).then(d => {
+        let defaultPresetName
+        switch (id) { // loads executable versions for specific randomizer versions
+            case "z17-rando": {
+                if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Old)'; 
+                if (!type) type = 'z17'; 
+                if (!defaultPresetName) defaultPresetName = 'Default z17 ALBWR Standard Template';
+            } case "z17-local": {
+                if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Older)'; 
+                if (!type) type = 'z17'; 
+                if (!defaultPresetName) defaultPresetName = 'Default z17 ALBWR Standard Template';
+            } case "albw": {
+                if (!typeInTitle) typeInTitle = 'ALBW Randomizer';
+                if (!type) type = 'albw';
+                if (!defaultPresetName) defaultPresetName = 'Default ALBWR Template';
+                fetch(`/execVersions/${id}`).then(res => res.json()).then(v => versionsCreator(v, d, defaultPresetName));
+                break;
+            } default: callback(d)
+        }
+    });
 }
 
 // creates one uppercase letter in the beginning of the text
@@ -182,8 +265,8 @@ function check4SameExcludeOptions(o) {
 }
 
 // loads randomizer settings based off of a user's selected preset.
-function randomizerSettings(d) {
-    document.getElementById('randoSettings').innerHTML = '';
+function randomizerSettings(d, clearSettingsHTML = false) {
+    if (clearSettingsHTML) document.getElementById('randoSettings').innerHTML = document.getElementById('versionSelect')?.outerHTML || '';
     const booleans = [true, false];
     for (const setting in d.settings) {
         let html = '';
@@ -291,7 +374,7 @@ function randomizerSettings(d) {
 function appendSettings(s) {
     // Loads the presets
     function listener(evt) {
-        randomizerSettings(s[evt.target.value])
+        randomizerSettings(s[evt.target.value], true)
     }
     document.getElementById('presets').style.display = 'none';
     document.getElementById('presetsSelection').innerHTML = '';

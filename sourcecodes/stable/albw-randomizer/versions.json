@@ -1,19 +1,23 @@
 {
-    "base": {
-        "versionName": "Starting Build",
-        "desc": "The build of ALBWR that started the z17 randomizer craise",
-        "warn": "The spoiler log in this build does not get generated properly for some reason. Only use this build if you don't want to use a spoiler log."
+    "0.1.0": {
+        "versionName": "Base Build",
+        "desc": "The build of ALBWR that started the z17 randomizer craise.",
+        "warn": "The spoiler log in this build does not get generated properly for some reason. Only use this build if you don't want to use a spoiler log.",
+        "useVerbose": true
     },
-    "dev": {
+    "0.2.0": {
         "versionName": "Dev Build",
-        "desc": "The build of ALBWR that has some slight improvements over the base build. The higher you get with the versions, the better things get."
+        "desc": "The build of ALBWR that has some slight improvements over the base build. The higher you get with the versions, the better things get.",
+        "useVerbose": true
     },
     "a0.0.1": {
         "versionName": "Glitched Logic Alpha 0.0.1",
-        "desc": "<small>build<br><br>glitched logic alpha build</small>"
+        "desc": "build\r\n\r\nglitched logic alpha build",
+        "useVerbose": true
     },
     "a0.0.2": {
         "versionName": "Glitched Logic Alpha 0.0.2",
-        "desc": "<small>alpha-0.0.2<br><br>glitched logic update for blacksmith cave, behind blacksmith cave, rosso cave, and DM Fairy Cave</small>"
+        "desc": "alpha-0.0.2\r\n\r\nglitched logic update for blacksmith cave, behind blacksmith cave, rosso cave, and DM Fairy Cave",
+        "useVerbose": true
     }
 }
