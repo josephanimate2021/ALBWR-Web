@@ -111,13 +111,13 @@ function versionsChecker(obj) {
             if (e.getAttribute('data-versionoptions')) {
                 array[i] = infoPlaceholder;
                 const info = JSON.parse(e.getAttribute('data-versionoptions'));
-                for (const settingCat in preset.settings) array[i].settings[settingCat] = preset.settings[settingCat]
-                for (const settingCat in info) array[i].settings[settingCat] = Object.assign({}, info[settingCat], array[i].settings[settingCat])
+                for (const settingCat in preset.settings) array[i].settings[settingCat] = Object.assign({}, preset.settings[settingCat]);
+                for (const settingCat in info) Object.assign(array[i].settings[settingCat], info[settingCat])
             } 
             if (e.getAttribute('data-versionoptionstoremove')) {
                 array[i] = array[i] || infoPlaceholder;
                 const info = JSON.parse(e.getAttribute('data-versionoptionstoremove'));
-                for (const settingCat in preset.settings) array[i].settings[settingCat] = array[i].settings[settingCat] || preset.settings[settingCat]
+                for (const settingCat in preset.settings) array[i].settings[settingCat] = array[i].settings[settingCat] || Object.assign({}, preset.settings[settingCat])
                 for (const option of info) {
                     const [key, value] = option.split(".");
                     if (array[i].settings[key][value]) delete array[i].settings[key][value]

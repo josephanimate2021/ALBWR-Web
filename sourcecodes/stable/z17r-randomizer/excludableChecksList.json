@@ -90,6 +90,722 @@
             "[PoD] Gemesaur King": {
                 "isChoice": true
             }
+        },
+        "Desert Palace": {
+            "[DP] (1F) Sand Room (South)": {
+                "isChoice": true
+            },
+            "[DP] (1F) Sand Switch Room": {
+                "isChoice": true
+            },
+            "[DP] (1F) Sand Room (North)": {
+                "isChoice": true
+            },
+            "[DP] (1F) Behind Rocks": {
+                "isChoice": true
+            },
+            "[DP] (1F) Big Chest (Behind Wall)": {
+                "isChoice": true
+            },
+            "[DP] (2F) Under Rock (Left)": {
+                "isChoice": true
+            },
+            "[DP] (2F) Beamos Room": {
+                "isChoice": true
+            },
+            "[DP] (2F) Under Rock (Right)": {
+                "isChoice": true
+            },
+            "[DP] (2F) Under Rock (Ball Room)": {
+                "isChoice": true
+            },
+            "[DP] (2F) Big Chest (Puzzle)": {
+                "isChoice": true
+            },
+            "[DP] (2F) Red/Blue Switches": {
+                "isChoice": true
+            },
+            "[DP] (2F) Leever Room": {
+                "isChoice": true
+            },
+            "[DP] (3F) Behind Falling Sand": {
+                "isChoice": true
+            },
+            "[DP] (3F) Armos Room": {
+                "isChoice": true
+            },
+            "Zaganaga": {
+                "comment": "Prevent Keys from spawning here"
+            }
+        },
+        "Eastern Palace": {
+            "[EP] (1F) Outside (East)": {
+                "isChoice": true
+            },
+            "[EP] (1F) Near Entrance": {
+                "comment": "glitched can throw a pot"
+            },
+            "[EP] (1F) Defeat Popos": {
+                "isChoice": true
+            },
+            "[EP] (1F) Hidden Door": {
+                "isChoice": true
+            },
+            "[EP] (1F) Switch Puzzle": {
+                "isChoice": true
+            },
+            "[EP] (2F) Ball Room": {
+                "isChoice": true
+            },
+            "[EP] (2F) Defeat Popos": {
+                "isChoice": true
+            },
+            "[EP] (2F) Switch Room": {
+                "comment": "glitched can throw pots"
+            },
+
+            "[EP] (2F) Big Chest": {
+                "isChoice": true
+            },
+            "[EP] (3F) After Cutscene": {
+                "isChoice": true
+            },
+            "[EP] Yuga": {
+                "isChoice": true
+            },
+            "[EP] (3F) Outside (North)": {
+                "isChoice": true
+            },
+            "[EP] (1F) Outside (West)": {
+                "isChoice": true
+            }
+        },
+        "Lorule Sanctuary": {
+            "[LS] Entrance Chest": {
+                "isChoice": true
+            },
+            "[LS] Lower Chest": {
+                "isChoice": true
+            },
+            "[LS] Upper Chest": {
+                "isChoice": true
+            },
+            "[LS] Ledge": {
+                "isChoice": true
+            }
+        },
+        "House of Gales": {
+            "[HoG] (1F) Torches": {
+                "isChoice": true
+            },
+            "[HoG] (1F) Switch Room": {
+                "isChoice": true
+            },
+            "[HoG] (1F) Fire Bubbles": {
+                "isChoice": true
+            },
+            "[HoG] (1F) Blue Bari Room": {
+                "isChoice": true
+            },
+            "[HoG] (1F) Blue Bari Room (Bottom Left)": {
+                "isChoice": true
+            },
+            "[HoG] (2F) Big Chest": {
+                "isChoice": true
+            },
+            "[HoG] (2F) Narrow Ledge": {
+                "isChoice": true
+            },
+            "[HoG] (2F) Fire Ring": {
+                "comment": "Not requiring Armos Boost"
+            },
+            "[HoG] (3F) Rat Room": {
+                "isChoice": true
+            },
+            "[HoG] (3F) Fire Bubbles": {
+                "isChoice": true
+            },
+            "[HoG] Margomill": {
+                "isChoice": true
+            }
+        },
+        "Ice Ruins": {
+            "[IR] (1F) Hidden Chest": {
+                "isChoice": true
+            },
+            "[IR] (B3) Grate Chest (Left)": {
+                "isChoice": true
+            },
+            "[IR] (B3) Grate Chest (Right)": {
+                "isChoice": true
+            },
+            "[IR] (B4) Ice Pillar": {
+                "isChoice": true
+            },
+            "[IR] (B5) Big Chest": {
+                "isChoice": true
+            },
+            "[IR] (B1) East Chest": {
+                "isChoice": true
+            },
+            "[IR] (B1) Narrow Ledge": {
+                "isChoice": true
+            },
+            "[IR] (B1) Upper Chest": {
+                "isChoice": true
+            },
+            "[IR] (B3) Big Chest (Puzzle)": {
+                "isChoice": true
+            },
+            "[IR] (B4) Switches": {
+                "isChoice": true
+            },
+            "[IR] (B4) Southwest Chest (Fall)": {
+                "isChoice": true
+            },
+            "[IR] (B4) Narrow Platform": {
+                "isChoice": true
+            },
+            "[IR] (B2) Far North": {
+                "isChoice": true
+            },
+            "[IR] (B4) Southeast Chest (Fall)": {
+                "isChoice": true
+            },
+            "[IR] Dharkstare": {
+                "isChoice": true
+            }
+        },
+        "Skull Woods": {
+            "[SW] (B1) Gibdo Room (Lower)": {
+                "isChoice": true
+            },
+            "[SW] (B1) South Chest": {
+                "isChoice": true
+            },
+            "[SW] (B1) Gibdo Room (Hole)": {
+                "isChoice": true
+            },
+            "[SW] (B1) Grate Room": {
+                "isChoice": true
+            },
+            "[SW] (B2) Moving Platform Room": {
+                "isChoice": true
+            },
+            "[SW] (B1) Big Chest (Upper)": {
+                "isChoice": true
+            },
+            "[SW] (B1) Big Chest (Eyes)": {
+                "isChoice": true
+            },
+            "[SW] Knucklemaster": {
+                "isChoice": true
+            }
+        },
+        "Swamp Palace": {
+            "[SP] (B1) Center": {
+                "isChoice": true
+            },
+            "[SP] (B1) Raft Room (Left)": {
+                "isChoice": true
+            },
+            "[SP] (B1) Raft Room (Right)": {
+                "isChoice": true
+            },
+            "[SP] (B1) Raft Room (Pillar)": {
+                "isChoice": true
+            },
+            "[SP] (B1) Gyorm": {
+                "isChoice": true
+            },
+            "[SP] (B1) Waterfall Room": {
+                "isChoice": true
+            },
+
+            "[SP] (B1) Big Chest (Secret)": {
+                "isChoice": true
+            },
+            "[SP] (1F) Water Puzzle": {
+                "isChoice": true
+            },
+            "[SP] (1F) East Room": {
+                "isChoice": true
+            },
+            "[SP] (1F) West Room": {
+                "isChoice": true
+            },
+
+            "[SP] (1F) Big Chest (Fire)": {
+                "isChoice": true
+            },
+            "[SP] Arrghus": {
+                "isChoice": true
+            }
+        },
+        "Thieves Hideout": {
+            "[TH] (B1) Jail Cell": {
+                "comment": "not including softlock strategy"
+            },
+            "[TH] (B1) Grate Chest": {
+                "isChoice": true
+            },
+            "[TH] (B2) Grate Chest (Fall)": {
+                "isChoice": true
+            },
+            "[TH] (B2) Switch Puzzle Room": {
+                "isChoice": true
+            },
+            "[TH] (B2) Jail Cell": {
+                "comment": "Not putting in glitched logic, miss-able if Master Ore hallway opened"
+            },
+            "[TH] (B2) Eyegores": {
+                "isChoice": true
+            },
+            "[TH] (B1) Behind Wall": {
+                "comment": "Not putting in glitched logic"
+            }, 
+            "[TH] (B1) Big Chest (Entrance)": {
+                "comment": "Not putting in glitched logic"
+            },
+            "[TH] (B3) Underwater": {
+                "isChoice": true
+            },
+            "[TH] (B3) Big Chest (Hidden)": {
+                "isChoice": true
+            },
+            "Stalblind": {
+                "isChoice": true
+            }
+        },
+        "Tower of Hera": {
+            "[ToH] (1F) Outside": {
+                "isChoice": true
+            },
+            "[ToH] (1F) Center": {
+                "isChoice": true
+            },
+            "[ToH] (3F) Platform": {
+                "isChoice": true
+            },
+            "[ToH] (5F) Red/Blue Switches": {
+                "isChoice": true
+            },
+            "[ToH] (6F) Left Mole": {
+                "isChoice": true
+            },
+            "[ToH] (6F) Right Mole": {
+                "isChoice": true
+            },
+            "[ToH] (7F) Outside (Ledge)": {
+                "isChoice": true
+            },
+            "[ToH] (8F) Fairy Room": {
+                "isChoice": true
+            },
+            "[ToH] (11F) Big Chest": {
+                "isChoice": true
+            },
+            "[ToH] Moldorm": {
+                "isChoice": true
+            }
+        },
+        "Turtle Rock": {
+            "[TR] (1F) Center": {
+                "isChoice": true
+            },
+            "[TR] (1F) Grate Chest": {
+                "isChoice": true
+            },
+            "[TR] (1F) Portal Room (Northwest)": {
+                "isChoice": true
+            },
+            "[TR] (1F) Northeast Ledge": {
+                "isChoice": true
+            },
+            "[TR] (1F) Southeast Chest": {
+                "isChoice": true
+            },
+            "[TR] (1F) Defeat Flamolas": {
+                "isChoice": true
+            },
+            "[TR] (B1) Northeast Room": {
+                "isChoice": true
+            },
+            "[TR] (B1) Platform": {
+                "isChoice": true
+            },
+            "[TR] (B1) Grate Chest (Small)": {
+                "isChoice": true
+            },
+            "[TR] (B1) Big Chest (Center)": {
+                "comment": "Throw skull to hit switch"
+            },
+            "[TR] (B1) Big Chest (Top)": {
+                "isChoice": true
+            },
+            "[TR] Grinexx": {
+                "isChoice": true
+            }
+        }
+    },
+    "HYRULE": {
+        "Death Mountain": {
+            "First Cave": {
+                "isChoice": true
+            },
+            "Blocked Cave": {
+                "isChoice": true
+            },
+            "Fairy Cave": {
+                "isChoice": true
+            },
+            "Death Mountain West Ledge": {
+                "isChoice": true
+            },
+            "Rock Cave (Pegs)": {
+                "isChoice": true
+            },
+            "Rock Cave (Top)": {
+                "isChoice": true
+            },
+            "Spectacle Rock": {
+                "isChoice": true
+            },
+            "Fire Cave Pillar": {
+                "isChoice": true
+            },
+            "Bouldering Guy": {
+                "isChoice": true
+            },
+            "Hookshot Treasure Dungeon": {
+                "isChoice": true
+            },
+            "Floating Island": {
+                "isChoice": true
+            }
+        },
+        "Eastern Ruins": {
+            "Merge Treasure Dungeon": {
+                "isChoice": true
+            },
+            "Armos Chest": {
+                "isChoice": true
+            },
+            "Hookshot Chest": {
+                "isChoice": true
+            },
+            "Merge Chest": {
+                "isChoice": true
+            },
+            "Cave": {
+                "isChoice": true
+            },
+            "Pegs (South)": {
+                "comment": "spare them from SRod"
+            }
+        },
+        "Hyrule Field": {
+            "Dampe": {
+                "isChoice": true
+            },
+            "Rosso Cave": {
+                "isChoice": true
+            },
+            "Sanctuary Pegs": {
+                "isChoice": true
+            },
+            "Sanctuary Treasure Dungeon": {
+                "isChoice": true
+            },
+            "Behind Blacksmith": {
+                "isChoice": true
+            },
+            "Blacksmith Cave": {
+                "isChoice": true
+            },
+            "Blacksmith": {
+                "isChoice": true
+            },
+            "Castle Rocks": {
+                "isChoice": true
+            },
+            "Rosso": {
+                "isChoice": true
+            },
+            "Clean Rocks": {
+                "isChoice": true
+            },
+            "Haunted Grove Tree Stump": {
+                "isChoice": true
+            },
+            "Ravio (1)": {
+                "isChoice": true
+            },
+            "Ravio (2)": {
+                "isChoice": true
+            },
+            "Ravio (3)": {
+                "isChoice": true
+            },
+            "Ravio (4)": {
+                "isChoice": true
+            },
+            "Ravio (5)": {
+                "isChoice": true
+            },
+            "Ravio (6)": {
+                "isChoice": true
+            },
+            "Ravio (7)": {
+                "isChoice": true
+            },
+            "Ravio (8)": {
+                "isChoice": true
+            },
+            "Ravio (9)": {
+                "isChoice": true
+            },
+            "Rupee Rush (Hyrule)": {
+                "isChoice": true
+            },
+            "Castle (Indoors)": {
+                "isChoice": true
+            },
+            "Castle Balcony": {
+                "isChoice": true
+            },
+            "Sanctuary Cave": {
+                "isChoice": true
+            }
+        },
+        "Kakariko Village": {
+            "Well (Chest)": {
+                "isChoice": true
+            },
+            "Well (Upper)": {
+                "isChoice": true
+            },
+            "Jail": {
+                "isChoice": true
+            },
+            "Merchant (Left)": {
+                "isChoice": true
+            },
+            "Bee Guy": {
+                "isChoice": true
+            },
+            "Bee Guy (Golden Bee)": {
+                "comment": "Always require Golden Bee dude, don't care"
+            },
+            "Fortune Teller": {
+                "isChoice": true
+            },
+            "Milk Bar Owner": {
+                "isChoice": true
+            },
+            "Cucco Ranch": {
+                "isChoice": true
+            },
+            "Shady Guy": {
+                "isChoice": true
+            },
+            "Merchant (Right)": {
+                "isChoice": true
+            },
+            "Stylish Woman": {
+                "isChoice": true
+            }
+        },
+        "Lake Hylia": {
+            "Torch Cave": {
+                "isChoice": true
+            },
+            "Lake Hylia Ledge Chest": {
+                "isChoice": true
+            },
+            "Bird Lover": {
+                "isChoice": true
+            },
+            "Secret Cave": {
+                "isChoice": true
+            },
+            "Shore": {
+                "isChoice": true
+            },
+            "Hyrule Hotfoot": {
+                "comment": "Present after Irene Trigger"
+            }
+        },
+        "Lost Woods": {
+            "Master Sword Pedestal": {
+                "isChoice": true
+            },
+            "Alcove": {
+                "isChoice": true
+            },
+            "Lost Woods Big Rock Chest": {
+                "isChoice": true
+            }
+        },
+        "Hyrule Sanctuary": {
+            "[HS] Entrance": {
+                "isChoice": true
+            },
+            "[HS] Lower Chest": {
+                "isChoice": true
+            },
+            "[HS] Upper Chest": {
+                "isChoice": true
+            },
+            "[HS] Ledge": {
+                "isChoice": true
+            }
+        },
+        "Southern Ruins": {
+            "Runaway Item Seller": {
+                "isChoice": true
+            },
+            "Behind Pillars": {
+                "isChoice": true
+            },
+            "Treasure Room": {
+                "isChoice": true
+            },
+            "Southern Ruins Ledge": {
+                "isChoice": true
+            }
+        },
+        "Zoras Domain": {
+            "Zora's Domain Ledge Chest": {
+                "isChoice": true
+            },
+            "Behind Waterfall": {
+                "isChoice": true
+            },
+            "Zora Queen": {
+                "isChoice": true
+            }
+        }
+    },
+    "LORULE": {
+        "Dark Ruins": {
+            "Dark Ruins Lakeview Chest": {
+                "isChoice": true
+            },
+            "Dark Maze Chest": {
+                "isChoice": true
+            },
+            "Dark Maze Ledge": {
+                "isChoice": true
+            },
+            "Hinox (1)": {
+                "isChoice": true
+            },
+            "Hinox (2)": {
+                "isChoice": true
+            },
+            "Hinox (3)": {
+                "isChoice": true
+            },
+            "Hinox (4)": {
+                "isChoice": true
+            },
+            "Hinox (5)": {
+                "isChoice": true
+            },
+            "Hinox (6)": {
+                "isChoice": true
+            }
+        },
+        "Death Mountain": {
+            "Ledge (East)": {
+                "isChoice": true
+            },
+            "Behind Ice Gimos (East)": {
+                "isChoice": true
+            },
+            "Ledge (West)": {
+                "isChoice": true
+            },
+            "Defeat Ice Gimos (West)": {
+                "isChoice": true
+            },
+            "Treacherous Tower (Intermediate)": {
+                "isChoice": true
+            }
+        },
+        "Lorule Field": {
+            "Boots Treasure Dungeon": {
+                "isChoice": true
+            },
+            "Vacant House": {
+                "isChoice": true
+            },
+            "Rupee Rush (Lorule)": {
+                "isChoice": true
+            },
+            "Great Rupee Fairy": {
+                "isChoice": true
+            },
+            "Big Bomb Cave": {
+                "isChoice": true
+            },
+            "Octoball Derby": {
+                "isChoice": true
+            },
+            "Blacksmith (Lorule)": {
+                "isChoice": true
+            },
+            "Swamp Cave (Left)": {
+                "isChoice": true
+            },
+            "Swamp Cave (Middle)": {
+                "isChoice": true
+            },
+            "Swamp Cave (Right)": {
+                "isChoice": true
+            },
+            "Thief Girl Cave": {
+                "isChoice": true
+            },
+            "Hookshot Ledge": {
+                "isChoice": true
+            }
+        },
+        "Graveyard": {
+            "Philosopher's Cave Big Chest": {
+                "isChoice": true
+            },
+            "Peninsula Chest": {
+                "isChoice": true
+            }
+        },
+        "Lorule Lake": {
+            "Lorule Lake NW Chest": {
+                "isChoice": true
+            },
+            "Turtle Rock Left Balcony": {
+                "isChoice": true
+            }
+        },
+        "Misery Mire": {
+            "Misery Mire Ledge": {
+                "isChoice": true
+            },
+            "Sand Rod Treasure Dungeon": {
+                "isChoice": true
+            }
+        },
+        "Skull Woods": {
+            "Canyon House": {
+                "isChoice": true
+            },
+            "Cucco Shack": {
+                "isChoice": true
+            },
+            "Skull Woods Outdoor Chest": {
+                "isChoice": true
+            }
         }
     }
 }

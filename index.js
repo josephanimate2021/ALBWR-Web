@@ -273,10 +273,11 @@ app.get('/', (req, res) => {
         function writeOldToml(newToml = false) {
             let toml = '';
             for (const i in req.query.settings) {
+                toml += `[${i}]\r\n`;
                 if (i == "exclude") {
     
-                } else {
-                    toml += `[${i}]\r\n`;
+                } else if (i == "exclusions") toml += `"exclusions" = ${JSON.stringify(req.query.settings.exclusions.exclusions, null, "\t")}`
+                else {
                     for (const c in req.query.settings[i]) toml += `${!newToml ? `# ` : ''}${c} = ${
                         typeof string2boolean(req.query.settings[i][c]) == "string" ? `'${req.query.settings[i][c]}'` : req.query.settings[i][c]
                     }\r\n`;
@@ -426,7 +427,7 @@ app.get('/', (req, res) => {
 }).post('/genZipFromRandomizedGame', async (req, res) => {
     function handleError(e) {
         console.error(e);
-        res.status(404).end(e.toString());
+        res.status(500).end(e.toString());
     }
     if (!userIsRandomizingGame) return handleError("Someone needs to randomize ALBW in order to generate a zip file.")
     userIsRandomizingGame = false;

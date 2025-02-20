@@ -21,14 +21,12 @@ bow_of_light_in_castle = false
 ## Swordless Mode. Removes all Swords from the game. You will need the Net to play Tennis with Yuganon.
 swordless_mode = false
 
+## Modifications for the game.
 [options]
-## Experimental option to change Hyrule's lighting until you visit Lorule for the first time.
-## Causes performance issues on console.
+## Experimental option to change Hyrule's lighting until you visit Lorule for the first time.<br>Causes performance issues on console.
 night_mode = false
 
-## Exclude a specific check from having progression items. A random junk item will be placed there instead.
-## Every check in the game has a *unique* name that can be placed here, consult a spoiler log for a complete list.
-## Remove the "#" before a check to uncomment it and make sure it's excluded, or place a "#" in front to include it
+## Exclude a specific check from having progression items.<br>A random junk item will be placed there instead.<br>Every check in the game has a *unique* name that can be placed here.
 [exclusions]
 "exclusions" = [
 #   "Great Rupee Fairy",
