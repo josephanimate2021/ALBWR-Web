@@ -1,0 +1,95 @@
+{
+    "DUNGEONS": {
+        "Lorule Castle": {
+            "[LC] (1F) Ledge": {
+                "isChoice": true
+            },
+            "[LC] (1F) Center": {
+                "isChoice": true
+            },
+            "[LC] (2F) Near Torches": {
+                "isChoice": true
+            },
+            "[LC] (2F) Hidden Path": {
+                "isChoice": true
+            },
+            "[LC] (2F) Ledge": {
+                "isChoice": true
+            },
+            "[LC] (4F) Center": {
+                "isChoice": true
+            },
+            "[LC] (4F) Hidden Path": {
+                "isChoice": true
+            },
+            "[LC] (3F) Bomb Trial (Chest)": {
+                "isChoice": true
+            },
+            "[LC] (3F) Bomb Trial (Behind Rock)":{
+                "isChoice": true
+            },
+            "[LC] (3F) Ball Trial (Chest)": {
+                "isChoice": true
+            },
+            "[LC] (3F) Ball Trial (Puzzle)": {
+                "isChoice": true
+            },
+            "[LC] (4F) Lamp Trial": {
+                "isChoice": true
+            },
+            "[LC] (4F) Hookshot Trial (Chest)": {
+                "isChoice": true
+            },
+            "[LC] (4F) Hookshot Trial (Eyes)": {
+                "isChoice": true
+            },
+            "[LC] Zelda": {
+                "isChoice": true
+            }
+        },
+        "Dark Palace": {
+            "[PoD] (1F) Near Entrance": {
+                "isChoice": true
+            },
+            "[PoD] (1F) Narrow Ledge": {
+                "isChoice": true
+            },
+            "[PoD] (1F) Switch Puzzle": {
+                "isChoice": true
+            },
+            "[PoD] (1F) Hidden Room (Upper)": {
+                "isChoice": true
+            },
+            "[PoD] (1F) Hidden Room (Lower)": {
+                "isChoice": true
+            },
+            "[PoD] (B1) Fall From 1F": {
+                "isChoice": true
+            },
+            "[PoD] (B1) Maze": {
+                "isChoice": true
+            },
+            "[PoD] (B1) Helmasaur Room": {
+                "isChoice": true
+            },
+            "[PoD] (B1) Helmasaur Room (Fall)": {
+                "isChoice": true
+            },
+            "[PoD] (2F) Big Chest (Hidden)": {
+                "isChoice": true
+            },
+            "[PoD] (2F) Alcove": {
+                "isChoice": true
+            },
+            "[PoD] (1F) Fall From 2F": {
+                "isChoice": true
+            },
+            "[PoD] (B1) Big Chest (Switches)": {
+                "isChoice": true
+            },
+            "[PoD] Gemesaur King": {
+                "isChoice": true
+            }
+        }
+    }
+}

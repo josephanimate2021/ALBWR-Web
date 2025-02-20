@@ -115,6 +115,9 @@ app.get('/', (req, res) => {
     function decodeNewToml(info, tomlFile) {
         let toml = fs.readFileSync(tomlFile).toString('utf-8'), settingCat;
         let p1 = toml.indexOf("## ");
+        const wordOptions = {
+            mode: ["Normal", "Hard", "GlitchBasic", "GlitchAdvanced", "GlitchHell", "NoLogic"]
+        }
         while (p1 > -1) {
             const s = toml.substring(p1);
             const [c, setting] = s.split(newLine + newLineCommon)
@@ -125,13 +128,25 @@ app.get('/', (req, res) => {
                 };
             } else if (settingCat == "exclude") {
 
+            } if (settingCat == "exclusions") {
+                let stuff = s.substring(s.indexOf(setting)).split("#").join("").split(`"exclusions" = [`)[1].slice(0, -1)
+                stuff = stuff.split(newLine).join('').split(newLineCommon);
+                stuff.splice(0, 1);
+                stuff.splice(stuff.length - 1, 1);
+                info.settings.exclusions.exclusions = {
+                    defaultValue: [],
+                    userCanAddNewLines: true,
+                    allOptions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`))
+                }
+                for (const option of stuff) info.settings.exclusions.exclusions.defaultValue.push(option.substring(4).slice(0, option.endsWith('",') ? -2 : -1));
             } else if (setting.includes(" = ") && !setting.startsWith("#") && settingCat) {
                 const [key, value] = setting.split(" = ");
                 info.settings[settingCat][key] = {
                     comment: c.substring(3),
-                    defaultValue: value,
-                    useBooleanOptions: true
+                    defaultValue: value
                 }
+                if (wordOptions[key]) info.settings[settingCat][key].allOptions = wordOptions[key];
+                else info.settings[settingCat][key].useBooleanOptions = true;
             }
             toml = toml.split(c).join("");
             p1 = toml.indexOf("## ", p1 + 3);
@@ -171,6 +186,15 @@ app.get('/', (req, res) => {
                 settings: {}
             });
             decodeNewToml(info, `${randoPath}/presets/Standard.toml`);
+            presets.unshift(info);
+            break;
+        } case "z17r": {
+            Object.assign(info, {
+                presetName: "Default z17 ALBWR Template",
+                notes: [],
+                settings: {}
+            });
+            decodeNewToml(info, `${randoPath}/presets/Example.toml`);
             presets.unshift(info);
             break;
         } case "z17": {
@@ -225,178 +249,173 @@ app.get('/', (req, res) => {
     }
     res.json(presets);
 }).post('/randomize/:id/:fileId', (req, res) => {
-    if (userIsRandomizingGame) return res.json({
-        error: {
-            message: "Someone else is randomizing their game right now. Please wait for a few minutes."
-        }
-    })
-    userIsRandomizingGame = true;
-    scriptOutput = '';
-    okay2spitscript = false;
-    const randoPath = `./sourcecodes/stable/${req.query.v}-randomizer`;
-    const command = [path.join(__dirname, randoPath), "&&", "albw-randomizer"];
-    function handleError(err) {
-        if (err) {
-            console.error(err)
-            return res.status(500).json({
-                error: {
-                    message: err.toString(),
-                    data: err
-                }
-            });
-        }
-    }
-    function string2boolean(s) {
-        switch (s) {
-            case "true": return true;
-            case "false": return false;
-            default: {
-                if (isNaN(Number(s))) return s;
-                return Number(s);
+    try {
+        if (userIsRandomizingGame) return res.json({
+            error: {
+                message: "Someone else is randomizing their game right now. Please wait for a few minutes."
             }
-        }
-    }
-    function writeOldToml(newToml = false) {
-        let toml = '';
-        for (const i in req.query.settings) {
-            if (i == "exclude") {
-
-            } else {
-                toml += `[${i}]\r\n`;
-                for (const c in req.query.settings[i]) toml += `${!newToml ? `# ` : ''}${c} = ${
-                    typeof string2boolean(req.query.settings[i][c]) == "string" ? `'${req.query.settings[i][c]}'` : req.query.settings[i][c]
-                }\r\n`;
-            }
-        }
-        return toml;
-    }
-    const presetFile = `${randoPath}/presets/${req.params.id}`;
-    scriptOutput += `${req.query.v} randomizer stable is running${req.query.execVersion ? ` on version ${req.query.execVersion}` : ''}.\r\n`;
-    if (req.query.execVersion) command[2] += `-${req.query.execVersion}`;
-    const versionsFile = `${randoPath}/versions.json`;
-    const versions = fs.existsSync(versionsFile) ? JSON.parse(fs.readFileSync(versionsFile)) : {};
-    switch (req.query.v) {
-        case "albw": {
-            if (versions[req.query.execVersion]?.useVerbose) command[2] += ` --verbose`;
-            if (!fs.existsSync(`${randoPath}/generated`)) fs.mkdirSync(`${randoPath}/generated`);
-            fs.copyFile(`./uploads/${req.params.fileId}.3ds`, `${randoPath}/albw.3ds`, handleError);
-            if (req.query.settings && typeof req.query.settings == "object") {
-                fs.renameSync(`${randoPath}/presets/Standard.toml`, `${randoPath}/presets/Standardold.toml`);
-                fs.writeFileSync(`${randoPath}/presets/Standard.toml`, writeOldToml());
-            }
-            break;
-        } case "z17-local": {
-            const config = parseTOML(fs.readFileSync(`${randoPath}/z17-randomizer/config/Rando.toml`).toString('utf-8'))
-            if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
-            fs.copyFile(`./uploads/${req.params.fileId}.3ds`, `${randoPath}/${config.rom}`, handleError);
-            if (req.query.settings && typeof req.query.settings == "object") {
-                const presetFile = `${randoPath}/z17-randomizer/config/presets/${req.params.id}.toml`
-                if (!fs.existsSync(presetFile)) fs.writeFileSync(presetFile, writeOldToml());
-            }
-            command.push(`--preset ${req.params.id}`);
-            function c(k) {
-                for (const j of fs.readdirSync(`${randoPath}/${k}`)) {
-                    const stats = fs.lstatSync(`${randoPath}/${k}/${j}`);
-                    if (stats.isDirectory()) {
-                        const p = `${k}/${j}`;
-                        const array = p.split("/");
-                        function d(j, n) {
-                            if (array.length == n) return;
-                            const p = path.join(process.env.APPDATA, j);
-                            if (!fs.existsSync(p)) fs.mkdirSync(p);
-                            d(`${j}/${array[n + 1]}`, n + 1);
-                        }
-                        d(array[0], 0)
-                        c(`${k}/${j}`);
-                    } else fs.writeFileSync(path.join(process.env.APPDATA, `${k}/${j}`), fs.readFileSync(`${randoPath}/${k}/${j}`));
+        })
+        userIsRandomizingGame = true;
+        scriptOutput = '';
+        okay2spitscript = false;
+        const randoPath = `./sourcecodes/stable/${req.query.v}-randomizer`;
+        const command = [path.join(__dirname, randoPath), "&&", "albw-randomizer"];
+        function string2boolean(s) {
+            switch (s) {
+                case "true": return true;
+                case "false": return false;
+                default: {
+                    if (isNaN(Number(s))) return s;
+                    return Number(s);
                 }
             }
-            c('z17-randomizer')
-            break;
-        } case "z17-rando": {
-            const config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'))
-            if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
-            fs.copyFile(`./uploads/${req.params.fileId}.3ds`, `${randoPath}/${config.rom}`, handleError);
-            if (req.query.settings && typeof req.query.settings == "object") fs.writeFileSync(`${randoPath}/presets/${req.params.id}.toml`, writeOldToml(true));
-            command.push(`--preset ${req.params.id}`);
-            break;
-        } case "z17": {
-            if (req.query.settings && typeof req.query.settings == "object") {
-                function c(j) {
-                    for (const i in j) {
-                        if (typeof j[i] == "object") c(j[i])
-                        else j[i] = string2boolean(j[i]);
+        }
+        function writeOldToml(newToml = false) {
+            let toml = '';
+            for (const i in req.query.settings) {
+                if (i == "exclude") {
+    
+                } else {
+                    toml += `[${i}]\r\n`;
+                    for (const c in req.query.settings[i]) toml += `${!newToml ? `# ` : ''}${c} = ${
+                        typeof string2boolean(req.query.settings[i][c]) == "string" ? `'${req.query.settings[i][c]}'` : req.query.settings[i][c]
+                    }\r\n`;
+                }
+            }
+            return toml;
+        }
+        const presetFile = `${randoPath}/presets/${req.params.id}`;
+        scriptOutput += `${req.query.v} randomizer stable is running${req.query.execVersion ? ` on version ${req.query.execVersion}` : ''}.\r\n`;
+        if (req.query.execVersion) command[2] += `-${req.query.execVersion}`;
+        const versionsFile = `${randoPath}/versions.json`;
+        const versions = fs.existsSync(versionsFile) ? JSON.parse(fs.readFileSync(versionsFile)) : {};
+        switch (req.query.v) {
+            case "albw": {
+                if (versions[req.query.execVersion]?.useVerbose) command[2] += ` --verbose`;
+                if (!fs.existsSync(`${randoPath}/generated`)) fs.mkdirSync(`${randoPath}/generated`);
+                fs.copyFileSync(`./uploads/${req.params.fileId}.3ds`, `${randoPath}/albw.3ds`);
+                if (req.query.settings && typeof req.query.settings == "object") {
+                    fs.renameSync(`${randoPath}/presets/Standard.toml`, `${randoPath}/presets/Standardold.toml`);
+                    fs.writeFileSync(`${randoPath}/presets/Standard.toml`, writeOldToml());
+                }
+                break;
+            } case "z17-local": {
+                const config = parseTOML(fs.readFileSync(`${randoPath}/z17-randomizer/config/Rando.toml`).toString('utf-8'))
+                if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
+                fs.copyFileSync(`./uploads/${req.params.fileId}.3ds`, `${randoPath}/${config.rom}`);
+                if (req.query.settings && typeof req.query.settings == "object") {
+                    const presetFile = `${randoPath}/z17-randomizer/config/presets/${req.params.id}.toml`
+                    if (!fs.existsSync(presetFile)) fs.writeFileSync(presetFile, writeOldToml());
+                }
+                command.push(`--preset ${req.params.id}`);
+                function c(k) {
+                    for (const j of fs.readdirSync(`${randoPath}/${k}`)) {
+                        const stats = fs.lstatSync(`${randoPath}/${k}/${j}`);
+                        if (stats.isDirectory()) {
+                            const p = `${k}/${j}`;
+                            const array = p.split("/");
+                            function d(j, n) {
+                                if (array.length == n) return;
+                                const p = path.join(process.env.APPDATA, j);
+                                if (!fs.existsSync(p)) fs.mkdirSync(p);
+                                d(`${j}/${array[n + 1]}`, n + 1);
+                            }
+                            d(array[0], 0)
+                            c(`${k}/${j}`);
+                        } else fs.writeFileSync(path.join(process.env.APPDATA, `${k}/${j}`), fs.readFileSync(`${randoPath}/${k}/${j}`));
                     }
                 }
-                c(req.query.settings);
-                if (req.params.id && !fs.existsSync(`${presetFile}.json`)) fs.writeFileSync(`${presetFile}.json`, JSON.stringify(req.query.settings, null, "\t"));
+                c('z17-randomizer')
+                break;
+            } 
+            case "z17r":
+            case "z17-rando": {
+                const config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'))
+                if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
+                fs.copyFileSync(`./uploads/${req.params.fileId}.3ds`, `${randoPath}/${config.rom}`);
+                if (req.query.settings && typeof req.query.settings == "object") fs.writeFileSync(`${randoPath}/presets/${req.params.id}.toml`, writeOldToml(true));
+                command.push(`--preset ${req.params.id}`);
+                break;
+            } case "z17": {
+                if (req.query.settings && typeof req.query.settings == "object") {
+                    function c(j) {
+                        for (const i in j) {
+                            if (typeof j[i] == "object") c(j[i])
+                            else j[i] = string2boolean(j[i]);
+                        }
+                    }
+                    c(req.query.settings);
+                    if (req.params.id && !fs.existsSync(`${presetFile}.json`)) fs.writeFileSync(`${presetFile}.json`, JSON.stringify(req.query.settings, null, "\t"));
+                }
+                const config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
+                if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
+                fs.copyFileSync(`./uploads/${req.params.fileId}.3ds`, `${randoPath}/${config.rom}`);
+                command.push(`--preset ${req.params.id}`);
+                break;
             }
-            const config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
-            if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
-            fs.copyFile(`./uploads/${req.params.fileId}.3ds`, `${randoPath}/${config.rom}`, handleError);
-            command.push(`--preset ${req.params.id}`);
-            break;
         }
-    }
-    console.log(command)
-    function gameGeneration(currentAttempt) {
-        function sForWord(word = 'attempt', num = 0) {
-            return num > 1 ? (word + 's') : word
-        }
-        scriptOutput+=`Attempt #${currentAttempt}\r\n`;
-        okay2spitscript = true
-        const liveOutput = spawn(`cd`, command, {
-            shell: true
-        });
-    
-        liveOutput.stdout.setEncoding('utf8');
-        liveOutput.stdout.on('data', function(data) {
-            console.log('stdout: ' + data);
-            
-            scriptOutput+=data.toString()+"\r\n";
+        console.log(command)
+        function gameGeneration(currentAttempt) {
+            function sForWord(word = 'attempt', num = 0) {
+                return num > 1 ? (word + 's') : word
+            }
+            scriptOutput+=`Attempt #${currentAttempt}\r\n`;
             okay2spitscript = true
-        });
-    
-        liveOutput.stderr.setEncoding('utf8');
-        liveOutput.stderr.on('data', function(data) {
-            console.log('stderr: ' + data);
-            
-            scriptOutput+=data.toString()+"\r\n";
-            okay2spitscript = true
-        });
-    
-        liveOutput.on('close', function(code) {
-            console.log('closing code:', code);
-
-            if (code != 0) {
-                scriptOutput += `The command closed unexpectedly with the ${code} code after ${currentAttempt} ${
+            const liveOutput = spawn(`cd`, command, {
+                shell: true
+            });
+        
+            liveOutput.stdout.setEncoding('utf8');
+            liveOutput.stdout.on('data', function(data) {
+                console.log('stdout:', data);
+                scriptOutput+=data.toString()+"\r\n";
+                okay2spitscript = true
+            });
+        
+            liveOutput.stderr.setEncoding('utf8');
+            liveOutput.stderr.on('data', function(data) {
+                console.log('stderr:', data);
+                scriptOutput+=data.toString()+"\r\n";
+                okay2spitscript = true
+            });
+        
+            liveOutput.on('close', function(code) {
+                console.log('closing code:', code)
+                if (code != 0) {
+                    scriptOutput += `The command closed unexpectedly with the ${code} code after ${currentAttempt} ${
+                        sForWord('attempt', currentAttempt)
+                    }.\r\nRetrying...\r\n`;
+                    okay2spitscript = true;
+                    gameGeneration(currentAttempt + 1);
+                } else {
+                    scriptOutput += `Press Enter to continue...`;
+                    okay2spitscript = true;
+                }
+            });
+        
+            liveOutput.on('error', function(code) {
+                console.log('error:', code);
+                scriptOutput += `The command errored out with ${code} after ${currentAttempt} ${
                     sForWord('attempt', currentAttempt)
                 }.\r\nRetrying...\r\n`;
                 okay2spitscript = true;
                 gameGeneration(currentAttempt + 1);
-            } else {
-                console.log('Full output of script: ',scriptOutput);
-                scriptOutput += `Press Enter to continue...`;
-                okay2spitscript = true;
+            });
+        }
+        gameGeneration(1)
+        res.json({
+            isRandomizing: true,
+            data: Object.assign({}, req.params, req.query)
+        })
+    } catch (err) {
+        console.error(err)
+        return res.status(500).json({
+            error: {
+                message: err.toString(),
+                data: err
             }
         });
-    
-        liveOutput.on('error', function(code) {
-            console.log('error:', code);
-
-            console.log('Full output of script: ',scriptOutput);
-            scriptOutput += `The command errored out with ${code} after ${currentAttempt} ${
-                sForWord('attempt', currentAttempt)
-            }.\r\nRetrying...\r\n`;
-            okay2spitscript = true;
-            gameGeneration(currentAttempt + 1);
-        });
     }
-    gameGeneration(1)
-    res.json({
-        isRandomizing: true,
-        data: Object.assign({}, req.params, req.query)
-    })
 }).get('/execVersions/:v', (req, res) => {
     const versionsPath = `./sourcecodes/stable/${req.params.v}-randomizer/versions.json`
     res.json(fs.existsSync(versionsPath) ? JSON.parse(fs.readFileSync(versionsPath)) : {})
@@ -435,6 +454,20 @@ app.get('/', (req, res) => {
                 const presetFile = `${randoPath}/presets/${req.params.id}.json`;
                 if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
                 break;
+            } 
+            case "z17r":
+            case "z17-rando": {
+                const config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'))
+                const generatedRomFolder = `${randoPath}/${config.output}`;
+                c(generatedRomFolder, zip);
+                fs.rmSync(generatedRomFolder, {
+                    recursive: true, 
+                    force: true 
+                });
+                fs.unlinkSync(`${randoPath}/${config.rom}`);
+                const presetFile = `${randoPath}/presets/${req.params.id}.toml`;
+                if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
+                break;
             } case "z17-local": {
                 const config = parseTOML(fs.readFileSync(`${randoPath}/z17-randomizer/config/Rando.toml`).toString('utf-8'))
                 const generatedRomFolder = `${randoPath}/${config.output}`;
@@ -451,7 +484,7 @@ app.get('/', (req, res) => {
                     force: true 
                 });
                 break;
-            } case "albw": {
+            }  case "albw": {
                 const generatedRomFolder = `${randoPath}/generated`;
                 c(generatedRomFolder, zip);
                 fs.rmSync(generatedRomFolder, {

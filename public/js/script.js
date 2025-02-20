@@ -2,6 +2,7 @@ let fileChunks = [];
 let exclusionOptions;
 let fileName = ''; // Variable to store the name of the original file
 const totalChunks = 100; // Variable to store the number of chunks
+let presets; // variable to store all of the presets
 
 // shows an element to the user depending on whatever or not the user uploaded the file.
 if (localStorage.uploadedFileId) loadSettings(document.getElementById('version').value, s => {
@@ -57,7 +58,6 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                         document.getElementById('randomizedGameDownload').remove();
                     });
                     back2randobtn.className = "styledButton";
-                    output.appendChild(back2randobtn);
                     if (res.ok) {
                         const blob = await res.blob();
                         evt.submitter.textContent = "Game Randomization Successful";
@@ -66,9 +66,11 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                         output.insertAdjacentHTML('afterend', `<a class="styledButton" id="randomizedGameDownload" href="${
                             URL.createObjectURL(blob)
                         }" download="albw-randomized.zip">${buttonName} -></a>`);
+                        output.appendChild(back2randobtn);
                     } else {
                         evt.submitter.textContent = "Game Randomization Failed";
                         term.write(`Could not get your randomized game due to an error: ${await res.text()}. Please try randomizing your game again.`);
+                        output.appendChild(back2randobtn);
                     }
                 }
             }
@@ -100,29 +102,25 @@ function versionsChecker(obj) {
         if (e.value != obj.value) continue;
         e.setAttribute('selected', '')
         for (var i = 0; i < presets.length; i++) {
-            const preset = presets[i];;
+            const preset = presets[i];
             const infoPlaceholder = {
                 presetName: preset.presetName + ` Version ${e.value}`,
                 notes: [],
                 settings: {}
             }
             if (e.getAttribute('data-versionoptions')) {
-                array[i] = array[i] || infoPlaceholder
+                array[i] = infoPlaceholder;
                 const info = JSON.parse(e.getAttribute('data-versionoptions'));
-                for (const settingCat in preset.settings) array[i].settings[settingCat] = array[i].settings[settingCat] || preset.settings[settingCat]
-                for (const settingCat in info) array[i].settings[settingCat] = info[settingCat]
+                for (const settingCat in preset.settings) array[i].settings[settingCat] = preset.settings[settingCat]
+                for (const settingCat in info) array[i].settings[settingCat] = Object.assign({}, info[settingCat], array[i].settings[settingCat])
             } 
             if (e.getAttribute('data-versionoptionstoremove')) {
                 array[i] = array[i] || infoPlaceholder;
                 const info = JSON.parse(e.getAttribute('data-versionoptionstoremove'));
-                for (const settingCat in preset.settings) {
-                    array[i].settings[settingCat] = array[i].settings[settingCat] || preset.settings[settingCat];
-                    for (const setting in array[i].settings[settingCat]) {
-                        if (setting == "comment") continue;
-                        const option = info.find(i => i == `${settingCat}.${setting}`);
-                        if (option && array[i].settings[settingCat][setting]) delete array[i].settings[settingCat][setting];
-                    }
-                    break;
+                for (const settingCat in preset.settings) array[i].settings[settingCat] = array[i].settings[settingCat] || preset.settings[settingCat]
+                for (const option of info) {
+                    const [key, value] = option.split(".");
+                    if (array[i].settings[key][value]) delete array[i].settings[key][value]
                 }
             }
         }
@@ -135,16 +133,14 @@ function loadSettings(id, callback) {
     const settings = document.getElementById('randoSettings');
     settings.innerHTML = '';
     let typeInTitle = '', type;
-    function versionsCreator(d, v, presetName) { // create a div element containing the versions selector
+    function versionsCreator(d, v) { // create a div element containing the versions selector
         if (!document.getElementById('versionSelect')) {
             const div = document.createElement('div');
-            const script = document.createElement('script');
-            script.textContent = `const presets = ${JSON.stringify(v)};`;
-            div.appendChild(script);
+            presets = v;
             div.insertAdjacentHTML("beforeend", `<h3>${typeInTitle} Executable Version</h3>`);
             div.insertAdjacentHTML("beforeend", `<p>The version that will be used to randomize your game with the ${type} randomizer.</p>`);
             div.id = "versionSelect";
-            div.insertAdjacentHTML("beforeend", `<select name="execVersion" onchange="versionsChecker(this, '${presetName}')">${(() => {
+            div.insertAdjacentHTML("beforeend", `<select name="execVersion" onchange="versionsChecker(this)">${(() => {
                 let html = ''
                 for (const key in d) { // adds in the version options
                     html += `<option value="${key}" title="${d[key].desc}${
@@ -159,21 +155,16 @@ function loadSettings(id, callback) {
         callback(v);
     }
     fetch(`/settings/${id}`).then(res => res.json()).then(d => {
-        let defaultPresetName
         switch (id) { // loads executable versions for specific randomizer versions
-            case "z17-rando": {
-                if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Old)'; 
-                if (!type) type = 'z17'; 
-                if (!defaultPresetName) defaultPresetName = 'Default z17 ALBWR Standard Template';
-            } case "z17-local": {
+            case "z17r": if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Beta)'; 
+            case "z17-rando": if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Old)'; 
+            case "z17-local": {
                 if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Older)'; 
                 if (!type) type = 'z17'; 
-                if (!defaultPresetName) defaultPresetName = 'Default z17 ALBWR Standard Template';
             } case "albw": {
                 if (!typeInTitle) typeInTitle = 'ALBW Randomizer';
                 if (!type) type = 'albw';
-                if (!defaultPresetName) defaultPresetName = 'Default ALBWR Template';
-                fetch(`/execVersions/${id}`).then(res => res.json()).then(v => versionsCreator(v, d, defaultPresetName));
+                fetch(`/execVersions/${id}`).then(res => res.json()).then(v => versionsCreator(v, d));
                 break;
             } default: callback(d)
         }
@@ -269,6 +260,7 @@ function randomizerSettings(d, clearSettingsHTML = false) {
     if (clearSettingsHTML) document.getElementById('randoSettings').innerHTML = document.getElementById('versionSelect')?.outerHTML || '';
     const booleans = [true, false];
     for (const setting in d.settings) {
+        if (typeof d.settings[setting] != "object") continue;
         let html = '';
         switch (setting) {
             case "exclude": {

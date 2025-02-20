@@ -1,0 +1,12 @@
+[logic]
+bell_in_shop = false
+pouch_in_shop = false
+boots_in_shop = false
+super_items = true
+swordless_mode = false
+start_with_bracelet = true
+glitched_logic = false
+dont_require_lamp_for_darkness = false
+minigames_excluded = false
+[options]
+night_mode = false

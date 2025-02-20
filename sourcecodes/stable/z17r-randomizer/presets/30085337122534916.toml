@@ -1,0 +1,12 @@
+[logic]
+lampless = true
+mode = 'Normal'
+assured_weapon = true
+bell_in_shop = true
+pouch_in_shop = true
+boots_in_shop = true
+super_items = true
+minigames_excluded = true
+skip_trials = true
+bow_of_light_in_castle = true
+swordless_mode = true

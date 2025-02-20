@@ -1,0 +1,18 @@
+[logic]
+randomize_dungeon_prizes = true
+lc_requirement = 0
+maiamai_madness = false
+vanes_activated = false
+lampless = false
+mode = 'Normal'
+assured_weapon = false
+bell_in_shop = false
+pouch_in_shop = false
+boots_in_shop = false
+super_items = false
+minigames_excluded = false
+skip_trials = false
+bow_of_light_in_castle = false
+swordless_mode = false
+[options]
+chest_size_matches_contents = false
