@@ -22,7 +22,6 @@
                     Don't worry, this step can only be completed once. 
                     If you uploaded the wrong file on accident, you may come back here to try again.
                 </p>
-                <small id="fileUpload.errorMessage" style="color: red;"></small>
                 <label for="fileInput" style="display: none;">Choose a file</label>
                 <input type="file" id="fileInput" name="file" accept=".3ds" style="display: none;">
                 <div id="dropArea" style="border: 2px dashed #ccc; padding: 20px; text-align: center;">
@@ -30,8 +29,8 @@
                 </div>
                 <div id="fileName" style="margin: 10%;"></div>
                 <button type="button" disabled id="uploadButtonChunk" class="styledButton">Upload</button>
-                <div class="w3-grey" id="progressBar" style="display: none;">
-                    <div class="w3-container w3-blue">0%</div>
+                <div id="progressBar" class="progressBarClass" style="display: none;">
+                    <div id="progressBarInner"></div>
                 </div>
             </div>
             <form id="step02" style="display: none;" action="javascript:;">

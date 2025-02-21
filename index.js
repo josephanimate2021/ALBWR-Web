@@ -1,6 +1,8 @@
 const express = require('express');
+const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const { promisify } = require('util');
 const {spawn} = require("child_process");
 const JSZip = require("jszip");
 let scriptOutput = '', okay2spitscript = false, userIsRandomizingGame = false;
@@ -502,31 +504,74 @@ app.get('/', (req, res) => {
 });
 
 
-// Route for uploading a file
-app.post('/upload', async (req, res) => {
-    const stream = fs.createWriteStream(`./uploads/${req.query.id}.${req.query.ext}`);
-    
-    req.pipe(stream);
-   
-    // When the stream is finished, print a final message
-    // Also, resolve the location of the file to calling function
-    stream.on('close', () => {
-        res.json({
-            success: true
-        })
-    });
-
-    stream.on('error', err => {
-        res.json({
-            error: {
-                message: err.toString(),
-                data: err
-            }
-        });
-    });
+// Multer storage configuration
+const storage = multer.diskStorage({
+    destination: 'temps/',
+    filename: function (req,file, cb) {
+        // Generate the filename 
+        const filename =  file.originalname;
+        
+        cb(null, filename); 
+    }
 });
 
-// listens to the server
+const upload = multer({ storage });
+const temporary = multer({ dest: 'temps/' });
+
+const readdir = promisify(fs.readdir);
+const readFile = promisify(fs.readFile);
+const appendFile = promisify(fs.appendFile);
+
+
+// Route for receiving file chunks
+app.post('/documents', upload.single('file'), (req, res) => {
+    const msg = `Chunk "${req.body.chunkNumber}" received successfully`;
+
+    console.log(msg);
+
+    // Here if you have the database you can use it to store the files that have been saved in the 'temps' folder
+    //..
+
+    res.send(msg);
+
+});
+
+
+// Route for combining and saving chunks
+app.get('/combine', upload.array('files'), async (req, res) => {
+    const tempFolder = 'temps/';
+    const uploadFolder = 'uploads/';
+    const combinedFileName = req.query.filename;
+
+
+    try {
+        // Read all files in the temps folder
+        const files = await readdir(tempFolder);
+
+        // Filter out only the files with the format `${number}-.-.${combinedFileName}`
+        const numberedFiles = files.filter(file => /^\d+-\.-\..+$/.test(file) && file.includes(combinedFileName));
+
+        // Sort files based on the numbers before `-.-.` in their names
+        numberedFiles.sort((a, b) => {
+            const numA = parseInt(a.split('-.-.')[0]);
+            const numB = parseInt(b.split('-.-.')[0]);
+            return numA - numB;
+        });
+        // Combine chunks into a single file
+        for (const file of numberedFiles) {
+            const filePath = path.join(tempFolder, file);
+            const data = await readFile(filePath);
+            await appendFile(path.join(uploadFolder, combinedFileName), data);
+            fs.unlinkSync(filePath);
+        }
+        res.status(200).send('Files combined and saved successfully.');
+    } catch (error) {
+        console.error('Error combining files:', error);
+        res.status(500).send('Internal Server Error');
+    }
+})
+
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
