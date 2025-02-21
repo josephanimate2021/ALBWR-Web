@@ -38,18 +38,31 @@ function handleDrop(event) {
     } else if (fileInput.files) delete fileInput.files;
 }
 
-function setBar(percent) {
-    const progressBar = document.getElementById('progressBar');
-    const progressBarInner = document.getElementById('progressBarInner');
-
-    progressBar.style.display = 'block';
-
-    if (percent === 101) {
-        progressBar.classList.remove('progressBarClass');
-        progressBar.innerHTML = `<p> Upload complete! Refreshing the page... </p>`;
-        window.location.reload();
-        return;
+// handles file submission
+document.getElementById('uploadButtonChunk').addEventListener("click", async function(e) {
+    document.getElementById('fileUpload.errorMessage').textContent = '';
+    document.getElementById('fileInput').style.display = 'none'
+    document.getElementById('fileName').style.display = 'none'
+    document.getElementById('dropArea').style.display = 'none'
+    function errorMessage(msg) {
+        e.target.textContent = "Upload";
+        document.getElementById('fileUpload.errorMessage').textContent = msg;
+        document.getElementById('fileInput').style.display = 'block'
+        document.getElementById('fileName').style.display = 'block'
+        document.getElementById('dropArea').style.display = 'block'
     }
+    e.target.textContent = "Uploading File...";
 
-    progressBarInner.style.width = `${percent}%`;
-}
+    const file = document.getElementById('fileInput').files[0];
+    const id = (Math.random()).toString().substring(2);
+    const res = await fetch(`/upload?ext=${file.name.substring(file.name.lastIndexOf(".") + 1)}&id=${id}`, {
+        method: "POST",
+        body: file
+    });
+    const json = await res.json();
+    if (json.success) {
+        e.target.textContent = 'Upload complete! Please wait while the page gets refreshed';
+        localStorage.setItem("uploadedFileId", id);
+        window.location.reload();
+    } else errorMessage(json.error.message);
+})
