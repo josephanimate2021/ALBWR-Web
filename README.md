@@ -4,7 +4,8 @@
     <br>
     (Web Interface)
   </h1>
-  <img src="https://www.nicepng.com/png/full/336-3365377_the-legend-of-zelda-a-link-between-worlds.png" alt="A Link Between Worlds">
+  <img src="![image](https://github.com/user-attachments/assets/a1185a97-2e5f-4bde-901b-23836b2ca64e)
+" alt="A Link Between Worlds">
   <p>A Node.js application meant to randomize your game using the original albw randomizer source codes and Node.JS's shell interface.</p>
 </div>
 
