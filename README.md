@@ -40,7 +40,7 @@ The source code takes the info from the Web UI and hands it off to either the z1
 
 ## Installation
 
-To use this application, follow these steps (Please Install [Node.JS](https://nodejs.org) and [Rust](https://www.rust-lang.org/) if you haven't already in order for this application to work for you):
+To use this application, follow these steps (Please Install [Node.JS](https://nodejs.org) if you haven't already in order for this application to work for you):
 
 1. Clone the repository:
 
