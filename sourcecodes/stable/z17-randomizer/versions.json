@@ -1,0 +1,18 @@
+{
+    "0.3.0-dev-build-3": {
+        "versionName": "v0.3.0 Dev Build 3",
+        "desc": "EmoTracker Pack for this release: https://github.com/rickfay/ALBW-Randomizer-Tracker/releases/tag/dev-build-3"
+    },
+    "0.3.0-dev-build-4": {
+        "versionName": "v0.3.0 Dev Build 4",
+        "desc": "Full Changelog: https://github.com/rickfay/z17-randomizer/compare/e0af7ea...7565a58",
+        "addOptions": {
+            "logic": {
+                "sword_in_shop": {
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            }
+        }
+    } 
+}
