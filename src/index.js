@@ -259,7 +259,7 @@ app.get('/', (req, res) => {
         scriptOutput = '';
         okay2spitscript = false;
         const randoPath = `./sourcecodes/stable/${req.query.v}-randomizer`;
-        const command = [path.join(__dirname, randoPath), "&&", "albw-randomizer"];
+        const command = [path.join(__dirname, randoPath), "&&", "./albw-randomizer"];
         function string2boolean(s) {
             switch (s) {
                 case "true": return true;
@@ -542,7 +542,7 @@ app.get('/combine', upload.array('files'), async (req, res) => {
     const tempFolder = 'temps/';
     const uploadFolder = 'uploads/';
     const combinedFileName = req.query.filename;
-
+    if (!fs.existsSync(uploadFolder)) fs.mkdirSync(uploadFolder);
 
     try {
         // Read all files in the temps folder
