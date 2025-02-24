@@ -36,7 +36,7 @@ docker build ALBWR-Web
 ```
 Once you are done with that, the project should be built. If you get any errors along the way and it points to any errors that i have listed below, then those are likely the causes of your error.
 
-###### no matching manifest for windows/[processor (CPU or Central Processing Unit) architecture] 10.0.[build number] in the manifest list entries
+###### no matching manifest for windows/[processor (CPU or Central Processing Unit) architecture] [windows version].[build number] in the manifest list entries
 This error is caused by you switching to a Windows container and building this project with that container. The solution is to swtich back to the Linux Container (the default container) and you should be able to build the app just fine.
 
 That's pretty much the entirety of the errors list, if you experience any errors along the way, feel free to send me a dm on discord at josephalt7000
