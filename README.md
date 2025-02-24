@@ -6,79 +6,36 @@
   </h1>
   <img src="https://github.com/user-attachments/assets/a1185a97-2e5f-4bde-901b-23836b2ca64e" alt="A Link Between Worlds">
   <p>A Node.js application meant to randomize your game using the original albw randomizer source codes and Node.JS's shell interface.</p>
+  <small>This is a version of ALBWR Web where you can host this online via a Docker Container. because of the linux support, you may only use versions down to 0.3.0 Dev Build 3 which isn't alot but is better than previous versions with less features and were more likely to make the game seed unbeatable anyway if you didn't understand how a game randomizer worked.</small>
 </div>
 
 ## Table of Contents
 
-- [Introduction](#introduction)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Introduction
-
-You may have seen videos of people playing The Legend Of Zelda: A Link Between Worlds Randomizer on youtube and said to yourself:<br>
-`I want to play the randomizer for myself to see what the hype is about.`
-And this is where this source code, including the actual albw randomizer source codes come in. You may use all to your advantage to randomize your legally dumped North America Rom file of A Link Between Worlds. Read below for more instructions.
+- [Instructions](#instructions)
+- [Building](#building)
+- [Hosting](#hosting)
 
 
-## How It Works
+## Instructions
 
-The source code takes the info from the Web UI and hands it off to either the z17 or albw randomizer source codes and uses Node.JS's shell interface to tell the source codes to randomize away with provided user input. For an idea of how your game will get randomized, you may click [here](https://github.com/rickfay/z17-randomizer/tree/master?tab=readme-ov-file#running-the-randomizer).
+Most of the instructions are located in the main branch of this repository. But for building and hosting, i will provide instructions for those.
 
+## Building
 
-## Features
-
-- Original settings are fetched from the z17 and albw randomizer source code presets (and user presets as well) so that it's easier for you to change them without having to modify their files localy.
-- Uploads your rom file into chunks for the server to process and then the server turns those chunks back into a single file to make for a fast and efficient file uploading process using [isaka's source code](https://github.com/isaka-james/chunks-to-file) to do most of the work.
-- Allows you to select which source code version is used to randomize your game.
-- Allows you to share your own settings presets with anybody if you wanted to.
-- Simple and easy-to-use interface.
-
-
-## Installation
-
-To use this application, follow these steps (Please Install [Node.JS](https://nodejs.org) if you haven't already in order for this application to work for you):
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/josephanimate2021/ALBWR-Web.git
-   ```
-   On side note, you can also download this source code as a zip file by going to Code -> Download ZIP and then extracting the downloaded zip file to get the same outcome.
-
-2. Enter into the project folder:
-
-   ```bash
-   cd ALBWR-Web
-   ```
-3. Install the dependencies:
+1. Download Docker from the [offical website](https://www.docker.com/).
+2. Launch the Docker Installer file you just downloaded and do what the steps ask you until Docker is fully installed to your computer.
+3. Open Docker for the first time. If you can, try to learn some stuff while you're there.
+4. Once you think you've learned enough or didn't want to learn, that's fine. I'm only here to provide some building instructions for this project. Anyways, Open command prompt and then type in the follwing
 ```bash
-   npm install
+cd <project folder>
+cd ../
+docker build ALBWR-Web
 ```
+Once you are done with that, the project should be built. If you get any errors along the way and it points to any errors that i have listed below, then those are likely the causes of your error.
 
-## Usage (YOU ONLY NEED TO DO STEPS 3, 4, 5, AND 6 ONCE BECAUSE AFTERWARDS THE APPLICATION WILL LOAD THE RANDOMIZER PAGE BY DEFAULT (Unless you delete the cookie that keeps track of the id of the uploaded file))
+###### no matching manifest for windows/amd64 10.0.<build number> in the manifest list entries
+This error is caused by you switching to a Windows container and building this project with that container. The solution is to swtich back to the Linux Container (the default container) and you should be able to build the app just fine.
 
-1. Start the server:
+That's pretty much the entirety of the errors list, if you experience any errors along the way, feel free to send me a dm on discord at josephalt7000
 
-   ```bash
-   npm start
-   ```
-   
-2. Open your web browser and navigate to `http://localhost:3000`.
-3. Select a rom file to upload using the provided input field.
-4. Click the "Upload" button to initiate the rom file upload process.
-5. The server will receive the file chunks and combine them into a single file inside the `uploads` folder.
-6. Once the file is uploaded, you will be shown a list of options you can change to randomize your game.
-7. Once all of the options are selected, you may click on the "Randomize Game" button. From there, the server will know that your game is ready to be randomized and will trigger either one of the randomizer codes to randomize your game.
-8. Once your game is randomized, you will get a download link of the randomized game where you can use the files to play the randomized copy of your game. You may refer [here](https://github.com/rickfay/z17-randomizer/tree/master?tab=readme-ov-file#installing-seeds) if you need help installing your randomized game seed.
-
-## Contributing
-
-Contributions are welcome! If you find have suggestions for improvement, please submit a pull request.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+## Hosting
