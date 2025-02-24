@@ -4,9 +4,9 @@
     <br>
     (Web Interface)
   </h1>
-  <img src="https://github.com/user-attachments/assets/a1185a97-2e5f-4bde-901b-23836b2ca64e" alt="A Link Between Worlds">
+  <img src="https://github.com/user-attachments/assets/a1185a97-2e5f-4bde-901b-23836b2ca64e" alt="The Legend Of Zelda: A Link Between Worlds Randomizer">
   <p>A Node.js application meant to randomize your game using the original albw randomizer source codes and Node.JS's shell interface.</p>
-  <small>This is a version of ALBWR Web where you can host this online via a Docker Container. because of the linux support, you may only use versions down to 0.3.0 Dev Build 3 which isn't alot but is better than previous versions with less features and were more likely to make the game seed unbeatable anyway if you didn't understand how a game randomizer worked.</small>
+  <small>This is a version of ALBWR Web where you can host this online via a Docker Container on most websites that support it. because of the linux support, you may only use versions down to 0.3.0 Dev Build 3 which isn't alot but is better than previous versions with less features and were more likely to make the game seed unbeatable anyway if you didn't understand how a game randomizer worked.</small>
 </div>
 
 ## Table of Contents
@@ -39,3 +39,4 @@ This error is caused by you switching to a Windows container and building this p
 That's pretty much the entirety of the errors list, if you experience any errors along the way, feel free to send me a dm on discord at josephalt7000
 
 ## Hosting
+Once i figure out the best way to host this app, i will provide instructions below.
