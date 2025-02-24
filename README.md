@@ -28,7 +28,7 @@ Most of the instructions are located in the main branch of this repository. But 
 1. Download Docker from the [offical website](https://www.docker.com/).
 2. Launch the Docker Installer file you just downloaded and do what the steps ask you until Docker is fully installed to your computer.
 3. Open Docker for the first time. If you can, try to learn some stuff while you're there.
-4. Once you think you've learned enough or didn't want to learn, that's fine. I'm only here to provide some building instructions for this project. Anyways, Open command prompt and then type in the follwing
+4. Once you think you've learned enough or didn't want to learn, that's fine. I'm only here to provide some building instructions for this project. Anyways, Open command prompt and then type in the following:
 ```bash
 cd <project folder>
 cd ../
