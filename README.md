@@ -42,5 +42,8 @@ This error is caused by you switching to a Windows container and building this p
 That's pretty much the entirety of the errors list, if you experience any errors along the way, feel free to send me a dm on discord at josephalt7000
 
 ## Hosting
-For AWS Hosting, you may watch this [youtube video](https://www.youtube.com/watch?v=qNIniDftAcU) to get an idea of how it's done. I can't really explain it in simplfied terms but you may host this on websites that support docker container deployment if you want to. Here is a list of sites i tried but didn't really process the requests as intended (like uploading files for example).
-1. [Render](https://render.com)
+These are the instructions for hosting your app on the following websites seen below.
+### AWS Hosting
+For AWS Hosting, you may watch this [youtube video](https://www.youtube.com/watch?v=qNIniDftAcU) to get an idea of how it's done. I can't really explain it in simplfied terms due to AWS not being user friendly.
+### MS Azure Hosting
+For Hosting on Microsoft Azure, you may watch this [youtube video](https://www.youtube.com/watch?v=GBl9CR8tlXk) to get an idea of how it's done. You just need to clone or download this git repository and you should be good to go from the details in the youtube video.
