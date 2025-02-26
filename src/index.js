@@ -452,7 +452,7 @@ app.get('/', (req, res) => {
                     force: true 
                 });
                 fs.unlinkSync(`${randoPath}/${config.rom}`);
-                const presetFile = `${randoPath}/presets/${req.params.id}.json`;
+                const presetFile = `${randoPath}/presets/${req.query.id}.json`;
                 if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
                 break;
             } 
@@ -466,7 +466,7 @@ app.get('/', (req, res) => {
                     force: true 
                 });
                 fs.unlinkSync(`${randoPath}/${config.rom}`);
-                const presetFile = `${randoPath}/presets/${req.params.id}.toml`;
+                const presetFile = `${randoPath}/presets/${req.query.id}.toml`;
                 if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
                 break;
             } case "z17-local": {
@@ -478,7 +478,7 @@ app.get('/', (req, res) => {
                     force: true 
                 });
                 fs.unlinkSync(`${randoPath}/${config.rom}`);
-                const presetFile = `${randoPath}/presets/${req.params.id}.toml`;
+                const presetFile = `${randoPath}/presets/${req.query.id}.toml`;
                 if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
                 fs.rmSync(path.join(process.env.APPDATA, 'z17-randomizer'), {
                     recursive: true, 
