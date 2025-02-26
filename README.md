@@ -31,8 +31,7 @@ Most of the instructions are located in the main branch of this repository. But 
 4. Once you think you've learned enough or didn't want to learn, that's fine. I'm only here to provide some building instructions for this project. Anyways, Open command prompt and then type in the following:
 ```bash
 cd <project folder>
-cd ../
-docker build ALBWR-Web
+docker build .
 ```
 Once you are done with that, the project should be built. If you get any errors along the way and it points to any errors that i have listed below, then those are likely the causes of your error.
 
