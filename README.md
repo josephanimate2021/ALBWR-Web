@@ -43,6 +43,31 @@ That's pretty much the entirety of the errors list, if you experience any errors
 ## Hosting
 These are the instructions for hosting your app on the following websites seen below.
 ### AWS Hosting
-For AWS Hosting, you may watch this [youtube video](https://www.youtube.com/watch?v=qNIniDftAcU) to get an idea of how it's done. I can't really explain it in simplfied terms due to AWS not being user friendly.
+1. Create or login to your AWS account as a root or IAM user
+2. Search for EC2 on the search bar and click on it when it comes up.
+3. Under the Launch Instance box, click on the Launch Instance button.
+4. On the Names and Tags box, name your instance to anything you want.
+5. On the Application and Machine Images box, configure it to the best of your needs. I prefer that you stick with Amazon Linux because the next steps will be assuming that you are using Amazon Linux.
+6. On the Instance type box, select anything that sticks with your plan. Assuming that your plan is a free tier, select anything that is Free Tier Elgiable
+7. On the Key Pair box, select any pair you want to use. If there's none, create one to the best of your standards.
+8. On the Network Settings box, be sure to check the boxes, Allow HTTPS/HTTP traffic from the internet.
+9. On the Configure Storage window, choose the gigs of space and drive type that fits best to your standards.
+10. Click on the "Launch Instance" button.
+11. After your instance has been created, go to the box that says Connect to your instance and click on the Connect to instance button.
+12. Click on the Connect button after you configure your instance to your standards.
+13. Once in, you will see a terminal box. Please note that Amazon linux only has the yum package manager and not the apt one. So to install packages and update stuff, you would have to type in sudo yum [action] instead of sudo (apt or apt-get) [action] into the terminal every time.
+14. Once youve gotten used to Amazon Linux, you are going to type in these commands into the terminal:
+    ```bash
+    sudo yum install git
+    git clone https://github.com/josephanimate2021/ALBWR-Web --branch docker-container
+    cd ALBWR-Web
+    sudo amazon-linux-extras install docker
+    sudo service docker start
+    set BUILDNAME=[name you want]
+    docker build -t BUILDNAME .
+    docker run -p 80:3000 -t BUILDNAME
+    ```
+15. To tell whatever or not your container is running, navigate to your assigned public IP in your browser. If it's running, this application should come up. If not, then you must have done something wrong. Please reread the steps if you need to.
+And that's all. I hope that there are no issues along the way.
 ### MS Azure Hosting
 For Hosting on Microsoft Azure, you may watch this [youtube video](https://www.youtube.com/watch?v=GBl9CR8tlXk) to get an idea of how it's done. You just need to clone or download this git repository and you should be good to go from the details in the youtube video.
