@@ -259,7 +259,7 @@ app.get('/', (req, res) => {
         scriptOutput = '';
         okay2spitscript = false;
         const randoPath = path.join(__dirname, `./sourcecodes/stable/${req.query.v}-randomizer`);
-        const command = [randoPath, "&&", "./albw-randomizer"];
+        const command = [randoPath, "&&", "bash ./albw-randomizer"];
         function string2boolean(s) {
             switch (s) {
                 case "true": return true;
