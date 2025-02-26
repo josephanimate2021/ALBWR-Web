@@ -259,7 +259,7 @@ app.get('/', (req, res) => {
         scriptOutput = '';
         okay2spitscript = false;
         const randoPath = path.join(__dirname, `./sourcecodes/stable/${req.query.v}-randomizer`);
-        const command = [randoPath, "&&", "bash ./albw-randomizer"];
+        let file = "albw-randomizer";
         function string2boolean(s) {
             switch (s) {
                 case "true": return true;
@@ -287,9 +287,10 @@ app.get('/', (req, res) => {
         }
         const presetFile = `${randoPath}/presets/${req.params.id}`;
         scriptOutput += `${req.query.v} randomizer stable is running${req.query.execVersion ? ` on version ${req.query.execVersion}` : ''}.\r\n`;
-        if (req.query.execVersion) command[2] += `-${req.query.execVersion}`;
+        if (req.query.execVersion) file += `-${req.query.execVersion}`;
         const versionsFile = `${randoPath}/versions.json`;
         const versions = fs.existsSync(versionsFile) ? JSON.parse(fs.readFileSync(versionsFile)) : {};
+        const command = [randoPath, "&&", `chmod +x ${file} && ./${file}`];
         switch (req.query.v) {
             case "albw": {
                 if (versions[req.query.execVersion]?.useVerbose) command[2] += ` --verbose`;
