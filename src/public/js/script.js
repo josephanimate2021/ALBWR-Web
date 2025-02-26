@@ -5,7 +5,7 @@ const totalChunks = 100; // Variable to store the number of chunks
 let presets; // variable to store all of the presets
 
 // shows an element to the user depending on whatever or not the user uploaded the file.
-if (localStorage.uploadedFileId) loadSettings(document.getElementById('version').value, s => {
+if (new URLSearchParams(window.location.search).get("fileUploaded")) loadSettings(document.getElementById('version').value, s => {
     const elem = document.getElementById('step02');
     elem.addEventListener("submit", randomizeGame);
     elem.style.display = 'block';
@@ -29,7 +29,7 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
     const params = new URLSearchParams();
     
     for (const [key, value] of formData.entries()) params.append(key, value);
-    fetch(`/randomize/${(Math.random()).toString().substring(2)}/${localStorage.uploadedFileId}?${params.toString()}`, {
+    fetch(`/randomize/${(Math.random()).toString().substring(2)}?${params.toString()}`, {
         method: "POST"
     }).then(res => res.json()).then(d => {
         if (d.isRandomizing) (async () => {
@@ -463,7 +463,6 @@ async function uploadChunks() {
         .then(data => {
             // The data from the server
             console.log(`The final response from server: ${data}`);
-            localStorage.setItem("uploadedFileId", id);
             setBar(101);
         })
         .catch(error => {

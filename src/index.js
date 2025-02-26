@@ -5,10 +5,11 @@ const path = require('path');
 const { promisify } = require('util');
 const {spawn} = require("child_process");
 const JSZip = require("jszip");
-let scriptOutput = '', okay2spitscript = false, userIsRandomizingGame = false;
+let scriptOutput = '', okay2spitscript = false, userIsRandomizingGame = false, sessions = {};
 
 const app = express();
 app.use((req, res, next) => {
+    sessions[req.headers['x-forwarded-for']] = sessions[req.headers['x-forwarded-for']] || {};
     console.log(req.method, req.url, req.query);
     next();
 });
@@ -42,15 +43,30 @@ function parseTOML(configToml) {
 }
 // Define routes
 app.get('/', (req, res) => {
+    if (!req.query.fileUploaded) {
+        if (sessions[req.headers['x-forwarded-for']] && sessions[req.headers['x-forwarded-for']].threeDsBuffer) return res.status(302).setHeader(
+            "Location", `/?fileUploaded=true`
+        ).end();
+    } else {
+        if (!sessions[req.headers['x-forwarded-for']] || !sessions[req.headers['x-forwarded-for']].threeDsBuffer) return res.status(302).setHeader(
+            "Location", `/`
+        ).end();
+    }
     res.sendFile(path.join(__dirname, 'views', 'uploadForm.html'));
+}).get('/deleteFile', (req, res) => {
+    delete sessions[req.headers['x-forwarded-for']].threeDsBuffer;
+    res.writeHead(302, '', {
+        location: req.headers.referer
+    });
+    res.end();
 }).get('/settings/:v', (req, res) => {
     const info = {}
     const presets = [];
-    for (const file of fs.readdirSync('./uploads').filter(i => i.startsWith(`settingsPreset-${req.params.v}-`) && i.endsWith(".json"))) {
+    /*for (const file of fs.readdirSync('./uploads').filter(i => i.startsWith(`settingsPreset-${req.params.v}-`) && i.endsWith(".json"))) {
         const info = JSON.parse(fs.readFileSync(`./uploads/${file}`));
         info.id = file.split("-")[2];
         presets.unshift(info);
-    }
+    }*/
     const randoPath = path.join(__dirname, `./sourcecodes/stable/${req.params.v}-randomizer`);
     const newLineCommon = "\n";
     const newLine = process.platform == "win32" ? "\r" : "" + newLineCommon;
@@ -248,7 +264,7 @@ app.get('/', (req, res) => {
         }
     }
     res.json(presets);
-}).post('/randomize/:id/:fileId', (req, res) => {
+}).post('/randomize/:id', (req, res) => {
     try {
         if (userIsRandomizingGame) return res.json({
             error: {
@@ -276,12 +292,10 @@ app.get('/', (req, res) => {
                 toml += `[${i}]\r\n`;
                 if (i == "exclude") {
     
-                } else if (i == "exclusions") toml += `"exclusions" = ${JSON.stringify(req.query.settings.exclusions.exclusions, null, "\t")}`
-                else {
-                    for (const c in req.query.settings[i]) toml += `${!newToml ? `# ` : ''}${c} = ${
-                        typeof string2boolean(req.query.settings[i][c]) == "string" ? `'${req.query.settings[i][c]}'` : req.query.settings[i][c]
-                    }\r\n`;
-                }
+                } else if (i == "exclusions") toml += `"exclusions" = ${JSON.stringify(req.query.settings.exclusions.exclusions, null, "\t")}\r\n`
+                else for (const c in req.query.settings[i]) toml += `${!newToml ? `# ` : ''}${c} = ${
+                    typeof string2boolean(req.query.settings[i][c]) == "string" ? `'${req.query.settings[i][c]}'` : req.query.settings[i][c]
+                }\r\n`;
             }
             return toml;
         }
@@ -290,12 +304,12 @@ app.get('/', (req, res) => {
         if (req.query.execVersion) file += `-${req.query.execVersion}`;
         const versionsFile = `${randoPath}/versions.json`;
         const versions = fs.existsSync(versionsFile) ? JSON.parse(fs.readFileSync(versionsFile)) : {};
-        const command = [randoPath, "&&", `chmod +x ${file} && ./${file}`];
+        const command = [randoPath, `&& chmod +x ${file} && ./${file}`];
         switch (req.query.v) {
             case "albw": {
-                if (versions[req.query.execVersion]?.useVerbose) command[2] += ` --verbose`;
+                if (versions[req.query.execVersion]?.useVerbose) command.push(`--verbose`);
                 if (!fs.existsSync(`${randoPath}/generated`)) fs.mkdirSync(`${randoPath}/generated`);
-                fs.copyFileSync(`./uploads/${req.params.fileId}.3ds`, `${randoPath}/albw.3ds`);
+                fs.writeFileSync(`${randoPath}/albw.3ds`, Buffer.concat(sessions[req.headers['x-forwarded-for']].threeDsBuffer));
                 if (req.query.settings && typeof req.query.settings == "object") {
                     fs.renameSync(`${randoPath}/presets/Standard.toml`, `${randoPath}/presets/Standardold.toml`);
                     fs.writeFileSync(`${randoPath}/presets/Standard.toml`, writeOldToml());
@@ -304,7 +318,7 @@ app.get('/', (req, res) => {
             } case "z17-local": {
                 const config = parseTOML(fs.readFileSync(`${randoPath}/z17-randomizer/config/Rando.toml`).toString('utf-8'))
                 if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
-                fs.copyFileSync(`./uploads/${req.params.fileId}.3ds`, `${randoPath}/${config.rom}`);
+                fs.writeFileSync(`${randoPath}/${config.rom}`, Buffer.concat(sessions[req.headers['x-forwarded-for']].threeDsBuffer));
                 if (req.query.settings && typeof req.query.settings == "object") {
                     const presetFile = `${randoPath}/z17-randomizer/config/presets/${req.params.id}.toml`
                     if (!fs.existsSync(presetFile)) fs.writeFileSync(presetFile, writeOldToml());
@@ -334,7 +348,7 @@ app.get('/', (req, res) => {
             case "z17-rando": {
                 const config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'))
                 if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
-                fs.copyFileSync(`./uploads/${req.params.fileId}.3ds`, `${randoPath}/${config.rom}`);
+                fs.writeFileSync(`${randoPath}/${config.rom}`, Buffer.concat(sessions[req.headers['x-forwarded-for']].threeDsBuffer));
                 if (req.query.settings && typeof req.query.settings == "object") fs.writeFileSync(`${randoPath}/presets/${req.params.id}.toml`, writeOldToml(true));
                 command.push(`--preset ${req.params.id}`);
                 break;
@@ -351,7 +365,7 @@ app.get('/', (req, res) => {
                 }
                 const config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
                 if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
-                fs.copyFileSync(`./uploads/${req.params.fileId}.3ds`, `${randoPath}/${config.rom}`);
+                fs.writeFileSync(`${randoPath}/${config.rom}`, Buffer.concat(sessions[req.headers['x-forwarded-for']].threeDsBuffer));
                 command.push(`--preset ${req.params.id}`);
                 break;
             }
@@ -541,10 +555,8 @@ app.post('/documents', upload.single('file'), (req, res) => {
 // Route for combining and saving chunks
 app.get('/combine', upload.array('files'), async (req, res) => {
     const tempFolder = 'temps/';
-    const uploadFolder = 'uploads/';
     const combinedFileName = req.query.filename;
-    if (!fs.existsSync(uploadFolder)) fs.mkdirSync(uploadFolder);
-
+    sessions[req.headers['x-forwarded-for']].threeDsBuffer = []
     try {
         // Read all files in the temps folder
         const files = await readdir(tempFolder);
@@ -561,8 +573,7 @@ app.get('/combine', upload.array('files'), async (req, res) => {
         // Combine chunks into a single file
         for (const file of numberedFiles) {
             const filePath = path.join(tempFolder, file);
-            const data = await readFile(filePath);
-            await appendFile(path.join(uploadFolder, combinedFileName), data);
+            sessions[req.headers['x-forwarded-for']].threeDsBuffer.push(await readFile(filePath));
             fs.unlinkSync(filePath);
         }
         res.status(200).send('Files combined and saved successfully.');
