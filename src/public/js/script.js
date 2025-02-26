@@ -112,7 +112,12 @@ function versionsChecker(obj) {
                 array[i] = infoPlaceholder;
                 const info = JSON.parse(e.getAttribute('data-versionoptions'));
                 for (const settingCat in preset.settings) array[i].settings[settingCat] = Object.assign({}, preset.settings[settingCat]);
-                for (const settingCat in info) Object.assign(array[i].settings[settingCat], info[settingCat])
+                for (const settingCat in info) {
+                    Object.assign(array[i].settings[settingCat], info[settingCat]);
+                    for (const c in preset.settings[settingCat]) {
+                        Object.assign(array[i].settings[settingCat][c], preset.settings[settingCat][c]);
+                    }
+                }
             } 
             if (e.getAttribute('data-versionoptionstoremove')) {
                 array[i] = array[i] || infoPlaceholder;
@@ -120,7 +125,7 @@ function versionsChecker(obj) {
                 for (const settingCat in preset.settings) array[i].settings[settingCat] = array[i].settings[settingCat] || Object.assign({}, preset.settings[settingCat])
                 for (const option of info) {
                     const [key, value] = option.split(".");
-                    if (array[i].settings[key][value]) delete array[i].settings[key][value]
+                    if (array[i].settings[key] && array[i].settings[key][value]) delete array[i].settings[key][value]
                 }
             }
         }

@@ -51,7 +51,7 @@ app.get('/', (req, res) => {
         info.id = file.split("-")[2];
         presets.unshift(info);
     }
-    const randoPath = `./sourcecodes/stable/${req.params.v}-randomizer`;
+    const randoPath = path.join(__dirname, `./sourcecodes/stable/${req.params.v}-randomizer`);
     const newLineCommon = "\n";
     const newLine = process.platform == "win32" ? "\r" : "" + newLineCommon;
     function decodeOldToml(info, tomlFile) {
@@ -258,8 +258,8 @@ app.get('/', (req, res) => {
         userIsRandomizingGame = true;
         scriptOutput = '';
         okay2spitscript = false;
-        const randoPath = `./sourcecodes/stable/${req.query.v}-randomizer`;
-        const command = [path.join(__dirname, randoPath), "&&", "./albw-randomizer"];
+        const randoPath = path.join(__dirname, `./sourcecodes/stable/${req.query.v}-randomizer`);
+        const command = [randoPath, "&&", "./albw-randomizer"];
         function string2boolean(s) {
             switch (s) {
                 case "true": return true;
@@ -418,7 +418,7 @@ app.get('/', (req, res) => {
         });
     }
 }).get('/execVersions/:v', (req, res) => {
-    const versionsPath = `./sourcecodes/stable/${req.params.v}-randomizer/versions.json`
+    const versionsPath = path.join(__dirname, `./sourcecodes/stable/${req.params.v}-randomizer/versions.json`);
     res.json(fs.existsSync(versionsPath) ? JSON.parse(fs.readFileSync(versionsPath)) : {})
 }).get('/randomizationStatus', (req, res) => {
     const interval = setInterval(() => {
@@ -434,7 +434,7 @@ app.get('/', (req, res) => {
     try {
         const zip = new JSZip();
         const fs = require('fs');
-        const randoPath = `./sourcecodes/stable/${req.query.v}-randomizer`;
+        const randoPath = path.join(__dirname, `./sourcecodes/stable/${req.query.v}-randomizer`);
         function c(l, k) {
             for (const file of fs.readdirSync(l)) {
                 const fileStats = fs.lstatSync(`${l}/${file}`);

@@ -1,14 +1,14 @@
 {
-  "name": "chunk",
+  "name": "albwr-web",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A Node.JS App that executes the albw-randomizer file using the input provided by the user",
+  "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Joseph",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.19.2",
     "jszip": "^3.10.1",
