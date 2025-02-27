@@ -9,7 +9,7 @@ COPY package*.json ./
 # Copy the src folder to the app directory
 COPY ./src ./
 
-# Install node packages, install serve, build the app, and remove dependencies at the end
+# Installs node and some apt packages.
 RUN sudo apt install -y make python build-essential && npm install
 
 EXPOSE 3000
