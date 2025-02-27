@@ -99,7 +99,7 @@ app.get('/', (req, res) => {
                     tip: c.substring(3),
                     defaultValue: {},
                     userCanAddNewLines: true,
-                    allOptions: JSON.parse(fs.readFileSync('./albwrVer-excludableChecksList.json'))
+                    allOptions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`))
                 });
                 const line = setting.split("# ")[1].split(newLine + newLineCommon)[0]
                 const key = line.split("[")[1].split("]")[0].split(".")[1];
@@ -219,15 +219,25 @@ app.get('/', (req, res) => {
             decodeNewToml(info, `${randoPath}/presets/Example.toml`);
             presets.unshift(info);
             break;
-        } case "z17": {
+        } case "z17v3": {
+            info.notes = ["Visit the project GitHub for details about each option: https://github.com/rickfay/z17-randomizer/tree/v0.3.0"];
+            info.settings = JSON.parse(fs.readFileSync(`${randoPath}/presets/Example.json`));
+        } default: {
             info.presetName = "Default z17 ALBWR Template";
             let json = fs.readFileSync(`${randoPath}/presets/Example.json`).toString('utf-8');
             const wordOptions = {
                 logic_mode: ["Normal", "Hard", "Glitched", "AdvGlitched", "Hell", "NoLogic"],
-                ped_requirement: ["Vanilla", "Charmed", "Standard"],
-                hyrule_castle_setting: ["EarlyLoruleCastle" , "Closed"],
                 lc_requirement: 7,
-                hint_ghost_price: 9999
+                ped_requirement: ["Vanilla", "Standard"],
+                cracks: ["Closed", "Open"],
+                cracksanity: ["Off", "CrossWorldPairs", "AnyWorldPairs", "MirroredCrossWorldPairs", "MirroredAnyWorldPairs"],
+                keysy: ["Off", "SmallKeysy", "BigKeysy", "AllKeysy"],
+                trials_door: ["OpenFromInsideOnly", "OneTrialRequired", "TwoTrialsRequired", "ThreeTrialsRequired", "AllTrialsRequired", "OpenFromBothSides"],
+                weather_vanes: ["Standard", "Shuffled", "Convenient", "Hyrule", "Lorule", "All"],
+                maiamai_limit: 100,
+                nice_items: ["Vanilla", "Shuffled", "Off"],
+                treacherous_tower_floors: 66,
+                user_exclusions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`))
             }
             const comments = [];
             let commentCount = 1;
@@ -238,39 +248,49 @@ app.get('/', (req, res) => {
                 json = json.split(c).join("")
                 pos = json.indexOf("// ", pos + 3);
             }
-            info.notes = [comments[0]];
-            info.settings = JSON.parse(json);
-            for (const settingCat in info.settings) {
-                for (const settingName in info.settings[settingCat]) {
-                    const defaultValue = info.settings[settingCat][settingName];
-                    const info2 = {
-                        comment: comments[commentCount],
-                        defaultValue
-                    }
-                    if (settingName == "exclusions") {
-                        info2.userCanAddNewLines = true;
-                        info2.allOptions = JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`));
-                    }
-                    switch (typeof info.settings[settingCat][settingName]) {
-                        case "boolean": {
-                            info2.useBooleanOptions = true;
-                            break;
-                        } default: {
-                            if (
-                                wordOptions[settingName]
-                            ) info2[typeof info.settings[settingCat][settingName] == "number" ? 'rangeNumOptionsTo' : 'allOptions'] = wordOptions[settingName]
+            info.notes = info.notes || [comments[0]];
+            if (!info.settings) Object.assign(info, JSON.parse(json));
+            function c(k) {
+                for (const settingName in k) {
+                    if (typeof k[settingName] == "object" && !k[settingName].exclusions && settingName != "user_exclusions") c(k[settingName]);
+                    else {
+                        if (k[settingName].exclusions) {
+                            const defaultValue = k[settingName].exclusions;
+                            k[settingName].exclusions = {
+                                comment: comments[commentCount],
+                                defaultValue,
+                                userCanAddNewLines: true,
+                                allOptions: wordOptions.user_exclusions
+                            }
+                        } else {
+                            const info2 = {
+                                comment: comments[commentCount],
+                                defaultValue: k[settingName]
+                            }
+                            switch (typeof k[settingName]) {
+                                case "boolean": {
+                                    info2.useBooleanOptions = true;
+                                    break;
+                                } default: {
+                                    if (settingName.includes("exclu")) info2.userCanAddNewLines = true;
+                                    if (
+                                        wordOptions[settingName]
+                                    ) info2[typeof k[settingName] == "number" ? 'rangeNumOptionsTo' : 'allOptions'] = wordOptions[settingName]
+                                }
+                            }
+                            k[settingName] = info2;
                         }
+                        commentCount++
                     }
-                    info.settings[settingCat][settingName] = info2;
-                    commentCount++
                 }
             }
+            c(info.settings)
             presets.unshift(info);
             break;
         }
     }
     res.json(presets);
-}).post('/randomize/:id/', (req, res) => {
+}).post('/randomize/:id', (req, res) => {
     try {
         if (userIsRandomizingGame) return res.json({
             error: {
@@ -359,7 +379,7 @@ app.get('/', (req, res) => {
                 if (req.query.settings && typeof req.query.settings == "object") fs.writeFileSync(`${randoPath}/presets/${req.params.id}.toml`, writeOldToml(true));
                 command.push(`--preset ${req.params.id}`);
                 break;
-            } case "z17": {
+            } case "z17v3": {
                 if (req.query.settings && typeof req.query.settings == "object") {
                     function c(j) {
                         for (const i in j) {

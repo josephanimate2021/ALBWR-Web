@@ -22,8 +22,14 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
     output.style.display = 'block';
     document.getElementById('presets').style.display = 'none';
     document.getElementById('randoVer').style.display = 'none';
-    const term = new Terminal({convertEol: true});
+    const term = new Terminal({
+        convertEol: true,
+        rows: 30,
+    });
+    const fitAddon = new FitAddon.FitAddon();
+    term.loadAddon(fitAddon);
     term.open(output);
+    fitAddon.fit();
     term.write('Running Randomizer...')
     const formData = new FormData(evt.currentTarget);
     const params = new URLSearchParams();
@@ -112,7 +118,10 @@ function versionsChecker(obj) {
                 array[i] = infoPlaceholder;
                 const info = JSON.parse(e.getAttribute('data-versionoptions'));
                 for (const settingCat in preset.settings) array[i].settings[settingCat] = Object.assign({}, preset.settings[settingCat]);
-                for (const settingCat in info) Object.assign(array[i].settings[settingCat], info[settingCat])
+                for (const settingCat in info) Object.assign(array[i].settings[settingCat], info[settingCat]);
+                for (const settingCat in preset.settings) {
+                    for (const d in preset.settings[settingCat]) Object.assign(array[i].settings[settingCat][d], preset.settings[settingCat][d]);
+                }
             } 
             if (e.getAttribute('data-versionoptionstoremove')) {
                 array[i] = array[i] || infoPlaceholder;
@@ -142,10 +151,10 @@ function loadSettings(id, callback) {
             div.id = "versionSelect";
             div.insertAdjacentHTML("beforeend", `<select name="execVersion" onchange="versionsChecker(this)">${(() => {
                 let html = ''
-                for (const key in d) { // adds in the version options
-                    html += `<option value="${key}" title="${d[key].desc}${
-                        d[key].warn ? `\r\nWARNING: ${d[key].warn}` : ''
-                    }"${d[key].addOptions ? ` data-versionoptions='${JSON.stringify(d[key].addOptions)}'` : ''}${d[key].removeOptions ? ` data-versionoptionstoremove='${JSON.stringify(d[key].removeOptions)}'` : ''}>${d[key].versionName}</option>`;
+                const keys = Object.keys(d);
+                for (var i = 0; i < keys.length; i++) { // adds in the version options
+                    const key = keys[i];
+                    html += `<option value="${key}" title="${d[key].desc}${d[key].warn ? `\r\nWARNING: ${d[key].warn}` : ''}"${d[key].addOptions ? ` data-versionoptions='${JSON.stringify(d[key].addOptions)}'` : ''}${d[key].removeOptions ? ` data-versionoptionstoremove='${JSON.stringify(d[key].removeOptions)}'` : ''}>${d[key].versionName}</option>`;
                 }
                 return html;
             })()}`);
@@ -156,8 +165,8 @@ function loadSettings(id, callback) {
     }
     fetch(`/settings/${id}`).then(res => res.json()).then(d => {
         switch (id) { // loads executable versions for specific randomizer versions
-            case "z17": if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Stable v1)'; 
-            case "z17r": if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Beta v1)'; 
+            case "z17v3": if (!typeInTitle) typeInTitle = 'Z17 Randomizer v3'; 
+            case "z17r": if (!typeInTitle) typeInTitle = 'Z17 Randomizer Beta'; 
             case "z17-rando": if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Old)'; 
             case "z17-local": {
                 if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Older)'; 
