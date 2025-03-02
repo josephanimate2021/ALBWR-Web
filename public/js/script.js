@@ -15,6 +15,8 @@ else document.getElementById(`step01`).style.display = 'block';
 
 // Randomizes ALBW
 function randomizeGame(evt, deletePresetAfterRandomization = true) {
+    document.getElementById('logo').style.display = 'none';
+    document.getElementById('options').style.display = 'none';
     evt.submitter.textContent = "Randomizing Game...";
     evt.submitter.setAttribute("disabled", "");
     document.getElementById('randoSettings').style.display = 'none';
@@ -47,10 +49,6 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                 term.write(status.split(doneText).join(''));
                 if (!status.includes(doneText)) await c();
                 else {
-                    term.write('\r\nRetrieving Your Randomized Game...\r\n');
-                    const res = await fetch(`/genZipFromRandomizedGame?v=${d.data.v}&id=${d.data.id}&deletePreset=${deletePresetAfterRandomization}`, {
-                        method: "POST"
-                    });
                     const back2randobtn = document.createElement('button');
                     back2randobtn.textContent = "<- Back To The Randomizer";
                     back2randobtn.addEventListener("click", () => {
@@ -62,21 +60,32 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                         document.getElementById('randoVer').style.display = 'block';
                         document.getElementById('randoSettings').style.display = 'block';
                         document.getElementById('randomizedGameDownload').remove();
+                        document.getElementById('options').style.display = 'block';
+                        document.getElementById('logo').style.display = 'none';
                     });
-                    back2randobtn.className = "styledButton";
-                    if (res.ok) {
-                        const blob = await res.blob();
-                        evt.submitter.textContent = "Game Randomization Successful";
-                        const buttonName = "Download Your Randomized Game"
-                        term.write(`Your randomized game was retrieved successfully!\r\nTo download it, click on the "${buttonName}" button below.`);
-                        output.insertAdjacentHTML('afterend', `<a class="styledButton" id="randomizedGameDownload" href="${
-                            URL.createObjectURL(blob)
-                        }" download="albw-randomized.zip">${buttonName} -></a>`);
-                        output.appendChild(back2randobtn);
-                    } else {
+                    back2randobtn.className = "greenBtn";
+                    function handleError(e) {
                         evt.submitter.textContent = "Game Randomization Failed";
-                        term.write(`Could not get your randomized game due to an error: ${await res.text()}. Please try randomizing your game again.`);
+                        term.write(e);
                         output.appendChild(back2randobtn);
+                    }
+                    try {
+                        term.write('\r\nRetrieving Your Randomized Game...\r\n');
+                        const res = await fetch(`/genZipFromRandomizedGame?v=${d.data.v}&id=${d.data.id}&deletePreset=${deletePresetAfterRandomization}`, {
+                            method: "POST"
+                        });
+                        if (res.ok) {
+                            const blob = await res.blob();
+                            evt.submitter.textContent = "Game Randomization Successful";
+                            const buttonName = "Download Your Randomized Game"
+                            term.write(`Your randomized game was retrieved successfully!\r\nTo download it, click on the "${buttonName}" button below.`);
+                            output.insertAdjacentHTML('afterend', `<a class="greenBtn" id="randomizedGameDownload" href="${
+                                URL.createObjectURL(blob)
+                            }" download="albw-randomized.zip">${buttonName} -></a>`);
+                            output.appendChild(back2randobtn);
+                        } else handleError(`Could not get your randomized game due to an error: ${await res.text()}. Please try randomizing your game again.`)
+                    } catch (e) {
+                        handleError(e.toString());
                     }
                 }
             }
@@ -102,6 +111,7 @@ function handleError(t = 'Upload failed! Please try again.', e) {
 
 // when a version selector gets created, this function may sometimes be called.
 function versionsChecker(obj) {
+    document.getElementById('link2cli').setAttribute("data-execv", obj.value);
     const array = [];
     for (const e of obj.children) {
         e.removeAttribute('selected')
@@ -118,9 +128,11 @@ function versionsChecker(obj) {
                 array[i] = infoPlaceholder;
                 const info = JSON.parse(e.getAttribute('data-versionoptions'));
                 for (const settingCat in preset.settings) array[i].settings[settingCat] = Object.assign({}, preset.settings[settingCat]);
-                for (const settingCat in info) Object.assign(array[i].settings[settingCat], info[settingCat]);
+                for (const settingCat in info) if (typeof array[i].settings[settingCat] == "object") Object.assign(array[i].settings[settingCat], info[settingCat]);
                 for (const settingCat in preset.settings) {
-                    for (const d in preset.settings[settingCat]) Object.assign(array[i].settings[settingCat][d], preset.settings[settingCat][d]);
+                    for (const d in preset.settings[settingCat]) if (
+                        typeof array[i].settings[settingCat][d] == "object"
+                    ) Object.assign(array[i].settings[settingCat][d], preset.settings[settingCat][d]);
                 }
             } 
             if (e.getAttribute('data-versionoptionstoremove')) {
@@ -139,6 +151,10 @@ function versionsChecker(obj) {
 
 // loads randomizer settings
 function loadSettings(id, callback) {
+    const cliLink = document.getElementById('link2cli');
+    cliLink.style.display = 'block';
+    cliLink.setAttribute("data-v", id);
+    document.getElementById('noVerboseDiv').style.display = 'none';
     const settings = document.getElementById('randoSettings');
     settings.innerHTML = '';
     let typeInTitle = '', type;
@@ -154,6 +170,7 @@ function loadSettings(id, callback) {
                 const keys = Object.keys(d);
                 for (var i = 0; i < keys.length; i++) { // adds in the version options
                     const key = keys[i];
+                    if (i == 0) cliLink.setAttribute("data-execv", key);
                     html += `<option value="${key}" title="${d[key].desc}${d[key].warn ? `\r\nWARNING: ${d[key].warn}` : ''}"${d[key].addOptions ? ` data-versionoptions='${JSON.stringify(d[key].addOptions)}'` : ''}${d[key].removeOptions ? ` data-versionoptionstoremove='${JSON.stringify(d[key].removeOptions)}'` : ''}>${d[key].versionName}</option>`;
                 }
                 return html;
@@ -171,9 +188,14 @@ function loadSettings(id, callback) {
             case "z17-local": {
                 if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Older)'; 
                 if (!type) type = 'z17'; 
+                if (id == "z17-local") cliLink.style.display = 'none';
             } case "albw": {
                 if (!typeInTitle) typeInTitle = 'ALBW Randomizer';
                 if (!type) type = 'albw';
+                if (type != "z17") {
+                    document.getElementById('noVerboseDiv').style.display = 'block';
+                    cliLink.style.display = 'none';
+                }
                 fetch(`/execVersions/${id}`).then(res => res.json()).then(v => versionsCreator(v, d));
                 break;
             } default: callback(d)
@@ -425,7 +447,7 @@ function isFileUploaded() {
 // Uploads the file chunks to the server
 async function uploadChunks() {
     console.log('Uploading chunks...');
-
+    document.getElementById('logo').style.display = 'none';
     const id = (Math.random()).toString().substring(2);
     const ext = fileName.substring(fileName.lastIndexOf("."));
 

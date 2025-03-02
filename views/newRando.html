@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+  <head>
+    <script src="/js/color-modes.js"></script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.122.0">
+    
+    <title>A Link Between Worlds Randomizer v4 Web UI · ALBWR Web</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/checkout/">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/xterm.css"/>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="/js/xterm.js"></script>
+    <script src="/js/addon-fit.js"></script>
+    <script src="/js/xterm-addon-web-links.js"></script>
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .b-example-divider {
+        width: 100%;
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 1px 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+      }
+
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+
+      .bi {
+        vertical-align: -.125em;
+        fill: currentColor;
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .btn-bd-primary {
+        --bd-violet-bg: #712cf9;
+        --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+        --bs-btn-font-weight: 600;
+        --bs-btn-color: var(--bs-white);
+        --bs-btn-bg: var(--bd-violet-bg);
+        --bs-btn-border-color: var(--bd-violet-bg);
+        --bs-btn-hover-color: var(--bs-white);
+        --bs-btn-hover-bg: #6528e0;
+        --bs-btn-hover-border-color: #6528e0;
+        --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+        --bs-btn-active-color: var(--bs-btn-hover-color);
+        --bs-btn-active-bg: #5a23c8;
+        --bs-btn-active-border-color: #5a23c8;
+      }
+
+      .bd-mode-toggle {
+        z-index: 1500;
+      }
+
+      .bd-mode-toggle .dropdown-menu .active .bi {
+        display: block !important;
+      }
+
+      .randoOutput {
+        display: none;
+      }
+    </style>
+
+    
+    <!-- Custom styles for this template -->
+    <link href="/css/newRando.css" rel="stylesheet">
+  </head>
+  <body class="bg-body-tertiary">
+    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+      <symbol id="check2" viewBox="0 0 16 16">
+        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+      </symbol>
+      <symbol id="circle-half" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+      </symbol>
+      <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+        <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+        <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
+      </symbol>
+      <symbol id="sun-fill" viewBox="0 0 16 16">
+        <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+      </symbol>
+    </svg>
+
+    <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
+      <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center"
+              id="bd-theme"
+              type="button"
+              aria-expanded="false"
+              data-bs-toggle="dropdown"
+              aria-label="Toggle theme (auto)">
+        <svg class="bi my-1 theme-icon-active" width="1em" height="1em"><use href="#circle-half"></use></svg>
+        <span class="visually-hidden" id="bd-theme-text">Toggle theme</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
+        <li>
+          <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+            <svg class="bi me-2 opacity-50" width="1em" height="1em"><use href="#sun-fill"></use></svg>
+            Light
+            <svg class="bi ms-auto d-none" width="1em" height="1em"><use href="#check2"></use></svg>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+            <svg class="bi me-2 opacity-50" width="1em" height="1em"><use href="#moon-stars-fill"></use></svg>
+            Dark
+            <svg class="bi ms-auto d-none" width="1em" height="1em"><use href="#check2"></use></svg>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+            <svg class="bi me-2 opacity-50" width="1em" height="1em"><use href="#circle-half"></use></svg>
+            Auto
+            <svg class="bi ms-auto d-none" width="1em" height="1em"><use href="#check2"></use></svg>
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div class="container">
+      <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+          <span class="fs-4">ALBW Randomizer</span>
+        </a>
+  
+        <ul class="nav nav-pills">
+          <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
+        </ul>
+      </header>
+    </div>
+    <div class="randoOutput" id="terminal"></div>
+    <div class="container">
+      <main>
+        <div class="py-5 text-center" id="logo">
+          <img class="d-block mx-auto mb-4" src="https://github.com/user-attachments/assets/a1185a97-2e5f-4bde-901b-23836b2ca64e" alt="The Legend Of Zelda: A Link Between Worlds Randomizer">
+          <p class="lead">Below is the form where you can fill out the infomation needed to randomize your game.</p>
+        </div>
+        <script>
+          function setVersion(obj) {
+            document.getElementById('randoVer').innerText = obj.id;
+            for (const eI of document.getElementById('versions').children) eI.classList.remove("bg-body-tertiary");
+            obj.classList.add("bg-body-tertiary");
+            jQuery('input[name="version"]').val($(obj).find(".my-0").text())
+          }
+        </script>
+        <div class="row g-5">
+          <div class="col-md-5 col-lg-4 order-md-last hideDuringRandomization">
+            <button class="d-flex justify-content-between align-items-center mb-3 btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+              <span>Randomizer Version</span>
+              <span class="badge bg-primary rounded-pill" id="randoVer">v0.4.0-release</span>
+            </button>
+            <ul class="dropdown-menu mb-3" id="versions">
+              <li id="v0.4.0-release" class="dropdown-item d-flex justify-content-between bg-body-tertiary" onclick="setVersion(this)">
+                <div>
+                  <h6 class="my-0">v0.4.0</h6>
+                  <small class="text-body-secondary">
+                    <strong>Full Changelog</strong>: 
+                    <a href="https://github.com/rickfay/z17-randomizer/compare/v0.3.1-release...v0.4.0-release" target="_blank">v0.3.1-release...v0.4.0-release</a>
+                  </small>
+                </div>
+                <span class="text-success">Stable Release</span>
+              </li>
+              <li id="v0.4.0-beta-2025-02-06" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
+                <div>
+                  <h6 class="my-0">v0.4.0-beta-2025-02-06</h6>
+                  <small class="text-body-secondary">
+                    <strong>Full Changelog</strong>: 
+                    <a href="https://github.com/rickfay/z17-randomizer/compare/v0.4.0-beta-2025-01-16...v0.4.0-beta-2025-02-06" target="_blank">
+                      v0.4.0-beta-2025-01-16...v0.4.0-beta-2025-02-06
+                    </a>
+                  </small>
+                </div>
+                <span class="text-warning">Pre Release</span>
+              </li>
+              <li id="v0.4.0-beta-2025-01-16" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
+                <div>
+                  <h6 class="my-0">v0.4.0-beta-2025-01-16</h6>
+                  <small class="text-body-secondary">
+                    <strong>Full Changelog</strong>: 
+                    <a href="https://github.com/rickfay/z17-randomizer/compare/v0.4.0-beta-2024-12-02...v0.4.0-beta-2025-01-16" target="_blank">
+                      v0.4.0-beta-2024-12-02...v0.4.0-beta-2025-01-16
+                    </a>
+                  </small>
+                </div>
+                <span class="text-warning">Pre Release</span>
+              </li>
+              <li id="v0.4.0-beta-2024-12-02" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
+                <div>
+                  <h6 class="my-0">v0.4.0-beta-2024-12-02</h6>
+                  <small class="text-body-secondary">
+                    <strong>Full Changelog</strong>: 
+                    <a href="https://github.com/rickfay/z17-randomizer/compare/v0.4.0-beta-2024-09-05...v0.4.0-beta-2024-12-02" target="_blank">
+                      v0.4.0-beta-2024-09-05...v0.4.0-beta-2024-12-02
+                    </a>
+                  </small>
+                </div>
+                <span class="text-warning">Pre Release</span>
+              </li>
+              <li id="sgl-2024-09-10" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
+                <div>
+                  <h6 class="my-0">SGL Tournament Build - 2024-09-10</h6>
+                  <small class="text-body-secondary">This is a special release for the <strong>SpeedGaming Live 2024 Tournament</strong>.</small>
+                </div>
+                <span class="text-info">
+                  For more information visit the Discord: 
+                  <a href="https://discord.gg/pD83S8WgJ7" target="_blank">https://discord.gg/pD83S8WgJ7</a>
+                </span>
+              </li>
+              <li id="v0.4.0-beta-2024-09-05" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
+                <div>
+                  <h6 class="my-0">v0.4.0-beta-2024-09-05</h6>
+                  <small class="text-body-secondary">
+                    <strong>Full Changelog</strong>: 
+                    <a href="https://github.com/rickfay/z17-randomizer/compare/v0.4.0-beta-2024-08-26...v0.4.0-beta-2024-09-05" target="_blank">
+                      v0.4.0-beta-2024-08-26...v0.4.0-beta-2024-09-05
+                    </a>
+                  </small>
+                </div>
+                <span class="text-warning">Pre Release</span>
+              </li>
+              <li id="v0.4.0-beta-2024-08-26" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
+                <div>
+                  <h6 class="my-0">v0.4.0-beta-2024-08-26</h6>
+                  <small class="text-body-secondary">
+                    <strong>Full Changelog</strong>: 
+                    <a href="https://github.com/rickfay/z17-randomizer/compare/v0.4.0-beta-2024-08-15...v0.4.0-beta-2024-08-26" target="_blank">
+                      v0.4.0-beta-2024-08-15...v0.4.0-beta-2024-08-26
+                    </a>
+                  </small>
+                </div>
+                <span class="text-warning">Pre Release</span>
+              </li>
+              <li id="v0.4.0-beta-2024-08-15" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
+                <div>
+                  <h6 class="my-0">v0.4.0-beta-2024-08-15</h6>
+                  <small class="text-body-secondary">
+                    <strong>Full Changelog</strong>: 
+                    <a href="https://github.com/rickfay/z17-randomizer/compare/v0.4.0-beta-2024-08-06...v0.4.0-beta-2024-08-15" target="_blank">
+                      v0.4.0-beta-2024-08-06...v0.4.0-beta-2024-08-15
+                    </a>
+                  </small>
+                </div>
+                <span class="text-warning">Pre Release</span>
+              </li>
+              <li id="v0.4.0-beta-2024-08-06" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
+                <div>
+                  <h6 class="my-0">v0.4.0-beta-2024-08-06</h6>
+                  <small class="text-body-secondary">
+                    <strong>Full Changelog</strong>: 
+                    <a href="https://github.com/rickfay/z17-randomizer/compare/v0.3.1-release...v0.4.0-beta-2024-08-06" target="_blank">
+                      v0.3.1-release...v0.4.0-beta-2024-08-06
+                    </a>
+                  </small>
+                </div>
+                <span class="text-warning">Pre Release</span>
+              </li>
+              <li id="sgl-2024" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
+                <div>
+                  <h6 class="my-0">SGL Tournament 2024 - Build #1</h6>
+                  <small class="text-body-secondary">This is a special release for the <strong>SpeedGaming Live 2024 Tournament</strong>.</small>
+                </div>
+                <span class="text-info">For more information visit the Discord: <a href="https://discord.gg/pD83S8WgJ7">https://discord.gg/pD83S8WgJ7</a></span>
+              </li>
+            </ul>
+            <script>
+              let presets;
+              function capWord(d) {
+                return d.substring(0, 1).toUpperCase() + d.substring(1);
+              }
+              function selectPreset(num) {
+                appendSetting(presets[num]);
+              }
+              function randomizeGame(obj) {
+                for (const elem of document.getElementsByClassName('hideDuringRandomization')) elem.style.display = 'none';
+                for (const elem of document.getElementsByClassName('randoOutput')) elem.style.display = 'block';
+                const randoGameBtn = document.getElementById('randoGameBtn');
+                const back2rando = document.getElementById('back2randobtn');
+                const zipfiledownload = document.getElementById('zipfiledownload');
+                const back2randobtnlistenr = evt => {
+                  for (const elem of document.getElementsByClassName('hideDuringRandomization')) elem.style.display = 'block';
+                  for (const elem of document.getElementsByClassName('randoOutput')) elem.style.display = 'none';
+                  term.clear()
+                  logo.style.display = 'block';
+                  randoGameBtn.removeAttribute("disabled");
+                  randoGameBtn.textContent = "Randomize Game";
+                  evt.target.classList.remove('d-block')
+                  evt.target.classList.add('d-none')
+                  zipfiledownload.classList.remove('d-flex');
+                  zipfiledownload.removeAttribute("href");
+                  zipfiledownload.classList.add('d-none');
+                }
+                back2rando.removeEventListener("click", back2randobtnlistenr);
+                const logo = document.getElementById('logo');
+                logo.style.display = 'none';
+                randoGameBtn.setAttribute("disabled", "");
+                randoGameBtn.textContent = "Randomizing Game..."
+                const term = new Terminal({
+                  convertEol: true,
+                  disableStdin: true,
+                  rows: 30
+                });
+                const fitAddon = new FitAddon.FitAddon();
+                const webLinksAddon = new WebLinksAddon.WebLinksAddon();
+                term.loadAddon(fitAddon);
+                term.loadAddon(webLinksAddon);
+                term.open(document.getElementById('terminal'))
+                fitAddon.fit();
+                term.write("Running Randomizer...");
+                const v = document.getElementById('randoVer').textContent;
+                jQuery.post(
+                  `/randomize/${(
+                    Math.random()
+                  ).toString().substring(3)}?v=z17&execVersion=${v.startsWith("v") ? v.substring(1) : v}&${$(obj).serialize()}`, 
+                  d => {
+                    if (d.isRandomizing) {
+                      function c() {
+                        jQuery.get("/randomizationStatus", l => {
+                          const doneText = "Press Enter to continue...";
+                          term.clear();
+                          term.write(l.split(doneText).join(''));
+                          function handleError(e) {
+                            randoGameBtn.textContent = "Game Randomization Failed";
+                            term.write(e);
+                            back2rando.addEventListener("click", back2randobtnlistenr);
+                            back2rando.classList.remove("d-none");
+                            back2rando.classList.add("d-flex");
+                          }
+                          if (!l.includes(doneText)) c();
+                          else try {
+                            term.write('\r\nRetrieving Your Randomized Game...\r\n');
+                            fetch(`/genZipFromRandomizedGame?v=${d.data.v}&id=${d.data.id}&deletePreset=${obj.getAttribute("data-wantsPresetDeleted")}`, {
+                              method: "POST"
+                            }).then(async res => {
+                              if (res.ok) {
+                                const blob = await res.blob();
+                                randoGameBtn.textContent = "Game Randomization Successful";
+                                term.write(
+                                  `Your randomized game was retrieved successfully!\r\nTo download it, click on the "Download Randomized Game" button below.`
+                                );
+                                back2rando.addEventListener("click", back2randobtnlistenr);
+                                back2rando.classList.remove("d-none");
+                                back2rando.classList.add("d-flex");
+                                zipfiledownload.href = URL.createObjectURL(blob);
+                                zipfiledownload.classList.remove('d-none');
+                                zipfiledownload.classList.add('d-flex');
+                              } else handleError(`Could not get your randomized game due to an error: ${await res.text()}. Please try randomizing your game again.`)
+                            })
+                          } catch (e) {
+                            handleError(e);
+                          }
+                        })
+                      }
+                      c();
+                    }
+                  }
+                )
+              }
+              function genRanNumber(id) {
+                const elem = document.getElementById(id);
+                elem.value = Math.floor(Math.random() * Number(elem.max) || 7);
+              }
+              function appendSetting(preset) {
+                let html = `<div class="input-grpup">
+                  <label class="form-check-label" for="seed">Seed (Optional)</label>
+                  <input type="number" class="form-control" id="seed" name="seed" value="${preset.seed}">
+                </div>`
+                for (const settingName in preset.settings) {
+                  const info = preset.settings[settingName];
+                  if (info.rangeNumOptionsTo) html += `<div class="col-12"${info.comment ? `title='${info.comment.split("'").join("")}'` : ''}>
+                    <label for="${settingName}" class="form-label">${settingName.split("_").map(capWord).join(' ')}</label>
+                    <div class="input-group">
+                      <input type="button" class="input-group-text" onclick="genRanNumber('${settingName}')" value="Generate Random Number"/>
+                      <input type="number" class="form-control" name="settings[${settingName}]" id="${settingName}" placeholder="${settingName.split(
+                        "_"
+                      ).map(capWord).join(' ')}" min="0" max="${info.rangeNumOptionsTo}" value="${info.defaultValue}" required>
+                    </div>
+                  </div>`;
+                  else if (!info.useCheckmarks) {
+                    const options = info.useBooleanOptions ? [true, false] : info.allOptions;
+                    if (Array.isArray(options)) html += `<div class="col-md-5"${info.comment ? `title='${info.comment.split("'").join("")}'` : ''}>
+                      <label for="${settingName}" class="form-label">${settingName.split("_").map(capWord).join(' ')}</label>
+                      <select class="form-select" id="${settingName}" name="settings[${settingName}]" required>${
+                        options.map(v => `<option value="${v}"${info.defaultValue == v ? ' selected' : ''}>${v}</option>`)
+                      }</select>
+                    </div>`
+                  } else {
+
+                  }
+                }
+                document.getElementById('randoSettings').innerHTML = html;
+              }
+              jQuery.getJSON(`/settings/z17`, d => {
+                presets = d;
+                appendSetting(d[0]);
+                for (var i = 0; i < d.length; i++) document.getElementById('presets').insertAdjacentHTML(
+                  "beforeend", `<li class="dropdown-item d-flex justify-content-between bg-body-tertiary" onclick="selectPreset('${i}')">
+                    <div>
+                      <h6 class="my-0">${d[i].presetName}</h6>
+                      <small class="text-body-secondary">
+                        NOTES:
+                        <ul>${d[i].notes.map(v => `<li>${v}</li>`)}</ul>
+                      </small>
+                    </div>
+                    <span class="text-info">${d[i].version}</span>
+                  </li>`
+                );
+                document.getElementById('preset').innerText = `${d[0].version}`
+              });
+              function cliRedirect(e) {
+                let link = `/cli?v=z17&execV=${document.getElementById('randoVer').textContent.substring(1)}`;
+                if (e.getAttribute("data-args")) link += ` ${e.getAttribute("data-args")}`;
+                window.open(link, '_blank');
+              }
+            </script>
+            <div class="card p-1">
+              <input type="button" class="btn btn-primary cliLink" value="Randomize Game With The CLI" onclick="cliRedirect(this)"/>
+            </div>
+            <div class="card p-1">
+              <input type="button" class="btn btn-secondary cliLink" data-args="--help" value="About RandoCLI" onclick="cliRedirect(this)" title="You may click on this button to help you ensure that you are really using your selected version of the CLI used to randomize your game."/>
+            </div>
+          </div>
+          <div class="col-md-7 col-lg-8">
+            <button class="hideDuringRandomization justify-content-between align-items-center mb-3 btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+              <span>Setting Presets</span>
+              <span class="badge bg-primary rounded-pill" id="preset"></span>
+            </button>
+            <ul class="dropdown-menu mb-3" id="presets"></ul>
+            <h4 class="mb-3 hideDuringRandomization">Randomizer Settings</h4>
+            <form action="javascript:;" onsubmit="randomizeGame(this)">
+              <input type="hidden" name="version" value="v0.4.0"/>
+              <div class="row g-3 hideDuringRandomization" id="randoSettings"></div>
+
+              <hr class="my-4 hideDuringRandomization">
+
+              <div class="form-check hideDuringRandomization">
+                <input type="checkbox" class="form-check-input" id="noPatch" name="noPatch">
+                <label class="form-check-label" for="noPatch">Disable Patch Generation</label>
+              </div>
+
+              <div class="form-check hideDuringRandomization">
+                <input type="checkbox" class="form-check-input" id="noSpoilers" name="noSpoilers">
+                <label class="form-check-label" for="noSpoilers">Disable Spoiler Log</label>
+              </div>
+
+              <button class="btn btn-primary btn-lg" type="submit" id="randoGameBtn">Randomize Game</button>
+              <center class="btn-group">
+                <input type="button" class="d-none btn btn-secondary btn-lg" id="back2randobtn" value="<- Back To Randomizer"/>
+                <a class="d-none btn btn-success btn-lg" id="zipfiledownload" download="albw-randomized.zip">Download Randomized Game -></a>
+              </center>
+            </form>
+          </div>
+        </div>
+      </main>
+      <footer class="my-5 pt-5 text-body-secondary text-center text-small">
+        <p class="mb-1">&copy; 2025–<script>document.write(new Date().getFullYear())</script> ALBWR Web</p>
+        <ul class="list-inline">
+          <li class="list-inline-item"><a href="/">Home Page</a></li>
+          <li class="list-inline-item"><a href="https://github.com/rickfay/z17-randomizer" target="_blank">ALBWR Source Code</a></li>
+          <li class="list-inline-item"><a href="https://discord.gg/dmAJh2uY7M" target="_blank">ALBWR Discord Server</a></li>
+          <li class="list-inline-item"><a href="https://albwrandomizer.com/">Rickfay's ALBWR Website (Coming Soon)</a></li>
+        </ul>
+      </footer>
+    </div>
+  </body>
+</html>

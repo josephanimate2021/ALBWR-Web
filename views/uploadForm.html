@@ -11,10 +11,8 @@
     </head>
     <body>
         <div class="container">
-            <h1>
-                The Legend Of Zelda
-                <br>
-                A Link Between Worlds Randomizer
+            <h1 id="logo">
+                <img src="https://github.com/user-attachments/assets/a1185a97-2e5f-4bde-901b-23836b2ca64e" alt="The Legend Of Zelda: A Link Between Worlds Randomizer">
             </h1>
             <div id="step01" style="display: none;">
                 <h2>North America ALBW Rom File</h2>
@@ -29,32 +27,52 @@
                     <p>Drag and drop files here or click to select</p>
                 </div>
                 <div id="fileName" style="margin: 10%;"></div>
-                <button type="button" disabled id="uploadButtonChunk" class="styledButton">Upload</button>
+                <button type="button" disabled id="uploadButtonChunk" class="greenBtn">Upload</button>
                 <div id="progressBar" class="progressBarClass" style="display: none;">
                     <div id="progressBarInner"></div>
                 </div>
             </div>
             <form id="step02" style="display: none;" action="javascript:;">
                 <div id="presets" style="float: left; display: none;">
-                    <label for="presetsSelection" title="Click me to create your own preset with your current settings" onclick="settingsPresetMaker()">Setting Presets</label>
+                    <label for="presetsSelection" title="Click me to create your own preset with your current settings" onclick="settingsPresetMaker()">
+                        Setting Presets
+                    </label><br>
                     <select id="presetsSelection"></select>
                 </div>
                 <div style="float: right;" id="randoVer">
-                    <label for="version">Randomizer Version</label>
+                    <label for="version">Randomizer Version</label><br>
                     <select id="version" onchange="loadSettings(this.value, appendSettings)" name="v">
                         <option value="z17v3">z17 v3</option>
                         <option value="z17r">z17 Beta</option>
                         <option value="z17-rando">z17 (Old)</option>
                         <option value="z17-local">z17 (Older)</option>
                         <option value="albw">albw</option>
-                    </select>
+                    </select><br>
+                    <input id="link2cli" type="button" value="Randomize Game With The CLI" class="greenBtn" onclick="location.href = `/cli?v=${this.getAttribute('data-v')}&execV=${this.getAttribute('data-execv')}`"/>
                 </div>
                 <h2>Randomizer Settings</h2>
+                <h6>This page can go up to v3 of the ALBW Randomizer. To use the latest versions of the albw randomizer, please click <a href="/v4">here</a>.</h6>
                 <p>You have uploaded a North America Rom File for A Legend Of Zelda: A Link Between Worlds. Now you may randomize away!</p>
                 <small>For more infomation about installing/uninstalling your randomized game seed, please refer <a href="https://github.com/rickfay/z17-randomizer?tab=readme-ov-file#installing-seeds">here</a>.</small>
                 <hr>
+                <div id="options">
+                    <label for="noPatch">Disable Patch Generation</label>
+                    <input type="checkbox" id="noPatch" name="noPatch">
+                    <br><br>
+                    <label for="noSpoilers">Disable Spoiler Log</label>
+                    <input type="checkbox" id="noSpoilers" name="noSpoilers">
+                    <br><br>
+                    <label for="seed">Seed (Optional)</label><br>
+                    <input type="number" id="seed" name="seed">
+                    <div id="noVerboseDiv" style="display: none;">
+                        <br><br>
+                        <label for="noVerbose">Disable Verbose Mode</label>
+                        <input type="checkbox" id="noVerbose" name="noVerbose">
+                    </div>
+                    <hr>
+                </div>
                 <div id="randoSettings" style="display: none;"></div>
-                <button type="submit" class="styledButton" id="gameRandomizeBtn">Randomize Game</button>
+                <button type="submit" class="blueBtn" id="gameRandomizeBtn">Randomize Game</button>
                 <div id="randoOutput" style="text-align: left;"></div>
             </form>
         </div>

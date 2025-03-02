@@ -1,5 +1,5 @@
 {
-  // "Visit the project GitHub for details about each option: https://github.com/rickfay/z17-randomizer/tree/dev#game-options"
+  // Visit the <a href="https://github.com/rickfay/z17-randomizer/tree/dev#game-options" target="_blank">project GitHub</a> for details about each option.
   "seed": 0,
   "version": "v0.4.0 - SGL Tournament Build #1",
   "settings": {
@@ -43,8 +43,6 @@
 
     "user_exclusions": [
       // Exclude locations to guarantee Junk items will be placed there.
-      // Check Names are all unique, consult a spoiler log for a complete list.
-      // Place a comma "," after each line (except the last line!)
       "Dodge the Cuccos",
       "Hyrule Hotfoot 65s",
       "Hyrule Hotfoot 75s",

@@ -1,9 +1,8 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f5f5f5;
-    margin: 0;
+    margin: 0px;
     padding: 0;
-    display: flex;
     justify-content: center;
     align-items: center;
 }
@@ -22,19 +21,19 @@ h1 {
 #fileInput {
     display: none;
 }
-label {
-    display: block;
+.blueBtn {
     background-color: #007bff;
     color: #fff;
     padding: 10px 20px;
+    border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-label:hover {
+.blueBtn:hover {
     background-color: #0056b3;
 }
-.styledButton {
+.greenBtn {
     background-color: #28a745;
     color: #fff;
     padding: 10px 20px;
@@ -43,7 +42,7 @@ label:hover {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-.styledButton:hover {
+.greenBtn:hover {
     background-color: #218838;
 }
 #fileName {
