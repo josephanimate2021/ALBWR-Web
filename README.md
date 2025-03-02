@@ -77,7 +77,16 @@ To use this application, follow these steps (Please Install [Node.JS](https://no
 
 ## Contributing
 
-Contributions are welcome! If you find have suggestions for improvement, please submit a pull request.
+If you want to make any contributions to my code, that's great. Contributions are welcome! You may either DM me your email address on discord at josephalt7000 to get contribution access to this repo or creating a fork of this repo, make any changes you want to the source code, and then send a pull request to this repo. I do need to note that this isn't for everybody though, and should only be done if you have coding knowledge with the following languages:
+
+1. HTML (Hyper Text Markup Language)
+   Knowledge of this language is required if you plan on making changes to the HTML files that serve the pages to the user. If you don't know HTML, things can go wrong and no one wants that.
+2. CSS (Cascading Style Sheets)
+   Knowledge of this language is required if you plan on making changes to the styling of the pages that get served to the user, The UI isn't going to look it's best if you have no experience with CSS.
+3. JS (Javascript)
+   Knowledge of this language is required if you plan on making changes to the behavior of the pages that get served to the user. The page may not behave as expected if you have no experience with JS
+
+This repo was created using Node.JS. so no worries if you have fear that i may have missed something (unless i actually did).
 
 ## License
 
