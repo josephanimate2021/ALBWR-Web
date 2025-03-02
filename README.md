@@ -77,7 +77,7 @@ To use this application, follow these steps (Please Install [Node.JS](https://no
 
 ## Contributing
 
-If you want to make any contributions to my code, that's great. Contributions are welcome! You may either DM me your email address on discord at josephalt7000 to get contribution access to this repo or creating a fork of this repo, make any changes you want to the source code, and then send a pull request to this repo. I do need to note that this isn't for everybody though, and should only be done if you have coding knowledge with the following languages:
+If you want to make any contributions to my code, that's great. Contributions are welcome! You may either DM me your email address on discord at josephalt7000 to get contribution access to this repo (please specify to me why you want to contribute) or creating a fork of this repo, make any changes you want to the source code, and then send a pull request to this repo. I do need to note that this isn't for everybody though, and should only be done if you have coding knowledge with the following languages:
 
 1. HTML (Hyper Text Markup Language)
    Knowledge of this language is required if you plan on making changes to the HTML files that serve the pages to the user. If you don't know HTML, things can go wrong and no one wants that.
