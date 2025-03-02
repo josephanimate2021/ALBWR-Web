@@ -94,7 +94,7 @@ wss.on('connection', (ws, req) => {
                         command.push(command1);
                         command.push(parsedUrl.query.command);
                     }
-                    shellInit(spawn(`${parsedUrl.query.type}${parsedUrl.query.ise ? '_ise' : ''}.exe`, command, {
+                    shellInit(spawn(`${parsedUrl.query.type || "powershell"}.exe`, command, {
                         name: 'xterm-color',
                         env: process.env
                     }))
@@ -139,7 +139,7 @@ app.get('/', (req, res) => {
     }
     res.sendFile(path.join(__dirname, 'views', 'uploadForm.html'));
 }).get('/shell', (req, res) => {
-    if (!req.headers.startsWith("localhost") || !req.headers.startsWith("127.0.0.1")) {
+    if (!req.headers.host.startsWith("localhost") && !req.headers.host.startsWith("127.0.0.1")) {
         res.writeHead(302, '', {
             location: "/"
         });
