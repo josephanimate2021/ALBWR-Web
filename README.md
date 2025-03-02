@@ -59,7 +59,7 @@ To use this application, follow these steps (Please Install [Node.JS](https://no
    npm install
 ```
 
-## Usage (YOU ONLY NEED TO DO STEPS 3, 4, 5, AND 6 ONCE BECAUSE AFTERWARDS THE APPLICATION WILL LOAD THE RANDOMIZER PAGE BY DEFAULT (Unless you delete the cookie that keeps track of the id of the uploaded file))
+## Usage (YOU ONLY NEED TO DO STEPS 3, 4, 5, AND 6 ONCE BECAUSE AFTERWARDS THE APPLICATION WILL LOAD THE RANDOMIZER PAGE BY DEFAULT (Unless you restart your session))
 
 1. Start the server:
 
