@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+    <head>
+        <title>ALBW Randomizer CLI - ALBW Web</title>
+        <link rel="stylesheet" href="/css/style.css"/>
+        <link rel="stylesheet" href="/css/xterm.css"/>
+        <script src="/js/xterm.js"></script>
+        <script src="/js/addon-fit.js"></script>
+        <script src="/js/xterm-addon-web-links.js"></script>
+    </head>
+    <body>
+        <center>
+            <h1>The Legend Of Zelda: A Link Between Worlds Randomizer CLI</h1>
+            <p>
+                This page is for people who prefer to use the CLI interface of the ALBW Randomizer. 
+                If you don't know anything about the CLI nor do you know how to use it,
+                then you are advised to leave this page and use the GUI instead unless you want to mess around in here and seeing what happens in the process.
+            </p>
+        </center>
+        <div id="terminal"></div>
+        <script>
+            const params = new URLSearchParams(window.location.search);
+            const v = params.get("v");
+            const execV = params.get("execV");
+            let cursorX;
+            const term = new Terminal({
+                cursorBlink: true,
+                convertEol: true,
+                rows: 40,
+            });
+            const fitAddon = new FitAddon.FitAddon();
+            const webLinksAddon = new WebLinksAddon.WebLinksAddon();
+            term.loadAddon(fitAddon);
+            term.loadAddon(webLinksAddon);
+            term.open(document.getElementById('terminal'));
+            fitAddon.fit();
+            window.addEventListener("resize", e => fitAddon.fit())
+            term.write('Setting Up The CLI for ALBWR...\n');
+            const socket = new WebSocket(`${window.location.protocol.startsWith("https") ? 'wss' : 'ws'}://${window.location.host}/randoCli?v=${v}&execV=${execV}`);
+            socket.addEventListener("message", e => {
+                if (typeof e.data == "string") {
+                    cursorX = e.data.substring(e.data.lastIndexOf("\n") + 1).length;
+                    term.write(e.data)
+                } else if (e.data instanceof Blob && !execV.includes("--")) {
+                    const div = document.createElement('div');
+                    div.className = "container";
+                    div.align = "center";
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(e.data);
+                    a.className = "greenBtn";
+                    a.download = "albw-randomized.zip";
+                    a.textContent = "Download Randomized Game";
+                    div.appendChild(a);
+                    document.body.appendChild(div);
+                }
+            });
+            let input = [];
+            term.onKey(k => {
+                switch (k.domEvent.key) {
+                    case "Enter": {
+                        if (cursorX) {
+                            cursorX = '';
+                            term.write(k.key);
+                            socket.send(input.join(''))
+                            input = [];
+                        }
+                        break;
+                    } case "Backspace": {
+                        if (cursorX && term.buffer._normal.cursorX > cursorX) {
+                            if (input[input.length - 1]) input.splice(input.length - 1, 1);
+                            term.write('\b \b');
+                        }
+                        break;
+                    } case "ArrowLeft": {
+                        if (cursorX && term.buffer._normal.cursorX > cursorX) term.write(k.key);
+                        break;
+                    } default: {
+                        if (k.domEvent.key != "ArrowRight") input[term.buffer._normal.cursorX] = k.key;
+                        term.write(k.key);
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>
