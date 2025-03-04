@@ -53,9 +53,10 @@ wss.on('connection', (ws, req) => {
                         case "z17-local":
                         case "albw": return ws.send(`Sorry, but the ${parsedUrl.query.v} randomizer does not support the CLI.`);
                     }
-                    const randoPath = path.join(__dirname, `./src/sourcecodes/stable/${parsedUrl.query.v}-randomizer`);
+                    const randoPath = path.join(__dirname, `./sourcecodes/stable/${parsedUrl.query.v}-randomizer`);
                     if (writeALBWFile(Object.assign(req, parsedUrl), {}, randoPath, false, [], ws)) {
-                        const shell = spawn("cd", [randoPath, `&& albw-randomizer-${parsedUrl.query.execV}`], {
+                        const file = `albw-randomizer-${parsedUrl.query.execV}`;
+                        const shell = spawn("cd", [randoPath, `&& chmod +x ${file} && ./${file}`], {
                             name: 'xterm-color',
                             env: process.env,
                             shell: true
@@ -86,14 +87,6 @@ wss.on('connection', (ws, req) => {
                         ws.send('\nPlease try reloading the page or contacting josephalt7000 on discord to get your issue resolved.')
                         ws.send('\nA screenshot of this error is highly encouraged in order for your error to be better resolved.');
                     }
-                    break;
-                } case "/shell": { // Loads a shell
-                    const command = [];
-                    if (parsedUrl.query.command) command.push(parsedUrl.query.command);
-                    shellInit(spawn(`bash`, command, {
-                        name: 'xterm-color',
-                        env: process.env
-                    }))
                     break;
                 }
             }
@@ -134,13 +127,6 @@ app.get('/', (req, res) => {
         }
     }
     res.sendFile(path.join(__dirname, 'views', 'uploadForm.html'));
-}).get('/shell', (req, res) => {
-    if (!req.headers.host.startsWith("localhost") && !req.headers.host.startsWith("127.0.0.1")) {
-        res.writeHead(302, '', {
-            location: "/"
-        });
-        res.end();
-    } else res.sendFile(path.join(__dirname, `views/interactiveShell.html`))
 }).get('/v4', (req, res) => {
     if (!sessions[req.headers['x-forwarded-for']] || !sessions[req.headers['x-forwarded-for']].threeDsBuffer) {
         res.writeHead(302, '', {
@@ -170,7 +156,7 @@ app.get('/', (req, res) => {
         info.id = file.split("-")[2];
         presets.unshift(info);
     }
-    const randoPath = `./src/sourcecodes/stable/${req.params.v}-randomizer`;
+    const randoPath = path.join(__dirname, `./sourcecodes/stable/${req.params.v}-randomizer`);
     const newLineCommon = "\n";
     const newLine = process.platform == "win32" ? "\r" : "" + newLineCommon;
     function decodeOldToml(info, tomlFile) {
@@ -397,13 +383,14 @@ app.get('/', (req, res) => {
         userIsRandomizingGame = true;
         scriptOutput = '';
         okay2spitscript = false;
-        const randoPath = `./src/sourcecodes/stable/${req.query.v}-randomizer`;
-        const command = [path.join(__dirname, randoPath), "&&", "albw-randomizer"];
+        const randoPath = path.join(__dirname, `./sourcecodes/stable/${req.query.v}-randomizer`);
+        let file = "albw-randomizer"
+        if (req.query.execVersion) file += `-${req.query.execVersion}`;
+        const command = [path.join(__dirname, randoPath), "&& chmod +x", file, `&& ./${file}`];
         if (req.query.noSpoilers) command.push('--no-spoiler');
         if (req.query.noPatch) command.push('--no-patch');
         if (req.query.seed) command.push(`--seed ${req.query.seed}`);
         scriptOutput += `${req.query.v} randomizer stable is running${req.query.execVersion ? ` on version ${req.query.execVersion}` : ''}.\r\n`;
-        if (req.query.execVersion) command[2] += `-${req.query.execVersion}`;
         const versionsFile = `${randoPath}/versions.json`;
         const versions = fs.existsSync(versionsFile) ? JSON.parse(fs.readFileSync(versionsFile)) : {};
         if (writeALBWFile(req, versions, randoPath, true, command, res)) {
@@ -470,7 +457,7 @@ app.get('/', (req, res) => {
         });
     }
 }).get('/execVersions/:v', (req, res) => {
-    const versionsPath = `./src/sourcecodes/stable/${req.params.v}-randomizer/versions.json`
+    const versionsPath = path.join(__dirname, `./sourcecodes/stable/${req.params.v}-randomizer/versions.json`)
     res.json(fs.existsSync(versionsPath) ? JSON.parse(fs.readFileSync(versionsPath)) : {})
 }).get('/randomizationStatus', (req, res) => {
     const interval = setInterval(() => {
@@ -522,7 +509,7 @@ async function genGameZip(req, res) {
     userIsRandomizingGame = false;
     try {
         const zip = new JSZip();
-        const randoPath = `./src/sourcecodes/stable/${req.query.v}-randomizer`;
+        const randoPath = path.join(__dirname, `./sourcecodes/stable/${req.query.v}-randomizer`);
         function c(l, k) {
             for (const file of fs.readdirSync(l)) {
                 const fileStats = fs.lstatSync(`${l}/${file}`);

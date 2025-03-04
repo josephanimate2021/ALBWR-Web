@@ -9,10 +9,11 @@ COPY package*.json ./
 # Copy the src folder to the app directory
 COPY ./src ./
 
-# Installs node and some apt packages.
-RUN sudo apt install -y make python build-essential && npm install
+# Installs node packages.
+RUN npm install ws
 
-EXPOSE 3000
+## Exposes a port number
+EXPOSE 80
 
-# Start the app using serve command
+# Starts the app
 CMD [ "node", "index.js" ]
