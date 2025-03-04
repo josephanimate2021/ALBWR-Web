@@ -10,7 +10,7 @@ COPY package*.json ./
 COPY ./src ./
 
 # Installs node packages.
-RUN npm install ws
+RUN npm install
 
 ## Exposes a port number
 EXPOSE 80

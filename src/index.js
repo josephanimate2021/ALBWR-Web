@@ -5,6 +5,7 @@ const path = require('path');
 const { promisify } = require('util');
 const {spawn} = require("child_process");
 const JSZip = require("jszip");
+const archipelago = require("archipelago.js");
 let scriptOutput = '', okay2spitscript = false, userIsRandomizingGame = false, sessions = {};
 const ws = require("ws");
 const app = express();
@@ -87,6 +88,24 @@ wss.on('connection', (ws, req) => {
                         ws.send('\nPlease try reloading the page or contacting josephalt7000 on discord to get your issue resolved.')
                         ws.send('\nA screenshot of this error is highly encouraged in order for your error to be better resolved.');
                     }
+                    break;
+                } case "/archipelago": { // when a user decides to connect to an archipelago server
+                    // Create a new instance of the Client class.
+                    const client = new archipelago.Client();
+
+                    // Set up an event listener for whenever a message arrives and print the plain-text content to the console.
+                    client.messages.on("message", d=> ws.send(d));
+
+                    // Login to the server. Replace `archipelago.gg:XXXXX` and `Phar` with the address/url and slot name for your room.
+                    // If no game is provided, client will connect in "TextOnly" mode, which is fine for this example.
+                    client.login(parsedUrl.query.host, parsedUrl.query.user).then(() => ws.send(JSON.stringify({connectionSuccessful: true}))).catch(e => {
+                        console.error(e);
+                        ws.send(JSON.stringify({
+                            connectionSuccessful: false,
+                            error: e.toString()
+                        }));
+                    });
+                    ws.on("close", () => client.socket.emit("close"))
                     break;
                 }
             }

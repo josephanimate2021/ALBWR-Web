@@ -140,16 +140,59 @@ const checkLocations = {
         "[Mai] Small Pond": {}
     },
     "Ravio's Shop": {
-        "Ravio's Gift": {},
-        "Ravio's Shop (1)": {},
-        "Ravio's Shop (2)": {},
-        "Ravio's Shop (3)": {},
-        "Ravio's Shop (4)": {},
-        "Ravio's Shop (5)": {},
-        "Ravio's Shop (6)": {},
-        "Ravio's Shop (7)": {},
-        "Ravio's Shop (8)": {},
-        "Ravio's Shop (9)": {}
+        "Ravio's Gift": {
+            small: true,
+            unlockedByDefault: true,
+            position: "274x344"
+        },
+        "Ravio's Shop (1)": {
+            small: true,
+            unlockedByDefault: true,
+            position: "268x346"
+        },
+        "Ravio's Shop (2)": {
+            small: true,
+            unlockedByDefault: true,
+            position: "268x340"
+        },
+        "Ravio's Shop (3)": {
+            stroke: true,
+            small: true,
+            unlockedByDefault: true,
+            position: "268x334"
+        },
+        "Ravio's Shop (4)": {
+            small: true,
+            unlockedByDefault: true,
+            position: "270x332"
+        },
+        "Ravio's Shop (5)": {
+            stroke: true,
+            small: true,
+            unlockedByDefault: true,
+            position: "274x332"
+        },
+        "Ravio's Shop (6)": {
+            small: true,
+            unlockedByDefault: true,
+            position: "278x332"
+        },
+        "Ravio's Shop (7)": {
+            stroke: true,
+            small: true,
+            unlockedByDefault: true,
+            position: "280x334"
+        },
+        "Ravio's Shop (8)": {
+            small: true,
+            unlockedByDefault: true,
+            position: "280x340"
+        },
+        "Ravio's Shop (9)": {
+            small: true,
+            unlockedByDefault: true,
+            position: "280x346"
+        },
     },
     "River Area": {
         Dampe: {},
