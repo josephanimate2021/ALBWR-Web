@@ -161,27 +161,27 @@ const checkLocations = {
             unlockedByDefault: true,
             position: "268x334"
         },
-        "Ravio's Shop (4)": {
-            small: true,
-            unlockedByDefault: true,
-            position: "270x332"
-        },
         "Ravio's Shop (5)": {
             stroke: true,
             small: true,
             unlockedByDefault: true,
             position: "274x332"
         },
-        "Ravio's Shop (6)": {
+        "Ravio's Shop (4)": {
             small: true,
             unlockedByDefault: true,
-            position: "278x332"
+            position: "270x332"
         },
         "Ravio's Shop (7)": {
             stroke: true,
             small: true,
             unlockedByDefault: true,
             position: "280x334"
+        },
+        "Ravio's Shop (6)": {
+            small: true,
+            unlockedByDefault: true,
+            position: "278x332"
         },
         "Ravio's Shop (8)": {
             small: true,

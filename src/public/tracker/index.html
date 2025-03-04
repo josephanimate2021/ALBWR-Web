@@ -14,6 +14,8 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.js"></script>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
 
     <link href="/css/bootstrap.min.css" rel="stylesheet">
@@ -132,7 +134,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Connect To Archipelago</button>
+            <button type="submit" class="btn btn-primary" data-connected="false">Connect To Archipelago</button>
           </div>
         </form>
       </div>
@@ -176,7 +178,7 @@
     <header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow" data-bs-theme="dark">
       <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white" href="/">ALBW Randomizer</a>
     </header>
-
+    
     <div class="container-fluid">
       <div class="row">
         <div class="sidebar border border-right col-md-3 col-lg-2 p-0 bg-body-tertiary">
@@ -282,7 +284,7 @@
               </h6>
               <ul class="nav flex-column" id="otherOptions" style="display: none;">
                 <li class="nav-item">
-                  <a class="nav-link d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#archipelagoConnector" data-serverConnectText="Connect To An Archipelago Server" href="#">
+                  <a class="nav-link d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#archipelagoConnector" href="#">
                     <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 30 36" style="enable-background:new 0 0 30 36" xml:space="preserve" class="bi">
                       <path class="st0" d="m208.47 21.68 2.15-.56-.58-2.97-9.53-.69-1.64 3.67 4.69.77-.24 2.01-2.74 1.28-4.14-1.42-1.96-6.58 1.72-7.17 3.88-1.5 3.23 1.1-.46 2.13 4.94 1.85 1.04-3.91-4.12-5.48h-9.14l-4.33 3.15-1.95 9.51 2.77 10.67 6.97 2.99 4.17-1.23-.11 3.06h5.92l.39-2.41-2.02-.96zm21.98-15.42L226.39 4l-8.59-.01-4.07 2.86-2.58 8.9 1.52 11.82 5.61 4.73 7.65.01 5.72-4.59 2.47-12.46-3.67-9zm-2.22 15.49-3.95 5.45-2.16.43-4.6-3.46-1.52-8.45 2.4-7.02 5.14-.48 2.97 1.79 1.74 5.83-.02 5.91zm-112.1 5.73-.24 4.88 12.26.09-.83-5.01-2.86-.48.14-17.62 2.45-.42-.14-4.85-10.92.36.1 4.6 3.2.63-.42 17.67-2.74.15zm25.21-23.27-12.88-.39v4.26l1.95.62v25.15l-1.8 1.41-.02 2.63h8.23l-.82-9.93h6.09l4.57-4.46V7.27l-5.32-3.06zm.04 16.3-2.54 1.89-3.23.16-.21-13.24h3.88l2.1 1.68v9.51zM14.14 11.28c0 .35-.02.71-.07 1.05.38.07.76.11 1.16.11s.79-.04 1.16-.11a7.933 7.933 0 0 1 4.65-8.3C20.17 1.68 17.9 0 15.24 0S10.3 1.68 9.42 4.03a7.922 7.922 0 0 1 4.72 7.25z"></path>
                       <path class="st0" d="M18.04 11.28c0 .16.01.32.02.48.02.3.06.6.13.88.06.28.15.56.25.83.11.3.24.58.39.85 1.42-1.33 3.33-2.15 5.42-2.15s4.01.82 5.42 2.15c.51-.9.79-1.94.79-3.04 0-3.42-2.79-6.22-6.22-6.22-.4 0-.79.04-1.16.11-.28.06-.56.13-.83.22-.28.09-.56.21-.83.35a6.24 6.24 0 0 0-3.38 5.54zm-11.82.88c2.1 0 4.01.82 5.42 2.15.15-.27.28-.55.39-.85.1-.27.19-.54.25-.83.06-.28.11-.58.13-.88.02-.15.02-.32.02-.48a6.23 6.23 0 0 0-3.39-5.54c-.27-.13-.54-.24-.83-.34-.27-.1-.55-.17-.83-.22a6.42 6.42 0 0 0-1.16-.11 6.227 6.227 0 0 0-5.43 9.26 7.885 7.885 0 0 1 5.43-2.16z"></path>
@@ -293,7 +295,7 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link d-flex align-items-center gap-2" href="javascript:document.getElementById('logsUploader').click()">
+                  <a id="uploadSpoilerBtn" class="nav-link d-flex align-items-center gap-2" href="javascript:document.getElementById('logsUploader').click()" title="Recommended if you want the tracker to work it's best to aid you in your randomized game, especially if you are using Archipelago autotracking, which this step is required in order for the autotracker to point you in the right direction.">
                     <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" class="bi">
                       <circle style="fill:#FAA85F;" cx="376" cy="400" r="112"/>
                       <polygon style="fill:#FFFFFF;" points="376,336 328,400 360,400 360,464 392,464 392,400 424,400 "/>
@@ -307,7 +309,7 @@
                         <path style="fill:#00384D;" d="M136,368v32h96c0-11.008,1.36-21.696,3.712-32H136z"/>
                       </g>
                     </svg>
-                    Upload Spoiler Log
+                    <span>Upload Spoiler Log</span>
                   </a>
                 </li>
               </ul>
@@ -327,8 +329,9 @@
             </div>
           </div>
         </div>
-
+        <input type="file" onchange="uploadSpoilerLog()" id="logsUploader" style="display: none;" accept=".json,.yaml,.txt"/>
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+          <div id="alertBlock"></div>
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">The Legend Of Zelda: A Link Between Worlds Randomizer Tracker</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
