@@ -3,7 +3,7 @@
  */
 
 // Toggles an element to show and hide
-let connected2archipelago = false;
+let connected2archipelago = false, spoiler;
 function toggle(id) {
     const elem = document.getElementById(id);
     elem.style.display = elem.style.display == "flex" ? 'none' : 'flex';
@@ -35,13 +35,14 @@ function switchTrackerMode(type) { // loads the map and items by default
             }
         }
     }
+    const items = document.getElementById('gameItems');
+    items.innerHTML = '';
     function getItems() { 
         const cats = {
             junk: "Junk Items",
             items: "Progression Items",
             others: "Other Items"
         }
-        const items = document.getElementById('gameItems');
         for (const type in cats) {
             let html = `<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
                 <span>${cats[type]}</span>
@@ -55,8 +56,11 @@ function switchTrackerMode(type) { // loads the map and items by default
             for (const item in checkItems) {
                 if (checkItems[item].cat == type) {
                     html += `<li class="nav-item" title="${!checkItems[item].dontSayTitle ? item : ''}">
-                        <a id="${checkItems[item].id}" class="nav-link d-flex align-items-center gap-2" href="javascript:retrievedItem('${checkItems[item].id}')">
-                            <img src="/tracker/images/${type}/${checkItems[item].imageFilename}" alt="${item}" class="gameItemNotObtained"/>
+                        <a id="${checkItems[item].id}" class="nav-link d-flex align-items-center gap-2" href="javascript:retrievedItem(this)">
+                            <img src="/tracker/images/${type}/${checkItems[item].id}${
+                                checkItems[item].count ? `-${checkItems[item].count}` : ''
+                            }.png" alt="${item}"${!checkItems[item].obtained ? ` class="gameItemNotObtained"` : ''}/>
+                            ${checkItems[item].count ? `<span id="${checkItems[item].id}Count"></span>` : ''}
                         </a>
                     </li>`;
                 }
@@ -65,7 +69,7 @@ function switchTrackerMode(type) { // loads the map and items by default
         }
     }
     for (const elem of document.getElementsByClassName('trackerOption')) elem.classList.remove('active');
-    document.getElementById(type).classList.add('active')
+    document.getElementById(type).classList.add('active');
     switch (type) {
         case "itemsAndMap": {
             drawMap();
@@ -76,12 +80,35 @@ function switchTrackerMode(type) { // loads the map and items by default
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             getItems();
-        break;
+            break;
         } case "map": {
             drawMap();
             break;
         }
     }
+}
+function findCheckItem(itemId) {
+    for (const item in checkItems) {
+        if (checkItems[item].id == itemId) return checkItems[item];
+    }
+    return false;
+}
+function retrievedItem(obj) {
+    const itemInfo = findCheckItem(obj.id);
+    const img = $(obj).find("img");
+    const className = "gameItemNotObtained";
+    if (!itemInfo?.count) img.hasClass(className) ? img.removeClass(className) : img.addClass(className)
+    else img.hasClass(className) ? (() => {
+        if (itemInfo.limit && itemInfo.count > itemInfo.limit) {
+            img.removeClass(className)
+            $(obj).find("#" + obj.id + "Count").text('')
+            delete itemInfo.obtained;
+        } else $(obj).find("#" + obj.id + "Count").text(itemInfo.count++);
+    })() : (() => {
+        img.addClass(className);
+        itemInfo.obtained = true;
+        $(obj).find("#" + obj.id + "Count").text(itemInfo.count++);
+    })();
 }
 // clears a message upon modal close for connecting to an archipelago server.
 $("#archipelagoConnector").on("hidden.bs.modal", e => $(e.target).find("p").text(''));
@@ -110,15 +137,90 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
             $(obj).find("p").html(`Failed to connect to Archipelago's WebSockets.<br>${e.toString()}`);
         }
         try {
-            const socket = new WebSocket(`${window.location.protocol.startsWith("https") ? 'wss' : 'ws'}://${window.location.host}/archipelago?${$(obj).serialize()}`);
+            const info = Object.fromEntries(new URLSearchParams($(obj).serialize()));
+            const socket = new WebSocket(`ws://${info.host}`);
             setTimeout(() => {
                 if (!connectionSuccessful) {
                     socket.close();
                     handleError("Timeout occured. Please try again later.")
                 }
             }, 35042)
-            socket.addEventListener("message", e => {
-                if (typeof e.data == "string" && connectionSuccessful) {
+            let roomInfo;
+            socket.addEventListener("message", async e => {
+                const array = JSON.parse(e.data);
+                switch (array[0].cmd) {
+                    case "RoomInfo": {
+                        if (!array[0].password || info.password) {
+                            roomInfo = array[0];
+                            array[0].password = !info.password ? array[0].password : info.password;
+                            array[0].cmd = "GetDataPackage";
+                            socket.send(JSON.stringify(array));
+                        } else {
+                            handleError("Please enter in the password");
+                            $(obj).append(`<label for="password">Password</label><input class="form-control" type="password" id="password" name="password" required/>`);
+                        }
+                        break;
+                    } case "DataPackage": {
+                        spoiler = {
+                            locations: {},
+                            items: {}
+                        };
+                        const games = array[0].data.games;
+                        console.log(roomInfo);
+                        const array2 = [];
+                        function uuidGenV4() { // generates a v4 UUID for archipelago
+                            const G=[];
+                            for (let Q = 0; Q < 36; Q++) G.push(Math.floor(Math.random() * 16));
+                            return G[14] = 4, G[19] = G[19] &= -5, G[19] = G[19] |= 8, G[8] = G[13] = G[18] = G[23] = "-", G.map((Q) => Q.toString(16)).join("")
+                        }
+                        for (const game in games) {
+                            if (game == "Archipelago") continue;
+                            array2.unshift({
+                                cmd: "Connect",
+                                password: info.password || "",
+                                name: info.user,
+                                game,
+                                slot_data: info.slotData == "on",
+                                items_handling: 7,
+                                uuid: uuidGenV4(),
+                                tags: roomInfo.tags,
+                                version: roomInfo.version,
+                            });
+                            for (const location in games[game].location_name_to_id) {
+                                spoiler.locations[location] = Object.assign({
+                                    id: games[game].location_name_to_id[location]
+                                }, checkLocations[location] || {});
+                            }
+                            for (const item in games[game].item_name_to_id) {
+                                spoiler.items[item] = Object.assign({
+                                    id: games[game].item_name_to_id[item]
+                                }, checkItems[item] || {});
+                            }
+                        }
+                        socket.send(JSON.stringify(array2));
+                        break;
+                    } case "Connected": {
+                        jQuery(obj).bind("archipelagoDisconnect", () => {
+                            $(obj).find('button[type="submit"]').attr("data-connected", false);
+                            socket.close();
+                            $(obj).find('button[type="submit"]').text(originalText);
+                            $("#statusKindof").html(originalText2);
+                            connected2archipelago= false;
+                            $(obj).find("p").text('Successfully disconnected from the Archipelago Server')
+                        })
+                        connectionSuccessful = true;
+                        $("#statusKindof").text("Connected To Archipelago")
+                        $(obj).find("p").css("color", "lime");
+                        $(obj).find('button[type="submit"]').attr("data-connected", true);
+                        $(obj).find('button[type="submit"]').attr("disabled", false);
+                        $(obj).find('button[type="submit"]').text("Disconnect From Archipelago");
+                        $(obj).find("p").text(`Successfully connected to the Archipelago server!`);
+                        break;
+                    } case "ReceivedItems": {
+
+                    }
+                }
+                /*if (typeof e.data == "string" && connectionSuccessful) {
                     console.log(e.data)
                     const [playerName, term, itemName, idk, location] = e.data.split(",");
                     for (const l in checkLocations) {
@@ -143,7 +245,7 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
                     $(obj).find('button[type="submit"]').attr("disabled", false);
                     $(obj).find('button[type="submit"]').text("Disconnect From Archipelago");
                     $(obj).find("p").text(`Successfully connected to the Archipelago server!`);
-                }
+                }*/
             })
         } catch (e) {
             handleError(e);
