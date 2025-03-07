@@ -46,3 +46,11 @@
 .navbar .form-control {
   padding: .75rem 1rem;
 }
+
+/*
+ * ALBW Item Not Obtained
+ */
+
+.gameItemNotObtained {
+  filter: grayscale(100%);
+}

@@ -3,11 +3,10 @@
  */
 
 // Toggles an element to show and hide
-let toggleStuff = {}, spoiler, connected2archipelago = false;
+let connected2archipelago = false;
 function toggle(id) {
     const elem = document.getElementById(id);
-    elem.style.display = toggleStuff[id] ? 'none' : 'block';
-    toggleStuff[id] = elem.style.display == "block";
+    elem.style.display = elem.style.display == "flex" ? 'none' : 'flex';
 }
 
 function switchTrackerMode(type) { // loads the map and items by default
@@ -28,16 +27,42 @@ function switchTrackerMode(type) { // loads the map and items by default
                     drawer.fillStyle = info.completed ? 'gray' : info.unlockedByDefault ? 'lime' : 'red';
                     drawer.fill();
                     if (info.stroke) {
-                        if (!info.unlockedByDefault) drawer.strokeStyle = 'brown';
-                        else if (info.completed) drawer.strokeStyle = 'grey';
+                        if (info.completed) drawer.strokeStyle = 'grey';
+                        else if (!info.unlockedByDefault) drawer.strokeStyle = 'brown';
                         drawer.stroke();
                     }
                 }
             }
         }
     }
-    function getItems() { // loads all of the items using either the uploaded spoiler log or default items file
-
+    function getItems() { 
+        const cats = {
+            junk: "Junk Items",
+            items: "Progression Items",
+            others: "Other Items"
+        }
+        const items = document.getElementById('gameItems');
+        for (const type in cats) {
+            let html = `<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
+                <span>${cats[type]}</span>
+                <a class="link-secondary" href="javascript:toggle('${type}Cat')">
+                    <svg id="plus-circle" viewBox="0 0 16 16" class="bi">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                </a>
+            </h6><ul class="nav flex-row" id="${type}Cat">`;
+            for (const item in checkItems) {
+                if (checkItems[item].cat == type) {
+                    html += `<li class="nav-item" title="${!checkItems[item].dontSayTitle ? item : ''}">
+                        <a id="${checkItems[item].id}" class="nav-link d-flex align-items-center gap-2" href="javascript:retrievedItem('${checkItems[item].id}')">
+                            <img src="/tracker/images/${type}/${checkItems[item].imageFilename}" alt="${item}" class="gameItemNotObtained"/>
+                        </a>
+                    </li>`;
+                }
+            }
+            items.insertAdjacentHTML("beforeend", html + '</ul>');
+        }
     }
     for (const elem of document.getElementsByClassName('trackerOption')) elem.classList.remove('active');
     document.getElementById(type).classList.add('active')
@@ -66,7 +91,7 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
     if (connected2archipelago) {
         if ($(obj).find('button[type="submit"]').data("connected")) jQuery(obj).trigger("archipelagoDisconnect");
         else $(obj).find("p").css("color", "red").text('Please wait for the archipelago server to be fully connected before you disconnect.')
-    } else if (spoiler) {
+    } else {
         const tracker = document.getElementById('tracker');
         let connectionSuccessful = false;
         connected2archipelago = true;
@@ -123,50 +148,20 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
         } catch (e) {
             handleError(e);
         }
-    } else $(obj).find("p").css("color", "red").text("Please upload your spoiler log");
+    }
 }
 
-function uploadSpoilerLog() { // uploads the spoiler log which will then help make tracking alot easier.
-    const link = document.getElementById('uploadSpoilerBtn');
-    const href = link.getAttribute("href");
-    link.removeAttribute("href");
-    const title = link.title;
-    link.title = "Your file is currently in process of uploading right now. Please wait before you do anything."
-    const linkJquery = $(link);
-    const originalText = linkJquery.find("span").text();
-    linkJquery.find("span").html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span role="status">Uploading Spoiler Log...</span>');
-    const file = document.getElementById('logsUploader').files[0];
-    function handleError(type, msg) {
-        link.title = title;
-        link.href = href;
-        linkJquery.find("span").text(originalText);
-        displayAlert(type, msg);
-    }
-    if (!file) {
-        spoiler = '';
-        handleError("warning", "You have deleted your spoiler log from this webpage. Please select a file.")
-    } else {
-        const reader = new FileReader();
-        reader.addEventListener("loadend", e => {
-            const info = e.target.result;
-            if (file.name.endsWith(".txt")) {
-                const excluseParams = {};
-                for (const info2 of info.split("\n")) {
-                    const [key, value] = info2.split(":");
-                    if (!key) continue;
-                    if (!value) continue;
-                    console.log(key, value.split("  ").join(''));
-                }
-            } else if (file.name.endsWith(".json") || file.name.endsWith(".yaml")) {
-                const info2 = file.name.endsWith(".yaml") ? jsyaml.load(info) : JSON.parse(info);
-                console.log(info2);
-            } else return handleError("danger", "The file you tried to upload is not supported.")
-            handleError("success", "Your spoiler log was uploaded succesasfully")
-        });
-        reader.readAsText(file);
-    }
+function findCheckLocation(f) {
+    for (const i in checkLocations) if (checkLocations[i][f]) return {
+        info: checkLocations[i][f],
+        cat: i
+    };
+    return false;
 }
 
 function displayAlert(type, msg) {
-    $("#alertBlock").html(`<div class="alert alert-${type}" role="alert">${msg}</div>`);
+    $("#alertBlock").html(`<div class="alert alert-${type} alert-dismissible" role="alert">
+        ${msg}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>`);
 }

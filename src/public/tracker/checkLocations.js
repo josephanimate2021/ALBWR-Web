@@ -24,14 +24,19 @@ const checkLocations = {
         "[Mai] Rosso's Ore Mine": {}
     },
     "Desert": {
-        "Desert Palace Weather Vane": {},
+        "Desert Palace Weather Vane": {
+            position: "42x428"
+        },
         "[Mai] Buried in the Desert": {},
         "[Mai] Buried near Desert Palace": {},
         "[Mai] Southern Ruins Big Rock": {}
     },
     "Eastern Ruins": {
         "Bird Lover": {},
-        "Eastern Palace Weather Vane": {},
+        "Eastern Palace Weather Vane": {
+            position: "483x200",
+            unlockedByDefault: true
+        },
         "Eastern Ruins Armos Chest": {},
         "Eastern Ruins Cave": {},
         "Eastern Ruins Hookshot Chest": {},
@@ -49,7 +54,10 @@ const checkLocations = {
         Blacksmith: {},
         "Blacksmith Cave": {},
         "Blacksmith Ledge": {},
-        "Blacksmith Table": {},
+        "Blacksmith Table": {
+            unlockedByDefault: true,
+            position: "0x0"
+        },
         "Cucco Mini-Dungeon": {},
         "Haunted Grove Stump": {},
         "Hyrule Castle Rocks": {},
@@ -76,7 +84,10 @@ const checkLocations = {
         "Kakariko Item Shop (1)": {},
         "Kakariko Item Shop (2)": {},
         "Kakariko Item Shop (3)": {},
-        "Kakariko Jail": {},
+        "Kakariko Jail": {
+            unlockedByDefault: true,
+            position: "10x10"
+        },
         "Kakariko Village Weather Vane": {
             unlockedByDefault: true,
             position: "68x239"
@@ -91,13 +102,18 @@ const checkLocations = {
         Woman: {},
         "[Mai] Cucco Ranch Tree": {},
         "[Mai] Hyrule Rupee Rush Wall": {},
-        "[Mai] Kakariko Bush": {},
+        "[Mai] Kakariko Bush": {
+            unlockedByDefault: true,
+            position: ""
+        },
         "[Mai] Kakariko Sand": {},
         "[Mai] Woman's Roof": {}
     },
     "Lake Hylia": {
         "100 Maiamai": {},
-        "House of Gales Weather Vane": {},
+        "House of Gales Weather Vane": {
+            position: "386x430"
+        },
         "Ice Rod Cave": {},
         "Lake Hylia Dark Cave": {},
         "Lake Hylia Eastern Shore": {},
@@ -117,7 +133,9 @@ const checkLocations = {
         "[Mai] Hyrule Hotfoot Rock": {},
         "[Mai] Lake Hylia East River": {},
         "[Mai] Lake Hylia Island Tile": {},
-        "[Mai] Lake Hylia Shallow Ring": {},
+        "[Mai] Lake Hylia Shallow Ring": {
+            position: ""
+        },
         "[Mai] Outside Maiamai Cave": {}
     },
     "Lost Woods Area": {
@@ -200,9 +218,14 @@ const checkLocations = {
         "Queen Oren": {},
         "River Mini-Dungeon": {},
         "Sanctuary Pegs": {},
-        "Sanctuary Weather Vane": {},
+        "Sanctuary Weather Vane": {
+            unlockedByDefault: true,
+            position: "226x157"
+        },
         "Waterfall Cave": {},
-        "Witch's House Weather Vane": {},
+        "Witch's House Weather Vane": {
+            position: "405x168"
+        },
         "Zora's Domain Ledge": {},
         "[HS] Entrance": {},
         "[HS] Ledge": {},
@@ -228,7 +251,9 @@ const checkLocations = {
     "Dark Ruins": {
         "Dark Maze Chest": {},
         "Dark Maze Ledge": {},
-        "Dark Palace Weather Vane": {},
+        "Dark Palace Weather Vane": {
+            position: "999x210"
+        },
         "Hinox (1)": {},
         "Hinox (2)": {},
         "Hinox (3)": {},
@@ -249,7 +274,9 @@ const checkLocations = {
     },
     "Graveyard": {
         "Graveyard Peninsula": {},
-        "Graveyard Weather Vane": {},
+        "Graveyard Weather Vane": {
+            position: "813x171"
+        },
         "Philosopher's Cave": {},
         "[LS] Entrance Chest": {},
         "[LS] Ledge": {},
@@ -262,10 +289,14 @@ const checkLocations = {
     "Lorule Castle Area": {
         "Big Bomb Flower Cave": {},
         "Blacksmith (Lorule)": {},
-        "Blacksmith Weather Vane": {},
+        "Blacksmith Weather Vane": {
+            position: "680x262"
+        },
         "Fortune's Choice": {},
         "Great Rupee Fairy": {},
-        "Lorule Castle Weather Vane": {},
+        "Lorule Castle Weather Vane": {
+            position: "760x228"
+        },
         "Lorule Field Hookshot Chest": {},
         "Octoball Derby": {},
         "Pegasus Boots Pyramid": {},
@@ -273,15 +304,21 @@ const checkLocations = {
         "Swamp Cave (Left)": {},
         "Swamp Cave (Middle)": {},
         "Swamp Cave (Right)": {},
-        "Swamp Palace Weather Vane": {},
+        "Swamp Palace Weather Vane": {
+            position: "744x461"
+        },
         "Thief Girl": {},
         "Thieves' Town Item Shop (1)": {},
         "Thieves' Town Item Shop (2)": {},
         "Thieves' Town Item Shop (3)": {},
         "Thieves' Town Item Shop (4)": {},
-        "Thieves' Town Weather Vane": {},
+        "Thieves' Town Weather Vane": {
+            position: "542x260"
+        },
         "Vacant House": {},
-        "Vacant House Weather Vane": {},
+        "Vacant House Weather Vane": {
+            position: "792x348"
+        },
         "[Mai] Behind Vacant House": {},
         "[Mai] Big Bomb Flower Grass": {},
         "[Mai] Lorule Blacksmith Wall": {},
@@ -300,13 +337,21 @@ const checkLocations = {
     },
     "Lorule Death Mountain": {
         "Behind Ice Gimos": {},
-        "Death Mountain (Lorule) Weather Vane": {},
+        "Death Mountain (Lorule) Weather Vane": {
+            position: "888x95"
+        },
         "Ice Cave Ledge": {},
         "Ice Gimos Fight": {},
-        "Ice Ruins Weather Vane": {},
+        "Ice Ruins Weather Vane": {
+            position: "965x50"
+        },
         "Lorule Mountain W Ledge": {},
-        "Treacherous Tower": {},
-        "Treacherous Tower Weather Vane": {},
+        "Treacherous Tower": {
+            position: "794x10"
+        },
+        "Treacherous Tower Weather Vane": {
+            position: "785x30"
+        },
         "[Mai] Ice Cave Ledge": {},
         "[Mai] Lorule Mountain E Big Rock": {},
         "[Mai] Lorule Mountain E Wall": {},
@@ -315,17 +360,29 @@ const checkLocations = {
         "[Mai] Outside Ice Ruins": {}
     },
     "Misery Mire": {
-        "Misery Mire Ledge": {},
-        "Misery Mire Weather Vane": {},
+        "Misery Mire Ledge": {
+            small: true,
+            position: "625x449"
+        },
+        "Misery Mire Weather Vane": {
+            small: true,
+            position: "625x455"
+        },
         "Sand Mini-Dungeon": {},
-        "[Mai] Misery Mire Rock": {},
+        "[Mai] Misery Mire Rock": {
+            position: "672x470"
+        },
         "[Mai] Misery Mire Wall": {},
-        "[Mai] Misery Mire Water": {}
+        "[Mai] Misery Mire Water": {
+            position: "547x467"
+        }
     },
     "Skull Woods Area": {
         "Destroyed House": {},
         "Mysterious Man": {},
-        "Skull Woods Weather Vane": {},
+        "Skull Woods Weather Vane": {
+            position: "610x80"
+        },
         "[Mai] Destroyed House Tree": {},
         "[Mai] Skull Woods Bush": {},
         "[Mai] Skull Woods Dry Pond": {},
@@ -343,7 +400,9 @@ const checkLocations = {
         "Lorule Lakeside Item Shop (2)": {},
         "Lorule Lakeside Item Shop (3)": {},
         "Lorule Lakeside Item Shop (4)": {},
-        "Turtle Rock Weather Vane": {},
+        "Turtle Rock Weather Vane": {
+            position: "908x445"
+        },
         "[Mai] Lorule Lake Rock": {},
         "[Mai] Lorule Lake SE Wall": {},
         "[Mai] Lorule Lake Skull": {},
