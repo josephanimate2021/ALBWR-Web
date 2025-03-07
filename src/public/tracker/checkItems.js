@@ -1,107 +1,143 @@
 const checkItems = { 
     // Please be aware that some locked checks might be easy to get meaning that this structure isn't going to be accurate for now.
     // I am working on making sure that this structure is accurate especially for autotracking and new users.
-    "Silver Rupee": {},
-    "Hylian Shield": {
-        cat: 'items',
-        id: 'hylianShield',
-        imageFilename: 'shield_hylian.png'
+    "Silver Rupee": {
+        cat: 'gear',
+        id: 'rupee_silver',
+        counts: [0]
     },
-    "Monster Tail": {},
-    "weatherVanes": {
-        dontSayTitle: true,
-        id: 'weatherVanes',
-        imageFilename: 'weather_vanes.png',
-        cat: 'others',
-        count: 0,
-        limit: 22
+    "Hylian Shield": {
+        cat: 'gear',
+        id: 'shield-2'
+    },
+    "Monster Tail": {
+        cat: 'gear',
+        id: 'tail'
     },
     "Empty Bottle": {
         cat: 'items',
         id: 'bottle',
-        imageFilename: 'bottle.png',
-        count: 0,
-        limit: 5
+        counts: [0, 0, 5]
     },
-    "Red Rupee": {},
-    "Monster Horn": {},
+    "Red Rupee": {
+        cat: 'gear',
+        id: 'rupee_red',
+        counts: [0]
+    },
+    "Monster Horn": {
+        cat: 'gear',
+        id: 'horn',
+        counts: [0]
+    },
     "Monster Guts": {
-        cat: 'junk',
-        id: 'monsterGuts',
-        imageFilename: `monster_guts.png`,
-        count: 0
+        cat: 'gear',
+        id: 'guts',
+        counts: [0]
     },
-    "Piece of Heart": {},
+    "Piece of Heart": {
+        cat: 'gear',
+        id: 'heart',
+        counts: [0, 0, 3],
+        dontShowCount: true,
+        hasImageWithCount: true,
+        startImageCountAt0: true
+    },
     "Lost Maiamai": {
-        cat: 'junk',
+        cat: 'gear',
         id: 'maiamai',
-        imageFilename: `maiamai.png`,
-        count: 0,
-        limit: 100
+        counts: [0, 0, 100],
     },
-    "Gold Rupee": {},
-    "Sword+": {
-        cat: 'items',
+    "Gold Rupee": {
+        cat: 'gear',
+        id: 'rupee_gold',
+        counts: [0]
+    },
+    Sword: {
+        cat: 'gear',
         id: 'sword',
-        imageFilename: 'fsword.png',
-        count: 0,
-        limit: 2
+        counts: [1, 1, 4],
+        dontShowCount: true,
+        hasImageWithCount: true
     },
-    "Heart Container": {},
-    "Net+": {
+    "Heart Container": {
+        cat: 'gear',
+        id: 'heart-container',
+        counts: [0, 0, 10]
+    },
+    Net: {
         cat: 'items',
         id: 'net',
-        imageFilename: 'net.png',
-        count: 0,
-        limit: 2
+        counts: [0, 0, 2],
+        dontShowCount: true,
+        hasImageWithCount: true
     },
-    "Lamp+": {
+    Lamp: {
         cat: 'items',
         id: 'lamp',
-        imageFilename: 'lamp.png',
-        count: 0,
-        limit: 2
+        counts: [0, 0, 2],
+        dontShowCount: true,
+        hasImageWithCount: true
     },
-    "Bow+": {
+    Bow: {
         cat: 'items',
         id: 'bow',
-        imageFilename: 'bow.png',
-        count: 0,
-        limit: 2
+        counts: [0, 0, 3],
+        dontShowCount: true,
+        hasImageWithCount: true
     },
-    "Mail+": {
-        cat: 'items',
+    Mail: {
+        cat: 'gear',
         id: 'mail',
-        imageFilename: 'mail_green.png',
-        count: 0,
-        limit: 2
+        counts: [0, 0, 3],
+        dontShowCount: true,
+        hasImageWithCount: true
     },
-    "Purple Rupee": {},
+    "Purple Rupee": {
+        cat: 'gear',
+        id: 'rupee_purple',
+        counts: [0]
+    },
     "Green Rupee": {
-        cat: 'junk',
-        id: 'greenRupee',
-        imageFilename: `rupee_green.png`,
-        count: 0
+        cat: 'gear',
+        id: 'rupee_green',
+        counts: [0]
     },
-    "Great Spin": {},
-    "Blue Rupee": {},
-    "Scoot Fruit": {},
-    "Foul Fruit": {},
-    "Shield": {},
-    "Bombs+": {
+    "Great Spin": {
+        cat: 'gear',
+        id: 'great_spin'
+    },
+    "Blue Rupee": {
+        cat: 'gear',
+        id: 'rupee_blue',
+        counts: [0]
+    },
+    "Scoot Fruit": {
+        cat: 'items',
+        id: 'scoot-fruit',
+        counts: [0]
+    },
+    "Foul Fruit": {
+        cat: 'items',
+        id: 'foul-fruit',
+        counts: [0]
+    },
+    Shield: {
+        cat: 'gear',
+        id: 'shield-1'
+    },
+    Bombs: {
         cat: 'items',
         id: 'bombs',
-        imageFilename: 'bombs.png',
-        count: 0,
-        limit: 2
+        counts: [0, 0, 3],
+        dontShowCount: true,
+        hasImageWithCount: true
     },
-    "Ravio's Bracelet+": {
-        cat: 'others',
+    "Ravio's Bracelet": {
+        cat: 'gear',
         id: 'bracelet',
-        imageFilename: `bracelet.png`,
-        count: 0,
-        limit: 2,
-        archipelagoItemName: ["Progressive Bracelet","Progressive Bracelet"],
+        counts: [0, 0, 2],
+        dontShowCount: true,
+        hasImageWithCount: true,
         unlockChecks2: [ 
             // Ravio's Bracelet unlocks a ton of checks (mainly in Lourle and bits in Hyrule). 
             // If there are any checks that don't get instantly unlocked after you get Ravio's Bracelet, 
@@ -139,140 +175,155 @@ const checkItems = {
             "[Mai] Thieves' Town Wall"
         ],
     },
-    "Charm": {},
-    "Fire Rod+": {
-        cat: 'items',
-        id: 'fireRod',
-        imageFilename: 'frod.png',
-        count: 0,
-        limit: 2
+    Charm: {
+        cat: 'gear',
+        id: 'pendant_charm'
     },
-    "Ice Rod+": {
+    "Fire Rod": {
         cat: 'items',
-        id: 'iceRod',
-        imageFilename: 'irod.png',
-        count: 0,
-        limit: 2
+        id: 'frod',
+        counts: [0, 0, 3],
+        dontShowCount: true,
+        hasImageWithCount: true
     },
-    "Quake": {},
+    "Ice Rod": {
+        cat: 'items',
+        id: 'irod',
+        counts: [0, 0, 3],
+        dontShowCount: true,
+        hasImageWithCount: true
+    },
+    Quake: {
+        cat: 'others',
+        id: 'quake'
+    },
     "Bee Badge": {
         id: "badge",
-        cat: "others",
-        imageFilename: "bee_badge.png"
+        cat: "gear"
     },
     "Hyrule Sewers Key": {},
     "Master Ore": {
-        id: 'ore',
+        id: 'master_ore',
         cat: "others",
-        imageFilename: "master_ore.png",
-        count: 0,
-        limit: 4
+        counts: [0, 0, 4]
     },
     "Hint Glasses": {
-        id: "glasses",
-        cat: "others",
-        imageFilename: "hint_glasses.png"
+        id: "hint-glasses",
+        cat: "items"
     },
-    "Hookshot+": {
+    Hookshot: {
         cat: 'items',
         id: 'hookshot',
-        imageFilename: 'hookshot.png',
-        count: 0,
-        limit: 2
+        counts: [0, 0, 3],
+        dontShowCount: true,
+        hasImageWithCount: true
     },
-    "Tornado Rod+": {
+    "Tornado Rod": {
         cat: 'items',
-        id: 'tonadoRod',
-        imageFilename: 'trod.png',
-        count: 0,
-        limit: 2
+        id: 'trod',
+        counts: [0, 0, 3],
+        dontShowCount: true,
+        hasImageWithCount: true
     },
-    "Boomerang+": {
+    Boomerang: {
         cat: 'items',
         id: 'boomerang',
-        imageFilename: 'boomerang.png',
-        count: 0,
-        limit: 2
+        counts: [0, 0, 3],
+        dontShowCount: true,
+        hasImageWithCount: true
     },
-    "Bee": {},
-    "Golden Bee": {},
-    "Fairy": {},
-    "Zora's Flippers": {
+    Bee: {
         cat: 'items',
-        id: 'zorasFlippers',
-        imageFilename: 'flippers.png',
+        id: 'bottle_bee',
+        count: [0]
+    },
+    "Golden Bee": {
+        cat: 'items',
+        id: 'bottle_bee_golden',
+        count: [0]
+    },
+    Fairy: {
+        cat: 'items',
+        id: 'bottle_fairy',
+        count: [0]
+    },
+    "Zora's Flippers": {
+        cat: 'gear',
+        id: 'flippers'
     },
     "Dark Palace Small Key": {},
     "Dark Palace Big Key": {},
     "Dark Palace Compass": {},
-    "Glove+": {
-        cat: 'items',
-        id: 'glove',
-        imageFilename: 'power_glove.png',
-        count: 0,
-        limit: 2
+    Glove: {
+        cat: 'gear',
+        id: 'mitt',
+        counts: [0, 0, 2],
+        dontShowCount: true,
+        hasImageWithCount: true
     },
-    "Hammer+": {
+    Hammer: {
         cat: 'items',
         id: 'hammer',
-        imageFilename: 'hammer.png',
-        count: 0,
-        limit: 2
+        counts: [0, 0, 2],
+        dontShowCount: true,
+        hasImageWithCount: true
     },
-    "Sage Oren": {},
+    "Sage Oren": {
+        cat: 'gear',
+        id: 'sage-oren'
+    },
     "Desert Palace Small Key": {},
     "Pegasus Boots": {
-        cat: 'items',
-        id: 'boots',
-        imageFilename: 'pegasus_boots.png'
+        cat: 'gear',
+        id: 'boots'
     },
     "Desert Palace Big Key": {},
-    "Sand Rod+": {
+    "Sand Rod": {
         cat: 'items',
-        id: 'sandRod',
-        imageFilename: 'srod.png',
-        count: 0,
-        limit: 2
+        id: 'srod',
+        counts: [0, 0, 3],
+        dontShowCount: true,
+        hasImageWithCount: true
     },
     "Bow of Light": {
         cat: 'items',
-        id: 'bowOfLight',
-        imageFilename: 'bow_light.png'
+        id: 'bow-of-light'
     },
     "Desert Palace Compass": {},
     "Pendant of Courage": {},
     "Eastern Palace Small Key": {},
     "Eastern Palace Big Key": {},
     "Stamina Scroll": {
-        id: 'staminaScroll',
-        cat: 'other',
-        imageFilename: 'stamina_scroll.png',
+        id: 'scroll',
+        cat: 'gear'
     },
-    "Sage Rosso": {},
+    "Sage Rosso": {
+        cat: 'gear',
+        id: 'sage-rosso'
+    },
     "Eastern Palace Compass": {},
     "House of Gales Compass": {},
     "House of Gales Small Key": {},
     "House of Gales Big Key": {},
-    "Sage Seres": {},
+    "Sage Seres": {
+        cat: 'gear',
+        id: 'sage-seres'
+    },
     "Ice Ruins Small Key": {},
     "Ice Ruins Big Key": {},
     "Ice Ruins Compass": {},
     Bell: {
-        cat: 'items',
-        id: 'bell',
-        imageFilename: 'bell.png',
-        count: 0
+        cat: 'gear',
+        id: 'bell'
     },
     "Sage Osfala": {},
     "Smooth Gem": {
         id: "gem",
-        cat: "others",
-        imageFilename: "smooth_gem.png"
+        cat: "gear"
     },
     Pouch: {
         id: "pouch",
-        cat: "others",
-        imageFilename: "pouch.png"
+        cat: "gear"
     },
     "Lorule Castle Small Key": {},
     "Lorule Castle Big Key": {},
@@ -280,21 +331,36 @@ const checkItems = {
     "Skull Woods Small Key": {},
     "Skull Woods Big Key": {},
     "Skull Woods Compass": {},
-    "Sage Irene": {},
+    "Sage Irene": {
+        cat: 'gear',
+        id: 'sage-irene'
+    },
     "Swamp Palace Small Key": {},
     "Swamp Palace Big Key": {},
     "Swamp Palace Compass": {},
-    "Pendant of Power": {},
+    "Pendant of Power": {
+        cat: 'gear',
+        id: 'pendant-of-power'
+    },
     "Thieves' Hideout Small Key": {},
     "Thieves' Hideout Big Key": {},
     "Thieves' Hideout Compass": {},
-    "Pendant of Wisdom": {},
+    "Pendant of Wisdom": {
+        cat: 'gear',
+        id: 'pendant-of-wisdom'
+    },
     "Tower of Hera Small Key": {},
     "Tower of Hera Big Key": {},
     "Tower of Hera Compass": {},
-    "Sage Impa": {},
+    "Sage Impa": {
+        cat: 'gear',
+        id: 'sage-impa'
+    },
     "Turtle Rock Big Key": {},
     "Turtle Rock Small Key": {},
     "Turtle Rock Compass": {},
-    "Sage Gulley": {}
+    "Sage Gulley": {
+        cat: 'gear',
+        id: 'sage-gulley'
+    },
 }
