@@ -99,6 +99,14 @@ wss.on('connection', (ws, req) => {
                         env: process.env
                     }))
                     break;
+                } case "/uploadFile": { // Uploads the ALBW rom file
+                    sessions[req.headers['x-forwarded-for']].threeDsBuffer = [];
+                    ws.on("message", e => {
+                        if (e) sessions[req.headers['x-forwarded-for']].threeDsBuffer.push(e);
+                        ws.send("ok");
+                    });
+                    ws.send("ok")
+                    break;
                 }
             }
             break;
@@ -533,7 +541,6 @@ async function genGameZip(req, res) {
                 else k.file(file, fs.readFileSync(`${l}/${file}`))
             }
         }
-        deleteALBWStuff(req, randoPath);
         let config;
         switch (req.query.v) {
             case "z17r":
@@ -552,6 +559,7 @@ async function genGameZip(req, res) {
             } default: config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
         }
         c(`${randoPath}/${config.output}`, zip);
+        deleteALBWStuff(req, randoPath);
         res.send(await zip.generateAsync({type:"nodebuffer"}))
     } catch (e) {
         handleError(e);
@@ -661,72 +669,6 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
         return false;
     }
 }
-
-// Multer storage configuration
-const storage = multer.diskStorage({
-    destination: 'temps/',
-    filename: function (req,file, cb) {
-        // Generate the filename 
-        const filename =  file.originalname;
-        
-        cb(null, filename); 
-    }
-});
-
-const upload = multer({ storage });
-const temporary = multer({ dest: 'temps/' });
-
-const readdir = promisify(fs.readdir);
-const readFile = promisify(fs.readFile);
-const appendFile = promisify(fs.appendFile);
-
-
-// Route for receiving file chunks
-app.post('/documents', upload.single('file'), (req, res) => {
-    const msg = `Chunk "${req.body.chunkNumber}" received successfully`;
-
-    console.log(msg);
-
-    // Here if you have the database you can use it to store the files that have been saved in the 'temps' folder
-    //..
-
-    res.send(msg);
-
-});
-
-
-// Route for combining and saving chunks
-app.get('/combine', upload.array('files'), async (req, res) => {
-    const tempFolder = 'temps/';
-    sessions[req.headers['x-forwarded-for']].threeDsBuffer = [];
-    const combinedFileName = req.query.filename;
-
-
-    try {
-        // Read all files in the temps folder
-        const files = await readdir(tempFolder);
-
-        // Filter out only the files with the format `${number}-.-.${combinedFileName}`
-        const numberedFiles = files.filter(file => /^\d+-\.-\..+$/.test(file) && file.includes(combinedFileName));
-
-        // Sort files based on the numbers before `-.-.` in their names
-        numberedFiles.sort((a, b) => {
-            const numA = parseInt(a.split('-.-.')[0]);
-            const numB = parseInt(b.split('-.-.')[0]);
-            return numA - numB;
-        });
-        // Combine chunks into a single file
-        for (const file of numberedFiles) {
-            const filePath = path.join(tempFolder, file);
-            sessions[req.headers['x-forwarded-for']].threeDsBuffer.push(await readFile(filePath));
-            fs.unlinkSync(filePath);
-        }
-        res.status(200).send('Files combined and saved successfully.');
-    } catch (error) {
-        console.error('Error combining files:', error);
-        res.status(500).send('Internal Server Error');
-    }
-})
 
 
 const PORT = process.env.PORT || 80;

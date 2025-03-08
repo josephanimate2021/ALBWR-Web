@@ -445,68 +445,31 @@ function isFileUploaded() {
 }
 
 // Uploads the file chunks to the server
-async function uploadChunks() {
+function uploadChunks() {
     console.log('Uploading chunks...');
     document.getElementById('logo').style.display = 'none';
-    const id = (Math.random()).toString().substring(2);
-    const ext = fileName.substring(fileName.lastIndexOf("."));
-
-    // Create an array to hold all the upload promises
-    const uploadPromises = [];
-
-    for (let i = 0; i < totalChunks; i++) {
-        const formData = new FormData();
-        formData.append('file', fileChunks[i], `${i+1}-.-.`+id+ext);
-        formData.append('filename',id+ext);
-        formData.append('totalChunks', totalChunks);
-        formData.append('chunkNumber', i + 1);
-
-        // Send the chunk upload request asynchronously and store the promise
-        const uploadPromise = uploadChunk(formData,i+1);
-
-        uploadPromise.then(() => {
-            var percentage = ((i + 1) / totalChunks) * 101;
-            if(percentage===101){
-                percentage=100;
+    const socket = new WebSocket(`${window.location.protocol.startsWith("https") ? 'wss' : 'ws'}://${window.location.host}/uploadFile`);
+    let start = 0;
+    socket.addEventListener("message", result => {
+        if (result.data == "ok") {
+            if (start < totalChunks) {
+                console.log('Server response:', result.data);
+                socket.send(fileChunks[start]);
+                start++;
+                setBar(start);
+            } else {
+                console.log('All chunks uploaded successfully.');
+                console.log(`The final response from server: ${result.data}`);
+                setBar(101);
             }
-            setBar(percentage); // Call setBar function with the percentage
-        });
-
-        uploadPromises.push(uploadPromise);
-    }
-
-    // Wait for all upload promises to resolve
-    await Promise.all(uploadPromises);
-    console.log('All chunks uploaded successfully.');
-
-    fetch(`/combine?filename=${encodeURIComponent(id+ext)}`)
-        .then(response => {
-            if (!response.ok) return handleError();
-            return response.text(); // The response from server(in texts)
-        })
-        .then(data => {
-            // The data from the server
-            console.log(`The final response from server: ${data}`);
-            setBar(101);
-        })
-        .catch(error => {
-            // Display errors when failed to get response from the server
-            handleError('Fetch error:', error);
-        });
-
-    
+        }
+    })
 }
 
 // Uploads a single file chunk to the server using the provided form data and progress of the file upload.
-async function uploadChunk(formData,progress) {
+async function uploadChunk(formData,socket) {
     try {
-        const response = await fetch('/documents', {
-            method: 'POST',
-            body: formData
-        });
-        const result = await response.text();
-        console.log(`Client Response: The file ${progress} sent to server!`);
-        console.log('Server response:', result); // Log the response from the server
+        socket.send(formData);
     } catch (error) {
         handleError('Error uploading file chunk:', error);
     }
