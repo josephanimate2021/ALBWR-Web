@@ -1,5 +1,14 @@
 FROM node
 
+# Install Rust nightly
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly
+
+# Add Rust to the PATH
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Verify the installation
+RUN rustc --version
+
 # The /app directory should act as the main application directory
 WORKDIR /app
 

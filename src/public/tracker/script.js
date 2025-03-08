@@ -151,7 +151,7 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
         }
         try {
             const info = Object.fromEntries(new URLSearchParams($(obj).serialize()));
-            const socket = new WebSocket(`ws://${info.host}`);
+            const socket = new WebSocket(`${info.host.startsWith("localhost") || info.host.startsWith("127.0.0.1") ? 'ws' : 'wss'}://${info.host}`);
             setTimeout(() => {
                 if (!connectionSuccessful) {
                     socket.close();
