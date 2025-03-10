@@ -5,11 +5,10 @@ const path = require('path');
 const { promisify } = require('util');
 const {spawn} = require("child_process");
 const JSZip = require("jszip");
-let scriptOutput = '', okay2spitscript = false, userIsRandomizingGame = false, sessions = {};
+let scriptOutput = '', okay2spitscript = false, userIsRandomizingGame = false
 const ws = require("ws");
 const app = express();
 app.use((req, res, next) => {
-    sessions[req.headers['x-forwarded-for']] = sessions[req.headers['x-forwarded-for']] || {};
     console.log(req.headers.origin ? req.headers.origin?.split(":")[0] : '', req.method, req.url, req.query);
     next();
 });
@@ -100,9 +99,10 @@ wss.on('connection', (ws, req) => {
                     }))
                     break;
                 } case "/uploadFile": { // Uploads the ALBW rom file
-                    sessions[req.headers['x-forwarded-for']].threeDsBuffer = [];
+                    if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
+                    fs.writeFileSync(`./uploads/rom-${req.headers['x-forwarded-for']}.3ds`, '');
                     ws.on("message", e => {
-                        if (e) sessions[req.headers['x-forwarded-for']].threeDsBuffer.push(e);
+                        fs.appendFileSync(`./uploads/rom-${req.headers['x-forwarded-for']}.3ds`, e);
                         ws.send("ok");
                     });
                     ws.send("ok")
@@ -131,14 +131,14 @@ function parseTOML(configToml) {
 // Define routes
 app.get('/', (req, res) => {
     if (!req.query.fileUploaded) {
-        if (sessions[req.headers['x-forwarded-for']] && sessions[req.headers['x-forwarded-for']].threeDsBuffer) {
+        if (fs.existsSync(`./uploads/rom-${req.headers['x-forwarded-for']}.3ds`)) {
             res.writeHead(302, '', {
                 location: "/?fileUploaded=true"
             });
             res.end();
         }
     } else {
-        if (!sessions[req.headers['x-forwarded-for']] || !sessions[req.headers['x-forwarded-for']].threeDsBuffer) {
+        if (!fs.existsSync(`./uploads/rom-${req.headers['x-forwarded-for']}.3ds`)) {
             res.writeHead(302, '', {
                 location: "/"
             });
@@ -154,21 +154,21 @@ app.get('/', (req, res) => {
         res.end();
     } else res.sendFile(path.join(__dirname, `views/interactiveShell.html`))
 }).get('/v4', (req, res) => {
-    if (!sessions[req.headers['x-forwarded-for']] || !sessions[req.headers['x-forwarded-for']].threeDsBuffer) {
+    if (!fs.existsSync(`./uploads/rom-${req.headers['x-forwarded-for']}.3ds`)) {
         res.writeHead(302, '', {
             location: "/"
         });
         res.end();
     } else res.sendFile(path.join(__dirname, 'views', 'newRando.html'));
 }).get('/cli', (req, res) => {
-    if (!sessions[req.headers['x-forwarded-for']] || !sessions[req.headers['x-forwarded-for']].threeDsBuffer) {
+    if (!fs.existsSync(`./uploads/rom-${req.headers['x-forwarded-for']}.3ds`)) {
         res.writeHead(302, '', {
             location: "/"
         });
         res.end();
     } else res.sendFile(path.join(__dirname, 'views', 'randoCli.html'));
 }).get('/deleteFile', (req, res) => {
-    delete sessions[req.headers['x-forwarded-for']].threeDsBuffer;
+    fs.unlinkSync(`./uploads/rom-${req.headers['x-forwarded-for']}.3ds`)
     res.writeHead(302, '', {
         location: req.headers.referer
     });
@@ -596,7 +596,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
             case "albw": {
                 if (versions[req.query.execVersion]?.useVerbose && !req.query.noVerbose) command.push(`--verbose`);
                 if (!fs.existsSync(`${randoPath}/generated`)) fs.mkdirSync(`${randoPath}/generated`);
-                fs.writeFileSync(`${randoPath}/albw.3ds`, Buffer.concat(sessions[req.headers['x-forwarded-for']].threeDsBuffer));
+                fs.writeFileSync(`${randoPath}/albw.3ds`, fs.readFileSync(`./uploads/rom-${req.headers['x-forwarded-for']}.3ds`));
                 if (req.query.settings && typeof req.query.settings == "object" && writeNewPreset) {
                     fs.renameSync(`${randoPath}/presets/Standard.toml`, `${randoPath}/presets/Standardold.toml`);
                     fs.writeFileSync(`${randoPath}/presets/Standard.toml`, writeOldToml());
@@ -605,7 +605,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
             } case "z17-local": {
                 const config = parseTOML(fs.readFileSync(`${randoPath}/z17-randomizer/config/Rando.toml`).toString('utf-8'))
                 if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
-                fs.writeFileSync(`${randoPath}/${config.rom}`, Buffer.concat(sessions[req.headers['x-forwarded-for']].threeDsBuffer));
+                fs.writeFileSync(`${randoPath}/${config.rom}`, fs.readFileSync(`./uploads/rom-${req.headers['x-forwarded-for']}.3ds`));
                 if (req.query.settings && typeof req.query.settings == "object" && writeNewPreset) {
                     const presetFile = `${randoPath}/z17-randomizer/config/presets/${req.params.id}.toml`
                     if (!fs.existsSync(presetFile)) fs.writeFileSync(presetFile, writeOldToml());
@@ -635,7 +635,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
             case "z17-rando": {
                 const config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'))
                 if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
-                fs.writeFileSync(`${randoPath}/${config.rom}`, Buffer.concat(sessions[req.headers['x-forwarded-for']].threeDsBuffer));
+                fs.writeFileSync(`${randoPath}/${config.rom}`, fs.readFileSync(`./uploads/rom-${req.headers['x-forwarded-for']}.3ds`));
                 if (
                     req.query.settings && typeof req.query.settings == "object" && writeNewPreset
                 ) fs.writeFileSync(`${randoPath}/presets/${req.params.id}.toml`, writeOldToml(true));
@@ -658,7 +658,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 }
                 const config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
                 if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
-                fs.writeFileSync(`${randoPath}/${config.rom}`, Buffer.concat(sessions[req.headers['x-forwarded-for']].threeDsBuffer));
+                fs.writeFileSync(`${randoPath}/${config.rom}`, fs.readFileSync(`./uploads/rom-${req.headers['x-forwarded-for']}.3ds`));
                 if (req.params?.id) command.push(`--preset ${req.params.id}`);
             }
         }
