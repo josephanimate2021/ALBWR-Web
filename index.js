@@ -1,14 +1,12 @@
 const express = require('express');
-const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
-const { promisify } = require('util');
 const {spawn} = require("child_process");
 const JSZip = require("jszip");
 let scriptOutput = '', okay2spitscript = false, userIsRandomizingGame = false
 const ws = require("ws");
 const app = express();
-app.use((req, res, next) => {
+app.use((req, _, next) => {
     console.log(req.headers.origin ? req.headers.origin?.split(":")[0] : '', req.method, req.url, req.query);
     next();
 });
@@ -27,6 +25,7 @@ app.use(express.static(publicDirectoryPath, {
     }
 }));
 const url = require("url");
+const { stdout, stderr } = require('process');
 const wss = new ws.WebSocketServer({ noServer: true });
 wss.on('connection', (ws, req) => {
     console.log(`ws`, req.method, req.url);
@@ -106,6 +105,41 @@ wss.on('connection', (ws, req) => {
                         ws.send("ok");
                     });
                     ws.send("ok")
+                    break;
+                } case "/cloneRepo": {
+                    ws.on("message", e => {
+                        const data = JSON.parse(e);
+                        const info = data.info[data.provider][data.url];
+                        const branchInfo = info.branches.find(i => i.name == data.branch) || info.commits.find(i => (i.sha || i.id) == data.branch);
+                        const sourcecodesDevFolder = path.join(__dirname, './sourcecodes/dev'), inIp = path.join(sourcecodesDevFolder, req.headers['x-forwarded-for'] || 'localhost');
+                        if (!fs.existsSync(sourcecodesDevFolder)) fs.mkdirSync(sourcecodesDevFolder);
+                        if (!fs.existsSync(inIp)) fs.mkdirSync(inIp);
+                        const repoFolder = path.join(inIp, info.repo.name);
+                        if (fs.existsSync(repoFolder)) fs.rmSync(repoFolder, {
+                            recursive: true
+                        })
+                        const command = [
+                            inIp,
+                            '&& git clone',
+                            (info.repo.html_url || info.repo.web_url) + ".git",
+                            '-v',
+                            '--progress',
+                            '--origin',
+                            branchInfo.sha || branchInfo.name || branchInfo.id
+                        ];
+                        ws.send(`\r\nRunning command:\r\ncd ${command.join(' ')}`)
+                        const shell = spawn(`cd`, command, {
+                            shell: true
+                        });
+                        shellInit(shell);
+                        shell.on("close", c => {
+                            if (c == 0) {
+                                fs.writeFileSync(path.join(repoFolder, 'info.json'), JSON.stringify(data, null, "\t"));
+                                ws.send('success');
+                            }
+                            else ws.send(`\r\nThe command closed unexpectedly closed with code ${c}.`);
+                        });
+                    })
                     break;
                 }
             }
@@ -675,4 +709,8 @@ const PORT = process.env.PORT || 80;
 
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+    setInterval(() => {
+        if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
+        //const romFiles = f
+    }, 66677788);
 });

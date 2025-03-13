@@ -169,8 +169,65 @@
   
         <ul class="nav nav-pills">
           <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
+          <li class="nav-item"><a href="javascript:;" id="modalRandoRepoCloneOpenBtn" data-bs-target="#modalRandoRepoClone" data-bs-toggle="modal" class="nav-link">Randomize Game Using It's Source Code</a></li>
         </ul>
       </header>
+    </div>
+    <div class="modal" tabindex="-1" id="modalRandoRepoClone">
+      <div class="modal-dialog">
+        <form class="modal-content" action="javascript:;" onsubmit="gameRandoSourceCode.beginRepoClone(this)">
+          <div class="modal-header">
+            <h5 class="modal-title">Randomize Game With It's Source Code</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Please follow the instructions on the form in order to get the source code accordingly.</p>
+            <label for="provider">Source Code Provider</label>
+            <select class="form-control" id="provider" onchange="gameRandoSourceCode = new GameRandoSourceCode(this, gameRandoSourceCode)">
+              <option value="github">GitHub (Recommended for most users)</option>
+              <option value="gitlab">GitLab (Use at your own risk)</option>
+            </select>
+            <div id="alertBlock4GameRandoViaSourceCode"></div>
+            <div id="settings" style="display: none;">
+              <label for="branch">Source Code Branch</label>
+              <select class="form-control" id="branch" name="branch"></select>
+              <div id="forkOnlySettings" style="display: none;">
+                <label for="owner">Source Code Owner</label>
+                <select class="form-control" id="owner" onchange="gameRandoSourceCode.loadSourceCodeInfoFromAuthor(this)"></select>
+              </div>
+              <div class="form-check text-start my-3">
+                <input class="form-check-input" type="checkbox" id="forkTick" onchange="gameRandoSourceCode.show('forks')">
+                <label class="form-check-label" for="forkTick">
+                  Use A Fork
+                </label>
+              </div>
+              <div class="form-check text-start my-3">
+                <input class="form-check-input" type="checkbox" id="commitTick" onchange="gameRandoSourceCode.show('commitsOnly')">
+                <label class="form-check-label" for="commitTick">
+                  Use A Commit Instead of a Branch (Not Recommended)
+                </label>
+              </div>
+            </div>
+            <div class="d-flex justify-content-center" id="settingsLoading">
+              <div class="spinner-border m-5" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+            <hr>
+            <center>Source Code Fork Pages</center>
+            <hr>
+            <div class="btn-group d-flex">
+              <button type="button" class="btn btn-success randoPageBtn" id="pageBackward" disabled title="Go Back One Page"><-</button>
+              <span id="pageNum">0</span>
+              <button type="button" class="btn btn-success randoPageBtn" id="pageForward" disabled title="Go Forward One Page">-></button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" id="repoCloneBtn" disabled title="This will use git to clone the source code over to ALBWR Web's uploads folder." data-bs-dismiss="modal">Begin Source Code Clone</button>
+          </div>
+        </form>
+      </div>
     </div>
     <div class="randoOutput" id="terminal"></div>
     <div class="container">
@@ -180,11 +237,164 @@
           <p class="lead">Below is the form where you can fill out the infomation needed to randomize your game.</p>
         </div>
         <script>
+          class GameRandoSourceCode { 
+            // Allows a user to randomize albw with the in-dev version of the source code without downloading rust + source code and figuring out the CLI 
+            // (unless they want to use the CLI which is coming soon for this specific version)
+            constructor(elem, oldThis = {}) {
+              Object.assign(this, oldThis);
+              this.provider = elem.value;
+              this.info ||= {};
+              this.info[this.provider] ||= {};
+              this.showWhat ||= {};
+              switch (this.provider) {
+                case "github": {
+                  this.loadSourceCodeInfo('', `https://api.github.com/repos/rickfay/z17-randomizer`);
+                  break;
+                } case "gitlab": {
+                  this.loadSourceCodeInfo('', 'https://gitlab.com/api/v4/projects/25946545', '/repository');
+                  break;
+                }
+              }
+            }
+            displayAlert(type, text = '') {
+              $("#alertBlock4GameRandoViaSourceCode").html(!text ? '' : `<div class="alert alert-${type}" role="alert">${text}</div>`)
+            }
+            jQueryURL(method, url, body = {}) {
+              return new Promise(res => jQuery[method](url, body, res));
+            }
+            async fetchUrl(url, type, options) {
+              const res = await fetch(url, options);
+              if (!res.ok && url.includes(this.provider)) {
+                const json = await res.json();
+                this.displayAlert('error', json.message.replace("documentation", `<a href="${json.documentation_url}">documentation</a>`));
+                return;
+              }
+              return await res[type]();
+            }
+            async loadSourceCodeInfo(callback, url, p) {
+              const info = this.info[this.provider][url || this.url] ||= {};
+              $("#pageNum").text(0);
+              document.getElementById('pageBackward').setAttribute("disabled", "")
+              document.getElementById('pageForward').setAttribute("disabled", "")
+              document.getElementById('provider').removeAttribute("disabled");
+              this.displayAlert('', '');
+              $("#settings").hide();
+              if ($("#settingsLoading").hasClass("d-none")) $("#settingsLoading").removeClass("d-none");
+              $("#settingsLoading").addClass("d-flex");
+              document.getElementById('repoCloneBtn').setAttribute("disabled", "")
+              try {
+                info.repo ||= await this.fetchUrl(url, 'json') || {};
+                info.branches ||= await this.fetchUrl(url + (p || '') + '/branches', 'json') || []
+                info.commits ||= await this.fetchUrl(url + (p || '') + '/commits', 'json') || [];
+                info.forks ||= await this.fetchUrl(url + '/forks', 'json') || [];
+                if (url) {
+                  this.url = url;
+                  this.originalUrl = !this.originalUrl?.includes(this.provider) ? url : this.originalUrl;
+                }
+                if (p) this.p ||= p; 
+                const d = this.showWhat.commitsOnly ? info.commits : info.branches;
+                let html = '';
+                for (let i = 0; i < d.length; i++) {
+                  const v = d[i];
+                  const val = this.showWhat.commitsOnly ? (() => {
+                    const maxLength = this.provider == "gitlab" ? 19 : this.provider == "github" ? 29 : 0;
+                    const oldCommit = info.commits[maxLength];
+                    if (d.length > maxLength) this.displayAlert("warning", `Not all of the commits will not show up as options due to a limit of commits that can show up in the ${this.provider} api. Any commits older than ${oldCommit.sha?.slice(0, -33) || oldCommit.short_id} will not show up in the options dropdown menu.`);
+                    return v.sha || v.id;
+                  })() : v.name;
+                  const title = v.message || v.commit?.message || (info.commits.find(i => i.id == v.commit?.id))?.message || (
+                    info.commits.find(i => i.sha == v.commit?.sha)
+                  )?.commit?.message || `No commit message was provided for this branch.`;
+                  const innerText = this.showWhat.commitsOnly ? `Commit ${v.sha?.slice(0, -33) || v.short_id}${i == 0 ? ` (Most Recent)` : ``}` : val;
+                  html += `<option value="${val}"${title ? ` title="${title}"` : ''}${info.repo.default_branch == val ? ' selected=""' : ''}>${innerText}</option>`
+                }
+                $("#branch").html(html);
+                if (typeof callback == "function") callback();
+                else {
+                  $("#settings").show();
+                  document.getElementById("repoCloneBtn").removeAttribute("disabled");
+                }
+              } catch (e) {
+                console.error(e);
+                this.displayAlert('danger', e.toString());
+              }
+              $("#settingsLoading").removeClass("d-flex");
+              $("#settingsLoading").addClass("d-none")
+            }
+            async show(type) {
+              this.showWhat[type] = !this.showWhat[type]
+              const info = this.info[this.provider][this.url];
+              this.loadSourceCodeInfo(() => {
+                if (type == "forks") {
+                  let html = '';
+                  if (this.showWhat.forks) {
+                    for (var i = 0; i < info.forks.length; i++) {
+                      const fork = info.forks[i];
+                      if (i == 0) this.loadSourceCodeInfo('', this.url.replace(info.repo.full_name || info.repo.id, fork.full_name || fork.id), this.p);
+                      html += `<option value="${fork.full_name || fork.id}">${fork.namespace?.name || fork.owner?.login || ''}</option>`
+                    } 
+                    document.getElementById('provider').setAttribute("disabled", "")
+                    if (info.forks.length > 0) {
+                      $("#forkOnlySettings").show();
+                      $("#pageNum").text(1);
+                      document.getElementById("pageForward").removeAttribute("disabled")
+                    }
+                  } else {
+                    $("#forkOnlySettings").hide();
+                    this.loadSourceCodeInfo('', this.originalUrl, this.p);
+                  }
+                  $("#owner").html(html);
+                }
+                $("#settings").show();
+                document.getElementById("repoCloneBtn").removeAttribute("disabled");
+              });
+            }
+            findInArray(param, val, array) {
+              for (const fork of typeof array != "object" || !Array.isArray(array) ? [] : array) {
+                if (fork[param] == val) return fork;
+              }
+            }
+            findInJson(param, val, json) {
+              for (const fork in typeof json != "object" ? {} : json) {
+                if (fork[param] == val) return fork;
+              }
+            }
+            loadSourceCodeInfoFromAuthor(obj) {
+            }
+            beginRepoClone(obj) {
+              const info = Object.fromEntries(new URLSearchParams($(obj).serialize()));
+              const {
+                randoGameBtn,
+                back2rando,
+                zipfiledownload,
+                back2randobtnlistenr,
+                logo,
+                term
+              } = initTerminal("Cloning The ALBW Randomizer Source Code...");
+              term.write("The git clone command is about to run in a few moments. Please wait.");
+              const socket = new WebSocket(`${grabURL4WebSocket()}/cloneRepo`);
+              socket.addEventListener("message", e => {
+                if (e.data == "success") {
+                  randoGameBtn.textContent = "Repo Clone Successful";
+                  term.write(`The source code was cloned successfuly! You will be redirected in a few moments`);
+                  let timeoutTime = 0;
+                  for (const child of $(term.element).find(".xterm-rows")[0].children) timeoutTime += child.innerText.length;
+                  timeoutTime += $(term.element).find(".xterm-rows")[0].innerText.length;
+                  setTimeout(() => window.location.href = `/dev/${this.info[this.provider][this.url].repo.name}`, timeoutTime + timeoutTime + timeoutTime + timeoutTime);
+                } else term.write(e.data);
+              });
+              socket.addEventListener("open", e => socket.send(JSON.stringify(Object.assign({}, this, info))))
+            }
+          }
+          let gameRandoSourceCode = new GameRandoSourceCode(document.getElementById('provider'));
           function setVersion(obj) {
             document.getElementById('randoVer').innerText = obj.id;
             for (const eI of document.getElementById('versions').children) eI.classList.remove("bg-body-tertiary");
             obj.classList.add("bg-body-tertiary");
             jQuery('input[name="version"]').val($(obj).find(".my-0").text())
+          }
+          function grabURL4WebSocket() {
+            return `${window.location.protocol.startsWith("https") ? 'wss' : 'ws'}://${window.location.host}`;
           }
         </script>
         <div class="row g-5">
@@ -307,6 +517,17 @@
               </li>
             </ul>
             <script>
+              window.addEventListener("load", e => {
+                var terminalProcessOngoing = false;
+                window.addEventListener("beforeunload", function (e) {
+                  if (terminalProcessOngoing) return undefined;
+                  var confirmationMessage = 'It looks like you have been editing something. If you leave before saving, your changes will be lost.';
+                  const stuff = (e || window.event);
+                  stuff.preventDefault();
+                  stuff.returnValue = confirmationMessage;
+                  return confirmationMessage;
+                });
+              })
               let presets;
               function capWord(d) {
                 return d.substring(0, 1).toUpperCase() + d.substring(1);
@@ -314,7 +535,13 @@
               function selectPreset(num) {
                 appendSetting(presets[num]);
               }
-              function randomizeGame(obj) {
+              function updateAttribute(elem, attr, val) {
+                elem.removeAttribute(attr);
+                elem.setAttribute(attr, val);
+              }
+              function initTerminal(btnLoadText) {
+                terminalProcessOngoing = true;
+                updateAttribute(document.getElementById('modalRandoRepoCloneOpenBtn'), "data-bs-toggle", "");
                 for (const elem of document.getElementsByClassName('hideDuringRandomization')) elem.style.display = 'none';
                 for (const elem of document.getElementsByClassName('randoOutput')) elem.style.display = 'block';
                 const randoGameBtn = document.getElementById('randoGameBtn');
@@ -337,7 +564,7 @@
                 const logo = document.getElementById('logo');
                 logo.style.display = 'none';
                 randoGameBtn.setAttribute("disabled", "");
-                randoGameBtn.textContent = "Randomizing Game..."
+                randoGameBtn.textContent = btnLoadText;
                 const term = new Terminal({
                   convertEol: true,
                   disableStdin: true,
@@ -349,6 +576,25 @@
                 term.loadAddon(webLinksAddon);
                 term.open(document.getElementById('terminal'))
                 fitAddon.fit();
+                window.addEventListener("resize", e => fitAddon.fit());
+                return {
+                  randoGameBtn,
+                  back2rando,
+                  zipfiledownload,
+                  back2randobtnlistenr,
+                  logo,
+                  term
+                }
+              }
+              function randomizeGame(obj) {
+                const {
+                  randoGameBtn,
+                  back2rando,
+                  zipfiledownload,
+                  back2randobtnlistenr,
+                  logo,
+                  term
+                } = initTerminal("Randomizing Game...");
                 term.write("Running Randomizer...");
                 const v = document.getElementById('randoVer').textContent;
                 jQuery.post(
@@ -387,6 +633,7 @@
                                 zipfiledownload.href = URL.createObjectURL(blob);
                                 zipfiledownload.classList.remove('d-none');
                                 zipfiledownload.classList.add('d-flex');
+                                terminalProcessOngoing = false;
                               } else handleError(`Could not get your randomized game due to an error: ${await res.text()}. Please try randomizing your game again.`)
                             })
                           } catch (e) {
@@ -496,7 +743,7 @@
         </div>
       </main>
       <footer class="my-5 pt-5 text-body-secondary text-center text-small">
-        <p class="mb-1">&copy; 2025–<script>document.write(new Date().getFullYear())</script> ALBWR Web</p>
+        <p class="mb-1">&copy; 2025–<script>document.write(new Date().getFullYear())</script> - ALBWR Web</p>
         <ul class="list-inline">
           <li class="list-inline-item"><a href="/">Home Page</a></li>
           <li class="list-inline-item"><a href="https://github.com/rickfay/z17-randomizer" target="_blank">ALBWR Source Code</a></li>
