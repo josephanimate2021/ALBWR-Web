@@ -234,6 +234,7 @@
       <main>
         <div class="py-5 text-center" id="logo">
           <img class="d-block mx-auto mb-4" src="https://github.com/user-attachments/assets/a1185a97-2e5f-4bde-901b-23836b2ca64e" alt="The Legend Of Zelda: A Link Between Worlds Randomizer">
+          <h2>Randomize Game Using The Latest Version Of ALBWR</h2>
           <p class="lead">Below is the form where you can fill out the infomation needed to randomize your game.</p>
         </div>
         <script>
@@ -375,12 +376,12 @@
               const socket = new WebSocket(`${grabURL4WebSocket()}/cloneRepo`);
               socket.addEventListener("message", e => {
                 if (e.data == "success") {
-                  randoGameBtn.textContent = "Repo Clone Successful";
+                  randoGameBtn.textContent = "The clone was successful!";
                   term.write(`The source code was cloned successfuly! You will be redirected in a few moments`);
                   let timeoutTime = 0;
-                  for (const child of $(term.element).find(".xterm-rows")[0].children) timeoutTime += child.innerText.length;
-                  timeoutTime += $(term.element).find(".xterm-rows")[0].innerText.length;
-                  setTimeout(() => window.location.href = `/dev/${this.info[this.provider][this.url].repo.name}`, timeoutTime + timeoutTime + timeoutTime + timeoutTime);
+                  setTimeout(() => {
+                    window.location.href = `/dev?repoName=${this.info[this.provider][this.url].repo.name}`
+                  }, 4096);
                 } else term.write(e.data);
               });
               socket.addEventListener("open", e => socket.send(JSON.stringify(Object.assign({}, this, info))))
@@ -594,11 +595,11 @@
                   back2randobtnlistenr,
                   logo,
                   term
-                } = initTerminal("Randomizing Game...");
-                term.write("Running Randomizer...");
+                } = initTerminal(`${gameRandoSourceCode.plandomizeGame ? 'Plandomizing' : 'Randomizing'} Game...`);
+                term.write(`Running ${gameRandoSourceCode.plandomizeGame ? 'Plandomizer' : 'Randomizer'}...`);
                 const v = document.getElementById('randoVer').textContent;
                 jQuery.post(
-                  `/randomize/${(
+                  `/${gameRandoSourceCode.plandomizeGame ? 'plandomizer' : 'randomizer'}/${(
                     Math.random()
                   ).toString().substring(3)}?v=z17&execVersion=${v.startsWith("v") ? v.substring(1) : v}&${$(obj).serialize()}`, 
                   d => {
@@ -609,7 +610,7 @@
                           term.clear();
                           term.write(l.split(doneText).join(''));
                           function handleError(e) {
-                            randoGameBtn.textContent = "Game Randomization Failed";
+                            randoGameBtn.textContent = `Game ${gameRandoSourceCode.plandomizeGame ? 'Plandomization' : 'Randomization'} Failed`;
                             term.write(e);
                             back2rando.addEventListener("click", back2randobtnlistenr);
                             back2rando.classList.remove("d-none");
@@ -617,15 +618,15 @@
                           }
                           if (!l.includes(doneText)) c();
                           else try {
-                            term.write('\r\nRetrieving Your Randomized Game...\r\n');
-                            fetch(`/genZipFromRandomizedGame?v=${d.data.v}&id=${d.data.id}&deletePreset=${obj.getAttribute("data-wantsPresetDeleted")}`, {
+                            term.write(`\r\nRetrieving Your ${gameRandoSourceCode.plandomizeGame ? 'Plandomized' : 'Randomized'} Game...\r\n`);
+                            fetch(`/genZipFromRandomizedGame?${new URLSearchParams(d.data).toString()}&deletePreset=${obj.getAttribute("data-wantsPresetDeleted")}`, {
                               method: "POST"
                             }).then(async res => {
                               if (res.ok) {
                                 const blob = await res.blob();
-                                randoGameBtn.textContent = "Game Randomization Successful";
+                                randoGameBtn.textContent = `Game ${gameRandoSourceCode.plandomizeGame ? 'Plandomization' : 'Randomization'} Successful`;
                                 term.write(
-                                  `Your randomized game was retrieved successfully!\r\nTo download it, click on the "Download Randomized Game" button below.`
+                                  `Your ${gameRandoSourceCode.plandomizeGame ? 'plandomized' : 'randomized'} game was retrieved successfully!\r\nTo download it, click on the "Download Randomized Game" button below.`
                                 );
                                 back2rando.addEventListener("click", back2randobtnlistenr);
                                 back2rando.classList.remove("d-none");
@@ -634,7 +635,7 @@
                                 zipfiledownload.classList.remove('d-none');
                                 zipfiledownload.classList.add('d-flex');
                                 terminalProcessOngoing = false;
-                              } else handleError(`Could not get your randomized game due to an error: ${await res.text()}. Please try randomizing your game again.`)
+                              } else handleError(`Could not get your ${gameRandoSourceCode.plandomizeGame ? 'plandomized' : 'randomized'} game due to an error: ${await res.text()}. Please try ${gameRandoSourceCode.plandomizeGame ? 'plandomizing' : 'randomizing'} your game again.`)
                             })
                           } catch (e) {
                             handleError(e);
@@ -680,7 +681,7 @@
                 }
                 document.getElementById('randoSettings').innerHTML = html;
               }
-              jQuery.getJSON(`/settings/z17`, d => {
+              jQuery.getJSON(`/settings/stable/z17`, d => {
                 presets = d;
                 appendSetting(d[0]);
                 for (var i = 0; i < d.length; i++) document.getElementById('presets').insertAdjacentHTML(
@@ -698,7 +699,8 @@
                 document.getElementById('preset').innerText = `${d[0].version}`
               });
               function cliRedirect(e) {
-                let link = `/cli?v=z17&execV=${document.getElementById('randoVer').textContent.substring(1)}`;
+                const execV = document.getElementById('randoVer').textContent;
+                let link = `/cli?sourceVersion=stable&type=${gameRandoSourceCode.plandomizeGame ? "plandomizer" : "randomizer"}&v=z17&execV=${execV.startsWith("v") ? execV.substring(1) : execV}`;
                 if (e.getAttribute("data-args")) link += ` ${e.getAttribute("data-args")}`;
                 window.open(link, '_blank');
               }
@@ -720,19 +722,31 @@
             <form action="javascript:;" onsubmit="randomizeGame(this)">
               <input type="hidden" name="version" value="v0.4.0"/>
               <div class="row g-3 hideDuringRandomization" id="randoSettings"></div>
-
+              <input type="hidden" name="sourceVersion" value="stable"/>
               <hr class="my-4 hideDuringRandomization">
-
-              <div class="form-check hideDuringRandomization">
+              <h4 class="mb-3 hideDuringRandomization">Game Generation Options</h4>
+              <div class="form-check hideDuringRandomization" title="Adds a flag/arguement to the albw randomizer executable where it is told to not patch your game at all.">
                 <input type="checkbox" class="form-check-input" id="noPatch" name="noPatch">
-                <label class="form-check-label" for="noPatch">Disable Patch Generation</label>
+                <label class="form-check-label" for="noPatch">Disable Game Patching</label>
               </div>
 
-              <div class="form-check hideDuringRandomization">
+              <div class="form-check hideDuringRandomization" title="BROKEN FEATURE!!! DO NOT USE!!!
+              
+              This feature allows you to manually place items in check areas of ALBW by hand. 
+              Please note that this feature currently relies on hardcoded settings and not user input to get your job done. 
+              Loaded settings via user input should be coming soon for the general public though. 
+              right now, this feature can only be utilized to it's full extent if you decide to randomize ALBW using only it's source code.
+              As of right now, this feature is currently broken and is best if you do not click on this checkmark.
+              I only added the option in case rickfay decides to do some more work with the plandomizer.">
+                <input type="checkbox" class="form-check-input" onclick="gameRandoSourceCode.plandomizeGame = !gameRandoSourceCode.plandomizeGame">
+                <label class="form-check-label" for="plandoOnly">Plandomize Game (BETA)</label>
+              </div>
+
+              <div class="form-check hideDuringRandomization" title="Adds a flag/arguement to the albw randomizer executable where it is told to not generate your spoiler log.">
                 <input type="checkbox" class="form-check-input" id="noSpoilers" name="noSpoilers">
                 <label class="form-check-label" for="noSpoilers">Disable Spoiler Log</label>
               </div>
-
+              <hr class="my-4 hideDuringRandomization">
               <button class="btn btn-primary btn-lg" type="submit" id="randoGameBtn">Randomize Game</button>
               <center class="btn-group">
                 <input type="button" class="d-none btn btn-secondary btn-lg" id="back2randobtn" value="<- Back To Randomizer"/>
@@ -747,6 +761,7 @@
         <ul class="list-inline">
           <li class="list-inline-item"><a href="/">Home Page</a></li>
           <li class="list-inline-item"><a href="https://github.com/rickfay/z17-randomizer" target="_blank">ALBWR Source Code</a></li>
+          <li class="list-inline-item"><a href="https://github.com/josephanimate2021/ALBWR-Web">Source Code For This Website</a></li>
           <li class="list-inline-item"><a href="https://discord.gg/dmAJh2uY7M" target="_blank">ALBWR Discord Server</a></li>
           <li class="list-inline-item"><a href="https://albwrandomizer.com/">Rickfay's ALBWR Website (Coming Soon)</a></li>
         </ul>

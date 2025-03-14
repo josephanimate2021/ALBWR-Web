@@ -51,9 +51,15 @@ wss.on('connection', (ws, req) => {
                         case "z17-local":
                         case "albw": return ws.send(`Sorry, but the ${parsedUrl.query.v} randomizer does not support the CLI.`);
                     }
-                    const randoPath = path.join(__dirname, `./sourcecodes/stable/${parsedUrl.query.v}-randomizer`);
+                    const randoPath = path.join(__dirname, `./sourcecodes/${parsedUrl.query.sourceVersion}/${parsedUrl.query.v}`);
+                    if (parsedUrl.query.sourceVersion == "dev") {
+                        if (!fs.existsSync(randoPath)) {
+                            const repoName = parsedUrl.query.v.substring(0, parsedUrl.query.v.indexOf("/"));
+                            console.log(repoName);
+                        }
+                    }
                     if (writeALBWFile(Object.assign(req, parsedUrl), {}, randoPath, false, [], ws)) {
-                        const shell = spawn("cd", [randoPath, `&& albw-randomizer-${parsedUrl.query.execV}`], {
+                        const shell = spawn("cd", [randoPath, `&& albw-${parsedUrl.query.type}-${parsedUrl.query.execV}`], {
                             name: 'xterm-color',
                             env: process.env,
                             shell: true
@@ -207,7 +213,7 @@ app.get('/', (req, res) => {
         location: req.headers.referer
     });
     res.end();
-}).get('/settings/:v', (req, res) => {
+}).get('/settings/:sourceVersion/:v', (req, res) => {
     const info = {}
     const presets = [];
     for (const file of fs.readdirSync('./uploads').filter(i => i.startsWith(`settingsPreset-${req.params.v}-`) && i.endsWith(".json"))) {
@@ -215,7 +221,7 @@ app.get('/', (req, res) => {
         info.id = file.split("-")[2];
         presets.unshift(info);
     }
-    const randoPath = `./sourcecodes/stable/${req.params.v}-randomizer`;
+    const randoPath = `./sourcecodes/${req.params.sourceVersion}/${req.params.v}`;
     const newLineCommon = "\n";
     const newLine = process.platform == "win32" ? "\r" : "" + newLineCommon;
     function decodeOldToml(info, tomlFile) {
@@ -432,79 +438,80 @@ app.get('/', (req, res) => {
         }
     }
     res.json(presets);
-}).post('/randomize/:id', (req, res) => {
+}).post('/:type/:id', (req, res) => {
     try {
         if (userIsRandomizingGame) return res.json({
             error: {
                 message: "Someone else is randomizing their game right now. Please wait for a few minutes."
             }
         })
+        res.json({
+            isRandomizing: true,
+            data: Object.assign({}, req.params, req.query)
+        })
         userIsRandomizingGame = true;
         scriptOutput = '';
         okay2spitscript = false;
-        const randoPath = `./sourcecodes/stable/${req.query.v}-randomizer`;
-        const command = [path.join(__dirname, randoPath), "&&", "albw-randomizer"];
+        const randoPath = `./sourcecodes/${req.query.sourceVersion}/${req.query.v}`;
+        const command = [path.join(__dirname, randoPath), "&&", `albw-${req.params.type}`];
         if (req.query.noSpoilers) command.push('--no-spoiler');
         if (req.query.noPatch) command.push('--no-patch');
-        if (req.query.seed) command.push(`--seed ${req.query.seed}`);
-        scriptOutput += `${req.query.v} randomizer stable is running${req.query.execVersion ? ` on version ${req.query.execVersion}` : ''}.\r\n`;
+        if (req.query.seed && req.params.type == "randomizer") command.push(`--seed ${req.query.seed}`);
+        scriptOutput += `${req.query.v} randomizer ${req.query.sourceVersion} is running${req.query.execVersion ? ` on version ${req.query.execVersion}` : ''}.\r\n`;
+        okay2spitscript = true;
         if (req.query.execVersion) command[2] += `-${req.query.execVersion}`;
         const versionsFile = `${randoPath}/versions.json`;
         const versions = fs.existsSync(versionsFile) ? JSON.parse(fs.readFileSync(versionsFile)) : {};
-        if (writeALBWFile(req, versions, randoPath, true, command, res)) {
-            function gameGeneration(currentAttempt) {
-                function sForWord(word = 'attempt', num = 0) {
-                    return num > 1 ? (word + 's') : word
-                }
-                scriptOutput+=`Attempt #${currentAttempt}\r\n`;
+        function sForWord(word = 'attempt', num = 0) {
+            return num > 1 ? (word + 's') : word
+        }
+        function gameGeneration(currentAttempt) {
+            scriptOutput+=`Attempt #${currentAttempt}\r\n`;
+            okay2spitscript = true
+            const liveOutput = spawn(`cd`, command, {
+                shell: true
+            });
+        
+            liveOutput.stdout.setEncoding('utf8');
+            liveOutput.stdout.on('data', function(data) {
+                console.log('stdout:', data);
+                scriptOutput+=data.toString()+"\r\n";
                 okay2spitscript = true
-                const liveOutput = spawn(`cd`, command, {
-                    shell: true
-                });
-            
-                liveOutput.stdout.setEncoding('utf8');
-                liveOutput.stdout.on('data', function(data) {
-                    console.log('stdout:', data);
-                    scriptOutput+=data.toString()+"\r\n";
-                    okay2spitscript = true
-                });
-            
-                liveOutput.stderr.setEncoding('utf8');
-                liveOutput.stderr.on('data', function(data) {
-                    console.log('stderr:', data);
-                    scriptOutput+=data.toString()+"\r\n";
-                    okay2spitscript = true
-                });
-            
-                liveOutput.on('close', function(code) {
-                    console.log('closing code:', code)
-                    if (code != 0) {
-                        scriptOutput += `The command closed unexpectedly with the ${code} code after ${currentAttempt} ${
-                            sForWord('attempt', currentAttempt)
-                        }.\r\nRetrying...\r\n`;
-                        okay2spitscript = true;
-                        gameGeneration(currentAttempt + 1);
-                    } else {
-                        scriptOutput += `Press Enter to continue...`;
-                        okay2spitscript = true;
-                    }
-                });
-            
-                liveOutput.on('error', function(code) {
-                    console.log('error:', code);
-                    scriptOutput += `The command errored out with ${code} after ${currentAttempt} ${
+            });
+        
+            liveOutput.stderr.setEncoding('utf8');
+            liveOutput.stderr.on('data', function(data) {
+                console.log('stderr:', data);
+                scriptOutput+=data.toString()+"\r\n";
+                okay2spitscript = true
+            });
+        
+            liveOutput.on('close', function(code) {
+                console.log('closing code:', code)
+                if (code != 0) {
+                    scriptOutput += `The command closed unexpectedly with the ${code} code after ${currentAttempt} ${
                         sForWord('attempt', currentAttempt)
                     }.\r\nRetrying...\r\n`;
                     okay2spitscript = true;
                     gameGeneration(currentAttempt + 1);
-                });
-            }
-            gameGeneration(1)
-            res.json({
-                isRandomizing: true,
-                data: Object.assign({}, req.params, req.query)
-            })
+                } else {
+                    scriptOutput += `Press Enter to continue...`;
+                    okay2spitscript = true;
+                }
+            });
+        
+            liveOutput.on('error', function(code) {
+                console.log('error:', code);
+                scriptOutput += `The command errored out with ${code} after ${currentAttempt} ${
+                    sForWord('attempt', currentAttempt)
+                }.\r\nRetrying...\r\n`;
+                okay2spitscript = true;
+                gameGeneration(currentAttempt + 1);
+            });
         }
+        if (writeALBWFile(req, versions, randoPath, true, command, res)) gameGeneration(1);
+        scriptOutput += `Running Command: cd ${command.join(' ')}\r\n`;
+        okay2spitscript = true;
     } catch (err) {
         console.error(err)
         return res.status(500).json({
@@ -514,8 +521,8 @@ app.get('/', (req, res) => {
             }
         });
     }
-}).get('/execVersions/:v', (req, res) => {
-    const versionsPath = `./sourcecodes/stable/${req.params.v}-randomizer/versions.json`
+}).get('/execVersions/:sourceVersion/:v', (req, res) => {
+    const versionsPath = `./sourcecodes/${req.params.sourceVersion}/${req.params.v}/versions.json`
     res.json(fs.existsSync(versionsPath) ? JSON.parse(fs.readFileSync(versionsPath)) : {})
 }).get('/randomizationStatus', (req, res) => {
     const interval = setInterval(() => {
@@ -567,7 +574,7 @@ async function genGameZip(req, res) {
     userIsRandomizingGame = false;
     try {
         const zip = new JSZip();
-        const randoPath = `./sourcecodes/stable/${req.query.v}-randomizer`;
+        const randoPath = `./sourcecodes/${req.query.sourceVersion}/${req.query.v}`;
         function c(l, k) {
             for (const file of fs.readdirSync(l)) {
                 const fileStats = fs.lstatSync(`${l}/${file}`);
@@ -599,7 +606,7 @@ async function genGameZip(req, res) {
         handleError(e);
     }
 }
-function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = false, command = [], res) {
+function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = false, command = [], res = {}) {
     try {
         function string2boolean(s) {
             switch (s) {
@@ -644,7 +651,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                     const presetFile = `${randoPath}/z17-randomizer/config/presets/${req.params.id}.toml`
                     if (!fs.existsSync(presetFile)) fs.writeFileSync(presetFile, writeOldToml());
                 }
-                if (req.params?.id) command.push(`--preset ${req.params.id}`);
+                if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
                 function c(k) {
                     for (const j of fs.readdirSync(`${randoPath}/${k}`)) {
                         const stats = fs.lstatSync(`${randoPath}/${k}/${j}`);
@@ -673,7 +680,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 if (
                     req.query.settings && typeof req.query.settings == "object" && writeNewPreset
                 ) fs.writeFileSync(`${randoPath}/presets/${req.params.id}.toml`, writeOldToml(true));
-                if (req.params?.id) command.push(`--preset ${req.params.id}`);
+                if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
                 break;
             } default: {
                 const info = req.query.v == "z17v3" ? req.query.settings : req.query;
@@ -693,13 +700,13 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 const config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
                 if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
                 fs.writeFileSync(`${randoPath}/${config.rom}`, fs.readFileSync(`./uploads/rom-${req.headers['x-forwarded-for']}.3ds`));
-                if (req.params?.id) command.push(`--preset ${req.params.id}`);
+                if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
             }
         }
         return true
     } catch (e) {
         console.log(e);
-        res.send(req.headers.connection == "upgrade" ? e : e.toString());
+        res.send(e.toString());
         return false;
     }
 }

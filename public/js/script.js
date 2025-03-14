@@ -37,7 +37,7 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
     const params = new URLSearchParams();
     
     for (const [key, value] of formData.entries()) params.append(key, value);
-    fetch(`/randomize/${(Math.random()).toString().substring(2)}?${params.toString()}`, {
+    fetch(`/randomizer/${(Math.random()).toString().substring(2)}?${params.toString()}`, {
         method: "POST"
     }).then(res => res.json()).then(d => {
         if (d.isRandomizing) (async () => {
@@ -71,7 +71,7 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                     }
                     try {
                         term.write('\r\nRetrieving Your Randomized Game...\r\n');
-                        const res = await fetch(`/genZipFromRandomizedGame?v=${d.data.v}&id=${d.data.id}&deletePreset=${deletePresetAfterRandomization}`, {
+                        const res = await fetch(`/genZipFromRandomizedGame?${new URLSearchParams(d.data).toString()}&deletePreset=${deletePresetAfterRandomization}`, {
                             method: "POST"
                         });
                         if (res.ok) {
@@ -180,7 +180,7 @@ function loadSettings(id, callback) {
         }
         callback(v);
     }
-    fetch(`/settings/${id}`).then(res => res.json()).then(d => {
+    fetch(`/settings/stable/${id}`).then(res => res.json()).then(d => {
         switch (id) { // loads executable versions for specific randomizer versions
             case "z17v3": if (!typeInTitle) typeInTitle = 'Z17 Randomizer v3'; 
             case "z17r": if (!typeInTitle) typeInTitle = 'Z17 Randomizer Beta'; 
@@ -196,7 +196,7 @@ function loadSettings(id, callback) {
                     document.getElementById('noVerboseDiv').style.display = 'block';
                     cliLink.style.display = 'none';
                 }
-                fetch(`/execVersions/${id}`).then(res => res.json()).then(v => versionsCreator(v, d));
+                fetch(`/execVersions/stable/${id}`).then(res => res.json()).then(v => versionsCreator(v, d));
                 break;
             } default: callback(d)
         }

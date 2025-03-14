@@ -1,0 +1,124 @@
+{
+    "0.0.1": {
+        "versionName": "Z17R v0.0.1",
+        "desc": "UI improvements, add new option exclude_minigames, rename shuffle_bracelet to start_with_bracelet"
+    },
+    "0.0.2": {
+        "versionName": "Z17R v0.0.2",
+        "desc": "Swordless Mode, Glitched logic updates, improve UI with better error handling, add Boots in shop option",
+        "addOptions": {
+            "logic": {
+                "bell_in_shop": {
+                    "comment": "The Bell will be placed in Ravios Shop",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "pouch_in_shop": {
+                    "comment": "The Pouch will be placed in Ravios Shop",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "boots_in_shop": {
+                    "comment": "The Pegasus Boots will be placed in Ravios Shop",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "swordless_mode": {
+                    "comment": "Swordless Mode. Removes all Swords from the game. You will need the Net to play Tennis with Yuganon.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            },
+            "options": {
+                "night_mode": {
+                    "comment": "Experimental option to change Hyrules lighting until you visit Lorule for the first time.<br>Causes performance issues on console.",
+                    "defaultValue": true,
+                    "useBooleanOptions": true
+                }
+            }
+        },
+        "removeOptions": ["logic.unsafe_key_placement"]
+    },
+    "0.0.3": {
+        "versionName": "Z17R v0.0.3",
+        "desc": "Full changelog: https://github.com/rickfay/z17-randomizer/compare/v0.0.2...v0.0.3",
+        "addOptions": {
+            "logic": {
+                "bell_in_shop": {
+                    "comment": "The Bell will be placed in Ravios Shop",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "pouch_in_shop": {
+                    "comment": "The Pouch will be placed in Ravios Shop",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "boots_in_shop": {
+                    "comment": "The Pegasus Boots will be placed in Ravios Shop",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "super_items": {
+                    "comment": "Place items using logic that potentially requires glitches to complete",
+                    "defaultValue": true,
+                    "useBooleanOptions": true
+                },
+                "swordless_mode": {
+                    "comment": "Swordless Mode. Removes all Swords from the game. You will need the Net to play Tennis with Yuganon.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            },
+            "options": {
+                "night_mode": {
+                    "comment": "Experimental option to change Hyrules lighting until you visit Lorule for the first time.<br>Causes performance issues on console.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            }
+        },
+        "removeOptions": ["logic.unsafe_key_placement"]
+    },
+    "0.0.4": {
+        "versionName": "Z17R v0.0.4 (latest STABLE)",
+        "desc": "Full changelog: https://github.com/rickfay/z17-randomizer/compare/v0.0.3...v0.0.4",
+        "addOptions": {
+            "logic": {
+                "bell_in_shop": {
+                    "comment": "The Bell will be placed in Ravios Shop",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "pouch_in_shop": {
+                    "comment": "The Pouch will be placed in Ravios Shop",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "boots_in_shop": {
+                    "comment": "The Pegasus Boots will be placed in Ravios Shop",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "super_items": {
+                    "comment": "Place items using logic that potentially requires glitches to complete",
+                    "defaultValue": true,
+                    "useBooleanOptions": true
+                },
+                "swordless_mode": {
+                    "comment": "Swordless Mode. Removes all Swords from the game. You will need the Net to play Tennis with Yuganon.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            },
+            "options": {
+                "night_mode": {
+                    "comment": "Experimental option to change Hyrules lighting until you visit Lorule for the first time.<br>Causes performance issues on console.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            }
+        },
+        "removeOptions": ["logic.unsafe_key_placement"]
+    }
+}

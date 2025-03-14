@@ -1,0 +1,103 @@
+{
+    "0.1.0": {
+        "versionName": "Z17R v0.1.0 (BETA)",
+        "desc": "Full changelog: https://github.com/rickfay/z17-randomizer/compare/v0.0.4...v0.0.5"
+    },
+    "0.1.1": {
+        "versionName": "Z17R v0.1.1 (BETA)",
+        "desc": "Full changelog: https://github.com/rickfay/z17-randomizer/compare/v0.0.5...z17r-v0.1.1"
+    },
+    "0.1.2": {
+        "versionName": "v0.1.2",
+        "desc": "z17r-v0.1.2\r\n\r\nmove TH mergeless jail chests to hell logic",
+        "addOptions": {
+            "logic": {
+                "lampless": {
+                    "comment": "Dont require Lamp. If true, the player may have to cross dark rooms without a light source. If youre not sure, select false.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            }
+        }
+    },
+    "0.3.0-dev-build-1": {
+        "versionName": "v0.3.0 - Dev Build 1",
+        "desc": "v0.3.0-dev-build-1\r\n\r\nadd back map toggle, fix lorule music, fix HC 4F cutscene, add big special something",
+        "addOptions": {
+            "logic": {
+                "randomize_dungeon_prizes": {
+                    "comment": "Randomizes the Pendants and Portraits between Hyrule and Lorule dungeons",
+                    "defaultValue": true,
+                    "useBooleanOptions": true
+                },
+                "lc_requirement": {
+                    "comment": "The number of Portraits (0-7) needed to trigger the Hilda cutscene to open Lorule Castle",
+                    "defaultValue": 7,
+                    "rangeNumOptionsTo": 7
+                },
+                "maiamai_madness": {
+                    "comment": "Maiamai Madness. Shuffles Maiamai into the pool, adding 100 more locations",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "vanes_activated": {
+                    "comment": "Pre-activates all Weather Vanes (EXPERIMENTAL). May cause Bracelet(s) to be located in any region of Lorule.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "lampless": {
+                    "comment": "Dont require Lamp. If true, the player may have to cross dark rooms without a light source. If youre not sure, select false.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            },
+            "options": {
+                "chest_size_matches_contents": {
+                    "comment": "Alters treasure chest sizes depending on their contents: Large for Progression items, Small for everything else.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            }
+        }
+    },
+    "0.3.0-dev-build-2": {
+        "versionName": "v0.3.0-dev-build-2",
+        "desc": "Full changelog: https://github.com/rickfay/z17-randomizer/compare/v0.1.2...v0.3.0",
+        "addOptions": {
+            "logic": {
+                "randomize_dungeon_prizes": {
+                    "comment": "Randomizes the Pendants and Portraits between Hyrule and Lorule dungeons",
+                    "defaultValue": true,
+                    "useBooleanOptions": true
+                },
+                "lc_requirement": {
+                    "comment": "The number of Portraits (0-7) needed to trigger the Hilda cutscene to open Lorule Castle",
+                    "defaultValue": 7,
+                    "rangeNumOptionsTo": 7
+                },
+                "maiamai_madness": {
+                    "comment": "Maiamai Madness. Shuffles Maiamai into the pool, adding 100 more locations",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "vanes_activated": {
+                    "comment": "Pre-activates all Weather Vanes (EXPERIMENTAL). May cause Bracelet(s) to be located in any region of Lorule.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "lampless": {
+                    "comment": "Dont require Lamp. If true, the player may have to cross dark rooms without a light source. If youre not sure, select false.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            },
+            "options": {
+                "chest_size_matches_contents": {
+                    "comment": "Alters treasure chest sizes depending on their contents: Large for Progression items, Small for everything else.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            }
+        }
+    }
+}

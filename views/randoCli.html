@@ -20,7 +20,6 @@
         <div id="terminal"></div>
         <script>
             const params = new URLSearchParams(window.location.search);
-            const v = params.get("v");
             const execV = params.get("execV");
             let cursorX;
             const term = new Terminal({
@@ -36,7 +35,7 @@
             fitAddon.fit();
             window.addEventListener("resize", e => fitAddon.fit())
             term.write('Setting Up The CLI for ALBWR...\n');
-            const socket = new WebSocket(`${window.location.protocol.startsWith("https") ? 'wss' : 'ws'}://${window.location.host}/randoCli?v=${v}&execV=${execV}`);
+            const socket = new WebSocket(`${window.location.protocol.startsWith("https") ? 'wss' : 'ws'}://${window.location.host}/randoCli${window.location.search}`);
             socket.addEventListener("message", e => {
                 if (typeof e.data == "string") {
                     cursorX = e.data.substring(e.data.lastIndexOf("\n") + 1).length;
