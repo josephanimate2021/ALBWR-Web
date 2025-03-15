@@ -46,49 +46,99 @@ wss.on('connection', (ws, req) => {
         case "GET": {
             switch (parsedUrl.pathname) {
                 case "/randoCli": { // CLI for the ALBW Randomizer
-                    userIsRandomizingGame = true;
+                    if (userIsRandomizingGame) return ws.send('Someone is currently randomizing their game right now. Please check back later.')
+                    userIsRandomizingGame = true
                     switch (parsedUrl.query.v) {
                         case "z17-local":
                         case "albw": return ws.send(`Sorry, but the ${parsedUrl.query.v} randomizer does not support the CLI.`);
                     }
-                    const randoPath = path.join(__dirname, `./sourcecodes/${parsedUrl.query.sourceVersion}/${parsedUrl.query.v}`);
+                    const sourceCodeRoot = path.join(__dirname, `./sourcecodes/${parsedUrl.query.sourceVersion}${
+                        parsedUrl.query.sourceVersion == "dev" ? `/${req.headers['x-forwarded-for'] || 'localhost'}` : ''
+                    }`);
+                    const randoPath = path.join(sourceCodeRoot, parsedUrl.query.v);
                     if (parsedUrl.query.sourceVersion == "dev") {
                         if (!fs.existsSync(randoPath)) {
-                            const repoName = parsedUrl.query.v.substring(0, parsedUrl.query.v.indexOf("/"));
-                            console.log(repoName);
-                        }
-                    }
-                    if (writeALBWFile(Object.assign(req, parsedUrl), {}, randoPath, false, [], ws)) {
-                        const shell = spawn("cd", [randoPath, `&& albw-${parsedUrl.query.type}-${parsedUrl.query.execV}`], {
-                            name: 'xterm-color',
-                            env: process.env,
-                            shell: true
-                        });
-                        shellInit(shell, () => {
-                            userIsRandomizingGame = false;
-                            deleteALBWStuff(req, randoPath);
-                        });
-                        shell.on("close", async c => {
-                            if (!parsedUrl.query.execV.includes("--")) {
+                            ws.send(`It seems that the build folder for your cloned source code does not exist. Creating the folder now...\r\n`);
+                            const sourceFolder = path.join(sourceCodeRoot, parsedUrl.query.v.substring(0, parsedUrl.query.v.indexOf("/")));
+                            const command = [sourceFolder, '&& cargo build'];
+                            ws.send(`Running Command: cd ${command.join(' ')}\r\n`);
+                            const shell = spawn('cd', command, {
+                                shell: true
+                            });
+                            shellInit(shell, () => {
+                                userIsRandomizingGame = false;
+                                deleteALBWStuff(req, randoPath);
+                            });
+                            shell.on("close", c => {
                                 if (c == 0) {
-                                    ws.send(`\nYour game was successfully randomized. Getting zip file for your randomized game...`);
-                                    await genGameZip(Object.assign(req, parsedUrl), ws);
-                                    ws.send(`\nYour zip file is available for download!`);
-                                    ws.send(`\nclick on the "Download Randomized Game" button below to download your randomized game.`);
-                                    ws.send(`\nIn order to randomize your game again, simply reload this page.`);
-                                } else {
-                                    ws.send(`\nThe Randomizer CLI Closed unexpectedly with code ${c}.`);
-                                    ws.send('\nTry refreshing this page and then randomizing your game again.');
-                                    ws.send("\nIf that dosen't work, it's likely that you might have to use the GUI to randomize your game.")
-                                    ws.send('\nThat method does a better job with error handling without you having to go through the CLI every single time')
-                                    ws.send('\nto configure your preset over and over again.')
+                                    ws.send(`The build was successful! Attempting to launch the ${parsedUrl.query.type} executable...\r\n`);
+                                    const configInBuild = path.join(randoPath, 'config.json');
+                                    if (!fs.existsSync(configInBuild)) {
+                                        ws.send('The config does not exist in your cloned source code build. Creating config...\r\n');
+                                        fs.copyFileSync(path.join(sourceFolder, "config.json"), configInBuild);
+                                        ws.send('The config file was created successfuly!\r\n');
+                                    }
+                                    for (const filePath of ["presets/Example.json", "presets/Example.toml", "presets/Standard.toml"]) {
+                                        const presetInBuild = path.join(randoPath, filePath);
+                                        if (!fs.existsSync(presetInBuild)) {
+                                            const presetFile = path.join(sourceFolder, filePath);
+                                            if (fs.existsSync(presetFile)) {
+                                                ws.send('The example preset does not exist in your cloned source code build. Creating example preset...\r\n');
+                                                const folder = filePath.split("/")[0];
+                                                if (!fs.existsSync(path.join(randoPath, folder))) fs.mkdirSync(path.join(randoPath, folder));
+                                                fs.copyFileSync(presetFile, presetInBuild);
+                                                ws.send('The example preset was created successfuly!\r\n');
+                                            }
+                                        }
+                                    }
+                                    const generatedFolder = path.join(randoPath, 'generated');
+                                    if (!fs.existsSync(generatedFolder)) {
+                                        ws.send('The generated folder does not exist in your cloned source code build. Creating folder...\r\n');
+                                        fs.mkdirSync(generatedFolder);
+                                        ws.send('The generated folder was created successfuly!\r\n');
+                                    }
+                                    ws.send('Looks like everything checked out successfuly. Continuing Executable Launch...\r\n');
+                                    launchExe();
                                 }
-                            }
-                        })
-                        shell.on("error", e => ws.send(e))
-                    } else {
-                        ws.send('\nPlease try reloading the page or contacting josephalt7000 on discord to get your issue resolved.')
-                        ws.send('\nA screenshot of this error is highly encouraged in order for your error to be better resolved.');
+                                else ws.send(`The build command for rust has failed with code ${
+                                    c
+                                }.\r\nEither rust isn't installed or something else went wrong during the build process like not having an existant directory for the cloned source code or etc,\r\nstuff like that. Please resolve those issues before reloading this page.`)
+                            })
+                        } else launchExe();
+                    } else launchExe();
+                    function launchExe() {
+                        if (writeALBWFile(Object.assign(req, parsedUrl), {}, randoPath, false, [], ws)) {
+                            const shell = spawn("cd", [randoPath, `&& albw-${parsedUrl.query.type}${parsedUrl.query.execV ? `-${parsedUrl.query.execV}` : ''}`], {
+                                name: 'xterm-color',
+                                env: process.env,
+                                shell: true
+                            });
+                            shellInit(shell, () => {
+                                userIsRandomizingGame = false;
+                                deleteALBWStuff(req, randoPath);
+                            });
+                            shell.on("close", async c => {
+                                if (!parsedUrl.query.execV?.includes("--")) {
+                                    if (c == 0) {
+                                        ws.send(`\nYour game was successfully randomized. Getting zip file for your randomized game...`);
+                                        await genGameZip(Object.assign(req, parsedUrl), ws);
+                                        ws.send(`\nYour zip file is available for download!`);
+                                        ws.send(`\nclick on the "Download Randomized Game" button below to download your randomized game.`);
+                                        ws.send(`\nIn order to randomize your game again, simply reload this page.`);
+                                    } else {
+                                        ws.send(`\nThe Randomizer CLI Closed unexpectedly with code ${c}.`);
+                                        ws.send('\nTry refreshing this page and then randomizing your game again.');
+                                        ws.send("\nIf that dosen't work, it's likely that you might have to use the GUI to randomize your game.")
+                                        ws.send('\nThat method does a better job with error handling without you having to go through the CLI every single time')
+                                        ws.send('\nto configure your preset over and over again.')
+                                    }
+                                }
+                            })
+                            shell.on("error", e => ws.send(e))
+                        } else {
+                            ws.send('\nPlease try reloading the page or contacting josephalt7000 on discord to get your issue resolved.')
+                            ws.send('\nA screenshot of this error is highly encouraged in order for your error to be better resolved.');
+                        }
                     }
                     break;
                 } case "/shell": { // Loads a shell
@@ -143,7 +193,10 @@ wss.on('connection', (ws, req) => {
                                 fs.writeFileSync(path.join(repoFolder, 'info.json'), JSON.stringify(data, null, "\t"));
                                 ws.send('success');
                             }
-                            else ws.send(`\r\nThe command closed unexpectedly closed with code ${c}.`);
+                            else {
+                                ws.send(`\r\nThe command closed unexpectedly with code ${c}.`);
+                                ws.send('fail');
+                            }
                         });
                     })
                     break;
@@ -210,7 +263,7 @@ app.get('/', (req, res) => {
 }).get('/deleteFile', (req, res) => {
     fs.unlinkSync(`./uploads/rom-${req.headers['x-forwarded-for']}.3ds`)
     res.writeHead(302, '', {
-        location: req.headers.referer
+        location: "/"
     });
     res.end();
 }).get('/settings/:sourceVersion/:v', (req, res) => {
@@ -221,7 +274,9 @@ app.get('/', (req, res) => {
         info.id = file.split("-")[2];
         presets.unshift(info);
     }
-    const randoPath = `./sourcecodes/${req.params.sourceVersion}/${req.params.v}`;
+    const randoPath = `./sourcecodes/${req.params.sourceVersion}${
+        req.params.sourceVersion == "dev" ? `/${req.headers['x-forwarded-for'] || 'localhost'}` : ''
+    }/${req.params.v}`;
     const newLineCommon = "\n";
     const newLine = process.platform == "win32" ? "\r" : "" + newLineCommon;
     function decodeOldToml(info, tomlFile) {
@@ -387,6 +442,10 @@ app.get('/', (req, res) => {
                 treacherous_tower_floors: 66,
                 user_exclusions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`))
             }
+            if (req.params.v == "z17v3") {
+                wordOptions.ped_requirement[1] = "Charmed";
+                wordOptions.ped_requirement[2] = "Standard";
+            }
             const comments = [];
             let commentCount = 1;
             let pos = json.indexOf("// ");
@@ -452,7 +511,9 @@ app.get('/', (req, res) => {
         userIsRandomizingGame = true;
         scriptOutput = '';
         okay2spitscript = false;
-        const randoPath = `./sourcecodes/${req.query.sourceVersion}/${req.query.v}`;
+        const randoPath = `./sourcecodes/${req.query.sourceVersion}${
+            req.query.sourceVersion == "dev" ? `/${req.headers['x-forwarded-for'] || 'localhost'}` : ''
+        }/${req.query.v}`;
         const command = [path.join(__dirname, randoPath), "&&", `albw-${req.params.type}`];
         if (req.query.noSpoilers) command.push('--no-spoiler');
         if (req.query.noPatch) command.push('--no-patch');
@@ -522,7 +583,9 @@ app.get('/', (req, res) => {
         });
     }
 }).get('/execVersions/:sourceVersion/:v', (req, res) => {
-    const versionsPath = `./sourcecodes/${req.params.sourceVersion}/${req.params.v}/versions.json`
+    const versionsPath = `./sourcecodes/${req.params.sourceVersion}${
+        req.params.sourceVersion == "dev" ? `/${req.headers['x-forwarded-for'] || 'localhost'}` : ''
+    }/${req.params.v}/versions.json`
     res.json(fs.existsSync(versionsPath) ? JSON.parse(fs.readFileSync(versionsPath)) : {})
 }).get('/randomizationStatus', (req, res) => {
     const interval = setInterval(() => {
@@ -559,11 +622,11 @@ function deleteALBWStuff(req, randoPath) {
             break;
         } 
     }
-    fs.rmSync(`${randoPath}/${config.output}`, {
+    if (fs.existsSync(`${randoPath}/${config.output}`)) fs.rmSync(`${randoPath}/${config.output}`, {
         recursive: true, 
         force: true 
     });
-    fs.unlinkSync(`${randoPath}/${config.rom}`);
+    if (fs.existsSync(`${randoPath}/${config.rom}`)) fs.unlinkSync(`${randoPath}/${config.rom}`);
 }
 async function genGameZip(req, res) {
     function handleError(e) {
@@ -574,7 +637,9 @@ async function genGameZip(req, res) {
     userIsRandomizingGame = false;
     try {
         const zip = new JSZip();
-        const randoPath = `./sourcecodes/${req.query.sourceVersion}/${req.query.v}`;
+        const randoPath = `./sourcecodes/${req.query.sourceVersion}${
+            req.query.sourceVersion == "dev" ? `/${req.headers['x-forwarded-for'] || 'localhost'}` : ''
+        }/${req.query.v}`;
         function c(l, k) {
             for (const file of fs.readdirSync(l)) {
                 const fileStats = fs.lstatSync(`${l}/${file}`);

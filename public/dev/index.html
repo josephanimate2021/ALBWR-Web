@@ -163,10 +163,10 @@
         <div class="alert alert-warning" role="alert">
           Randomizing ALBW With A Cloned Source Code (GUI Edition) is currently in beta right now. 
           Things may not be stable, especially the older your cloned source code version gets. 
-          You are recommended to either use the GUI for stable versions like latest or v3 and below, or the 
+          You are recommended to either use the GUI for stable versions like latest, v3 and below, or the 
           <script>
             const repoName = (new URLSearchParams(window.location.search)).get("repoName");
-            document.write(`<a href="/cli?sourceVersion=dev&v=${repoName}/target/debug`);
+            document.write(`<a href="/cli?sourceVersion=dev&v=${repoName}/target/debug&type=randomizer">CLI</a>`);
           </script> 
           for this repo version. Thank you for your patience. Things should be fully functional with the GUI soon.
         </div>
@@ -174,7 +174,12 @@
         <div class="row g-5">
           <div class="col-md-7 col-lg-8">
             <h4 class="mb-3">Preset Infomation</h4>
-            <form id="settings" action="javascript:;" onsubmit="randomizeGame(this)">
+            <div class="text-center" id="settingsLoading">
+              <div class="spinner-border m-5" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+            <form id="settings" action="javascript:;" onsubmit="randomizeGame(this)" style="display: none;">
               <input type="hidden" name="sourceVersion" value="dev"/>
               <script>document.write(`<input type="hidden" name="v" value="${repoName}"/>`)</script>
               <div class="row g-3">

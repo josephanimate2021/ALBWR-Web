@@ -382,6 +382,10 @@
                   setTimeout(() => {
                     window.location.href = `/dev?repoName=${this.info[this.provider][this.url].repo.name}`
                   }, 4096);
+                } else if (e.data == "fail") {
+                  randoGameBtn.textContent = "The clone has failed";
+                  updateAttribute(document.getElementById('modalRandoRepoCloneOpenBtn'), "data-bs-toggle", "modal");
+                  term.write(`The source code failed to clone over to your directory for cloned source codes. Please try the clone again by clicking on the "Randomize Game Using It's Source Code" link on the right of the header.`);
                 } else term.write(e.data);
               });
               socket.addEventListener("open", e => socket.send(JSON.stringify(Object.assign({}, this, info))))

@@ -18,29 +18,15 @@
             </p>
         </center>
         <div id="terminal"></div>
+        <script src="/js/terminal.js"></script>
         <script>
             const params = new URLSearchParams(window.location.search);
             const execV = params.get("execV");
-            let cursorX;
-            const term = new Terminal({
-                cursorBlink: true,
-                convertEol: true,
-                rows: 40,
-            });
-            const fitAddon = new FitAddon.FitAddon();
-            const webLinksAddon = new WebLinksAddon.WebLinksAddon();
-            term.loadAddon(fitAddon);
-            term.loadAddon(webLinksAddon);
-            term.open(document.getElementById('terminal'));
-            fitAddon.fit();
-            window.addEventListener("resize", e => fitAddon.fit())
-            term.write('Setting Up The CLI for ALBWR...\n');
-            const socket = new WebSocket(`${window.location.protocol.startsWith("https") ? 'wss' : 'ws'}://${window.location.host}/randoCli${window.location.search}`);
-            socket.addEventListener("message", e => {
-                if (typeof e.data == "string") {
-                    cursorX = e.data.substring(e.data.lastIndexOf("\n") + 1).length;
-                    term.write(e.data)
-                } else if (e.data instanceof Blob && !execV.includes("--")) {
+            const t = new TerminalEmulator(
+                new WebSocket(`${window.location.protocol.startsWith("https") ? 'wss' : 'ws'}://${window.location.host}/randoCli${window.location.search}`)
+            );
+            t.otherDataFunction = e => {
+                if (e.data instanceof Blob && !execV?.includes("--")) {
                     const div = document.createElement('div');
                     div.className = "container";
                     div.align = "center";
@@ -52,33 +38,7 @@
                     div.appendChild(a);
                     document.body.appendChild(div);
                 }
-            });
-            let input = [];
-            term.onKey(k => {
-                switch (k.domEvent.key) {
-                    case "Enter": {
-                        if (cursorX) {
-                            cursorX = '';
-                            term.write(k.key);
-                            socket.send(input.join(''))
-                            input = [];
-                        }
-                        break;
-                    } case "Backspace": {
-                        if (cursorX && term.buffer._normal.cursorX > cursorX) {
-                            if (input[input.length - 1]) input.splice(input.length - 1, 1);
-                            term.write('\b \b');
-                        }
-                        break;
-                    } case "ArrowLeft": {
-                        if (cursorX && term.buffer._normal.cursorX > cursorX) term.write(k.key);
-                        break;
-                    } default: {
-                        if (k.domEvent.key != "ArrowRight") input[term.buffer._normal.cursorX] = k.key;
-                        term.write(k.key);
-                    }
-                }
-            })
+            }
         </script>
     </body>
 </html>
