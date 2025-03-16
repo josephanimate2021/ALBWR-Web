@@ -1,5 +1,5 @@
 {
-    "DUNGEONS": {
+    "Dungeons": {
         "Dark Palace": {
             "[PD] (1F) Right Pit": {
                 "isChoice": true
@@ -557,7 +557,7 @@
             }
         }
     },
-    "HYRULE": {
+    "Hyrule": {
         "Death Mountain": {
             "Bouldering Guy": {
                 "isChoice": true
@@ -979,7 +979,7 @@
             }
         }
     },
-    "LORULE": {
+    "Lorule": {
         "Chamber of the Sages": {
             "Osfala": {
                 "isChoice": true

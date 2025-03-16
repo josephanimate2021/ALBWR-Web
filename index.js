@@ -303,7 +303,7 @@ app.get('/', (req, res) => {
                 Object.assign(info.settings[settingCat], {
                     tip: c.substring(3),
                     defaultValue: {},
-                    userCanAddNewLines: true,
+                    useCheckmarks: true,
                     allOptions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`))
                 });
                 const line = setting.split("# ")[1].split(newLine + newLineCommon)[0]
@@ -362,7 +362,7 @@ app.get('/', (req, res) => {
                 stuff.splice(stuff.length - 1, 1);
                 info.settings.exclusions.exclusions = {
                     defaultValue: [],
-                    userCanAddNewLines: true,
+                    useCheckmarks: true,
                     allOptions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`))
                 }
                 for (const option of stuff) info.settings.exclusions.exclusions.defaultValue.push(option.substring(4).slice(0, option.endsWith('",') ? -2 : -1));
@@ -690,7 +690,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
             for (const i in req.query.settings) {
                 toml += `[${i}]\r\n`;
                 if (i == "exclude" && !newToml) {
-    
+                    console.log(req.query.settings.exclude)
                 } else if (i == "exclusions" && newToml) toml += `"exclusions" = ${JSON.stringify(req.query.settings.exclusions.exclusions, null, "\t")}`
                 else {
                     for (const c in req.query.settings[i]) toml += `${!newToml ? `# ` : ''}${c} = ${
@@ -701,6 +701,8 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
             return toml;
         }
         let config;
+        if (req.query?.settings?.exclusions?.exclusions) req.query.settings.exclusions.exclusions = Object.keys(req.query.settings.exclusions.exclusions);
+        if (req.query?.settings?.user_exclusions) req.query.settings.user_exclusions = Object.keys(req.query.settings.user_exclusions);
         switch (req.query.v) {
             case "z17r":
             case "z17-rando": {

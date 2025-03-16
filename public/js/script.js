@@ -277,14 +277,12 @@ function findJsonInfoFrom(json, val, isAttr = false) {
     }
 }
 
-// checks the select element to ensure that options the user added are not overlapping with each other to prevent breaking the randomizer
-function check4SameExcludeOptions(o) {
-    const dom = [];
-    for (const tag of document.getElementsByTagName('select')) {
-        if (!tag.name.startsWith("settings[exclu")) continue;
-        dom.push(tag);
-    }
-    console.log(dom)
+// opens a collapsible
+function toggleCollapsible(coll, elemId) {
+    coll.classList.toggle("active");
+    var content = coll.nextElementSibling;
+    if (content.style.display === "block") content.style.display = "none";
+    else content.style.display = "block";
 }
 
 // loads randomizer settings based off of a user's selected preset.
@@ -308,7 +306,7 @@ function randomizerSettings(d, clearSettingsHTML = false) {
         function appendRandoSettings(setting2, json, noSetting2 = false) {
             const info = json[setting2];
             if (setting2 != setting) html += `<h4>${setting2.split("_").map(captializeBegLetterInWord).join(" ")}</h4>`;
-            if (info.comment) html += `<p>${info.comment}</p>`;
+            if (info.comment && !noSetting2) html += `<p>${info.comment}</p>`;
             function createSelectBox(n, elemId, val) {
                 let select = ''
                 const name = `settings[${setting}]${!noSetting2 ? `[${setting2}]` : ''}${n && typeof n == "number" ? `[${n - 1}]` : ''}`;
@@ -316,7 +314,7 @@ function randomizerSettings(d, clearSettingsHTML = false) {
                     elemId ? 'id' : 'name'
                 }', '${elemId ? `${elemId}.${n - 1}` : name}', '${info.rangeNumOptionsTo}')"/><input type="number" name="${name}" min="0" value="${info.defaultValue}" max="${info.rangeNumOptionsTo}"/>`;
                 else {
-                    select += `<select${setting2 == "exclude" || setting2 == "exclusions" ? ' onchange="excludeOptionSelected(this)"' : ''} name="settings[${setting}]${
+                    select += `<select name="settings[${setting}]${
                         !noSetting2 ? `[${setting2}]` : ''
                     }${
                         n && typeof n == "number" ? `[${n - 1}]` : ''
@@ -335,58 +333,36 @@ function randomizerSettings(d, clearSettingsHTML = false) {
                 select += '<br>';
                 return select;
             }
-            if (!info.userCanAddNewLines) html += createSelectBox() + '<hr>';
-            else {
-                let n = 1;
-                const optionId = `myOptions.${setting}${!noSetting2 ? `.${setting2}` : ''}`;
-                html += `<div id="${optionId}">${
-                    (() => {
-                        let html = '';
-                        if (info.defaultValue) {
-                            function append(j) {
-                                for (var I = 0; I < j.length; I++) html += createSelectBox(n, optionId, j[I]), n++;
-                            }
-                            switch (typeof info.defaultValue) {
-                                case "object": {
-                                    if (Array.isArray(info.defaultValue)) append(info.defaultValue);
-                                    else {
-                                        function c(k) {
-                                            for (const i in k) {
-                                                if (Array.isArray(k[i])) append(k[i])
-                                                else c(k[i]);
-                                            }
-                                        }
-                                        c(info.defaultValue);
-                                    }
-                                }
-                            }
+            function createCheckmarks(info2, p) {
+                let html = '';
+                for (const l in info2) {
+                    if (!Array.isArray(info2[l])) {
+                        if (!info2[l].isChoice && !info2[l].comment) {
+                            html += `<input onclick="toggleCollapsible(this)" class="collapsible" type="button" value="${l}">`
+                            html += `<div class="collapsibleContent">${createCheckmarks(info2[l], l)}</div>`;
+                        } else {
+                            if (info2[l].comment) html += `<div title="${info2[l].comment}">`
+                            html += `<input id="${l.split(' ').join('').split("'").join('')}" type="checkbox" name="settings[${setting}]${
+                                !noSetting2 ? `[${setting2}]` : ''
+                            }[${l}]"/>`
+                            html += `<label for="${l.split(' ').join('').split("'").join('')}">${l}</label><br>`;
+                            if (info2[l].comment) html += `</div>`
                         }
-                        return html;
-                    })()
-                }</div><hr>`
-                const newOptionBtn = document.createElement('input');
-                newOptionBtn.type = "button";
-                newOptionBtn.value = 'Add New Option';
-                newOptionBtn.style.float = "left";
-                newOptionBtn.addEventListener("click", function(e) {
-                    document.getElementById(optionId).insertAdjacentHTML('beforeend', createSelectBox(n++, optionId));
-                    check4SameExcludeOptions(info.allOptions);
-                });
-                document.getElementById('randoSettings').appendChild(newOptionBtn);
-                const removeOptionBtn = document.createElement('input');
-                removeOptionBtn.type = "button";
-                removeOptionBtn.value = 'Remove Option';
-                removeOptionBtn.style.float = "right";
-                removeOptionBtn.addEventListener("click", function() {
-                    const elem = document.getElementById(optionId + `.${n - 2}`);
-                    const elem2 = elem.nextSibling;
-                    if (elem && elem2) {
-                        elem2.remove();
-                        elem.remove();
-                        n--
+                    } else for (var i = 0; i < info2[l].length; i++) {
+                        const check = info2[l][i];
+                        const defaultValuePlaceInfo = info.defaultValue[p];
+                        let defaultValue;
+                        if (defaultValuePlaceInfo) defaultValue = defaultValuePlaceInfo[l]?.find(i => i == check);
+                        html += `<input${defaultValue ? ' checked=""' : ''} id="${check.split(" ").join('')}" type="checkbox" name='settings[${setting}][${setting}.${p}]["${l}"][${i}][${check}]'/>`
+                        html += `<label for="${check.split(" ").join('')}">${l} ${check}</label><br>`;
                     }
-                });
-                document.getElementById('randoSettings').appendChild(removeOptionBtn);
+                }
+                return html;
+            }
+            if (!info.useCheckmarks) html += createSelectBox() + '<hr>';
+            else {
+                if (info.comment) html += `<p>${info.comment}</p>`;
+                html += createCheckmarks(info.allOptions) + '<hr>';
             }
         }
         document.getElementById('randoSettings').insertAdjacentHTML('beforeend', html)

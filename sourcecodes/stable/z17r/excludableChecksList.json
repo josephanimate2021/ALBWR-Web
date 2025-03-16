@@ -1,5 +1,5 @@
 {
-    "DUNGEONS": {
+    "Dungeons": {
         "Lorule Castle": {
             "[LC] (1F) Ledge": {
                 "isChoice": true
@@ -448,7 +448,7 @@
             }
         }
     },
-    "HYRULE": {
+    "Hyrule": {
         "Death Mountain": {
             "First Cave": {
                 "isChoice": true
@@ -687,7 +687,7 @@
             }
         }
     },
-    "LORULE": {
+    "Lorule": {
         "Dark Ruins": {
             "Dark Ruins Lakeview Chest": {
                 "isChoice": true
