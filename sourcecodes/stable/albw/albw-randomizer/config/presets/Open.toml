@@ -8,9 +8,9 @@
 ## Disables lamp requirement for dark areas.
 # dont_require_lamp_for_darkness = true
 ## Requires seller's golden bee for Bee Badge check.
-# require_golden_bee_for_sale = true
+# require_golden_bee_for_sale = false
 ## Allows keys to be placed in an order that can lead to softlocks.
-# unsafe_key_placement = true
+# unsafe_key_placement = false
 
 ## Modifications to certain items.
 [items]
@@ -28,13 +28,12 @@
 ## Starts the game in a pseudo-post-Sanctuary state.
 # open = true
 ## Enables the barrier around Hyrule Castle from the start.
-# barrier = 'Start'
+# barrier = 'Unchanged'
 
 ## Excludes certain locations from having progression items.
 [exclude]
 ## Use the names from the spoiler log.
 # [exclude.Lorule]
 # 'Death Mountain' = [
-#     'Treacherous Tower (Advanced 1)',
-#     'Treacherous Tower (Advanced 2)',
+#     'Treacherous Tower (Intermediate)'
 # ]

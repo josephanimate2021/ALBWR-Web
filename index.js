@@ -293,46 +293,47 @@ app.get('/', (req, res) => {
         let p1 = toml.indexOf("## ");
         while (p1 > -1) {
             const s = toml.substring(p1);
-            const [c, setting] = s.split(newLine + newLineCommon);
-            if (setting.startsWith("[") && setting.endsWith("]")) {
-                settingCat = setting.split("[")[1].split("]")[0] 
-                info.settings[settingCat] = {
-                    comment: c.substring(3)
-                };
-            } else if (settingCat == "exclude") {
-                Object.assign(info.settings[settingCat], {
-                    tip: c.substring(3),
-                    defaultValue: {},
-                    useCheckmarks: true,
-                    allOptions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`))
-                });
-                const line = setting.split("# ")[1].split(newLine + newLineCommon)[0]
-                const key = line.split("[")[1].split("]")[0].split(".")[1];
-                info.settings[settingCat].defaultValue[key] = {};
-                const stuff = toml.substring(p1 + c.length);
-                let p2 = stuff.indexOf("# ");
-                while (p2 > -1) {
-                    const n = p2 + 2;
-                    const stuff2 = stuff.substring(n);
-                    if (!stuff2.startsWith("[") && !stuff2.endsWith("]")) {
-                        const unparsedArray = stuff2.split(' = ')[1].split('# ').join('');
-                        const words = unparsedArray.split('[' + newLine + newLineCommon)[1].split(']')[0].split(',').map(word => word.trim().slice(0, -1).substring(1));
-                        words.splice(words.length - 1, 1)
-                        info.settings[settingCat].defaultValue[key][stuff2.split("'")[1].split("'")[0]] = words; 
-                        p2 = -1;
-                    } else p2 = stuff.indexOf("# ", n);
+            const [c, setting] = s.split(newLine).join('').split(newLineCommon);
+            if (setting) {
+                if (setting.startsWith("[") && setting.endsWith("]")) {
+                    settingCat = setting.split("[")[1].split("]")[0] 
+                    info.settings[settingCat] = {
+                        comment: c.substring(3)
+                    };
+                } else if (settingCat == "exclude") {
+                    Object.assign(info.settings[settingCat], {
+                        tip: c.substring(3),
+                        defaultValue: {},
+                        useCheckmarks: true,
+                        allOptions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`))
+                    });
+                    const line = setting.split("# ")[1].trim()
+                    const key = line.split("[")[1].split("]")[0].split(".")[1];
+                    info.settings[settingCat].defaultValue[key] ||= {};
+                    const stuff = toml.substring(p1 + c.length);
+                    let p2 = stuff.indexOf("# ");
+                    while (p2 > -1) {
+                        const n = p2 + 2;
+                        const stuff2 = stuff.substring(n);
+                        if (!stuff2.startsWith("[") && !stuff2.endsWith("]")) {
+                            const unparsedArray = stuff2.split(' = ')[1].split('# ').join('');
+                            const words = unparsedArray.split('[')[1].split(']')[0].split("'").join('').split('  ').join('').trim().split(',');
+                            info.settings[settingCat].defaultValue[key][stuff2.split("'")[1].split("'")[0]] = words; 
+                            p2 = -1;
+                        } else p2 = stuff.indexOf("# ", n);
+                    }
+                } else if (setting.startsWith("# ") && setting.includes(" =") && settingCat) {
+                    let val = setting.split(" = ")[1].split(newLine)[0]
+                    if (val.startsWith("'") && val.endsWith("'")) val = val.substring(1, val.length - 1);
+                    const info2 = {
+                        comment: c.substring(3),
+                        defaultValue: val
+                    }
+                    const name = setting.split("# ")[1].split(" =")[0];
+                    if (wordOptions[name]) info2.allOptions = wordOptions[name];
+                    else info2.useBooleanOptions = true;
+                    info.settings[settingCat][name] = info2
                 }
-            } else if (setting.startsWith("# ") && setting.includes(" =") && settingCat) {
-                let val = setting.split(" = ")[1].split(newLine + newLineCommon)[0]
-                if (val.startsWith("'") && val.endsWith("'")) val = val.substring(1, val.length - 1);
-                const info2 = {
-                    comment: c.substring(3),
-                    defaultValue: val
-                }
-                const name = setting.split("# ")[1].split(" =")[0];
-                if (wordOptions[name]) info2.allOptions = wordOptions[name];
-                else info2.useBooleanOptions = true;
-                info.settings[settingCat][name] = info2
             }
             toml = toml.split(c).join("");
             p1 = toml.indexOf("## ", p1 + 3);
@@ -347,32 +348,38 @@ app.get('/', (req, res) => {
         }
         while (p1 > -1) {
             const s = toml.substring(p1);
-            const [c, setting] = s.split(newLine + newLineCommon)
+            const [c, setting] = s.split(newLine).join('').split(newLineCommon);
             if (setting.startsWith("[") && setting.endsWith("]")) {
                 settingCat = setting.split("[")[1].split("]")[0];
                 info.settings[settingCat] = {
                     comment: c.substring(3)
                 };
-            } else if (settingCat == "exclude") {
+                switch (settingCat) {
+                    case "exclusions": {
+                        let stuff = s.substring(s.indexOf(setting)).split("#").join("").split(`"exclusions" = [`)[1].slice(0, -1)
+                        stuff = stuff.split(newLine).join('').split(newLineCommon);
+                        stuff.splice(0, 1);
+                        stuff.splice(stuff.length - 1, 1);
+                        info.settings.exclusions.exclusions = {
+                            defaultValue: [],
+                            useCheckmarks: true,
+                            allOptions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`))
+                        }
+                        for (const option of stuff) info.settings.exclusions.exclusions.defaultValue.push(
+                            option.substring(4).slice(0, option.endsWith('",') ? -2 : -1)
+                        );
+                        break;
+                    } case "exclude": {
 
-            } if (settingCat == "exclusions") {
-                let stuff = s.substring(s.indexOf(setting)).split("#").join("").split(`"exclusions" = [`)[1].slice(0, -1)
-                stuff = stuff.split(newLine).join('').split(newLineCommon);
-                stuff.splice(0, 1);
-                stuff.splice(stuff.length - 1, 1);
-                info.settings.exclusions.exclusions = {
-                    defaultValue: [],
-                    useCheckmarks: true,
-                    allOptions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`))
+                    }
                 }
-                for (const option of stuff) info.settings.exclusions.exclusions.defaultValue.push(option.substring(4).slice(0, option.endsWith('",') ? -2 : -1));
             } else if (setting.includes(" = ") && !setting.startsWith("#") && settingCat) {
                 const [key, value] = setting.split(" = ");
                 info.settings[settingCat][key] = {
                     comment: c.substring(3),
                     defaultValue: value
                 }
-                if (wordOptions[key]) info.settings[settingCat][key].allOptions = wordOptions[key];
+                if (wordOptions[key]) info.settings[settingCat][key].allOptions = wordOptions[key]
                 else info.settings[settingCat][key].useBooleanOptions = true;
             }
             toml = toml.split(c).join("");
@@ -380,31 +387,21 @@ app.get('/', (req, res) => {
         }
         return info;
     }
+    let localPrefix
     switch (req.params.v) {
-        case "albw": {
-            Object.assign(info, {
-                presetName: "Default ALBWR Template",
+        case "albw": localPrefix = "albw";
+        case "z17-local": {
+            localPrefix ||= "z17";
+            presets.unshift(decodeOldToml({
+                presetName: `Default${localPrefix == "z17" ? ' z17' : ''} ALBWR Standard Template`,
                 notes: [],
                 settings: {}
-            });
-            decodeOldToml(info, `${randoPath}/presets/Standard.toml`);
-            presets.unshift(info);
-            break;
-        } case "z17-local": {
-            Object.assign(info, {
-                presetName: "Default z17 ALBWR Standard Template",
+            }, `${randoPath}/${localPrefix}-randomizer/config/presets/Standard.toml`));
+            presets.unshift(decodeOldToml({
+                presetName: `Default${localPrefix == "z17" ? ' z17' : ''} ALBWR Open World Template`,
                 notes: [],
                 settings: {}
-            });
-            decodeOldToml(info, `${randoPath}/z17-randomizer/config/presets/Standard.toml`);
-            presets.unshift(info);
-            const info2 = {
-                presetName: "Default z17 ALBWR Open World Template",
-                notes: [],
-                settings: {}
-            };
-            decodeOldToml(info2, `${randoPath}/z17-randomizer/config/presets/Open.toml`)
-            presets.unshift(info2)
+            }, `${randoPath}/${localPrefix}-randomizer/config/presets/Open.toml`));
             break;
         } case "z17-rando": {
             Object.assign(info, {
@@ -554,9 +551,9 @@ app.get('/', (req, res) => {
                 if (code != 0) {
                     scriptOutput += `The command closed unexpectedly with the ${code} code after ${currentAttempt} ${
                         sForWord('attempt', currentAttempt)
-                    }.\r\nRetrying...\r\n`;
+                    }.${code == 101 ? `\r\nRetrying...\r\n` : 'Press Enter to continue...'}`;
                     okay2spitscript = true;
-                    gameGeneration(currentAttempt + 1);
+                    if (code == 101) gameGeneration(currentAttempt + 1);
                 } else {
                     scriptOutput += `Press Enter to continue...`;
                     okay2spitscript = true;
@@ -565,11 +562,8 @@ app.get('/', (req, res) => {
         
             liveOutput.on('error', function(code) {
                 console.log('error:', code);
-                scriptOutput += `The command errored out with ${code} after ${currentAttempt} ${
-                    sForWord('attempt', currentAttempt)
-                }.\r\nRetrying...\r\n`;
+                scriptOutput += `The command errored out with ${code} after ${currentAttempt} ${sForWord('attempt', currentAttempt)}.Press Enter to continue...`;
                 okay2spitscript = true;
-                gameGeneration(currentAttempt + 1);
             });
         }
         if (writeALBWFile(req, versions, randoPath, true, command, res)) gameGeneration(1);
@@ -597,27 +591,27 @@ app.get('/', (req, res) => {
 function deleteALBWStuff(req, randoPath) {
     let config;
     switch (req.query.v) {
+        case "albw": config = "albw";
         case "z17-local": {
-            config = parseTOML(fs.readFileSync(`${randoPath}/z17-randomizer/config/Rando.toml`).toString('utf-8'))
-            fs.rmSync(path.join(process.env.APPDATA, 'z17-randomizer'), {
+            const t = config || 'z17';
+            if (
+                fs.existsSync(`${randoPath}/${t}-randomizer/config/presets/${req.query.id}.toml`) && req.query.deletePreset
+            ) fs.unlinkSync(`${randoPath}/${t}-randomizer/config/presets/${req.query.id}.toml`)
+            config = parseTOML(fs.readFileSync(`${randoPath}/${t}-randomizer/config/Rando.toml`).toString('utf-8'))
+            fs.rmSync(path.join(process.env.APPDATA, `${t}-randomizer`), {
                 recursive: true, 
                 force: true 
             });
+            break;
         } 
         case "z17r":
         case "z17-rando": {
-            if (!config) config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'))
+            config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'))
             const presetFile = `${randoPath}/presets/${req.query.id}.toml`;
             if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
             break;
-        } case "albw": {
-            config = {
-                output: 'generated',
-                rom: 'albw.3ds'
-            }
-            fs.renameSync(`${randoPath}/presets/Standardold.toml`, `${randoPath}/presets/Standard.toml`)
-            break;
-        } default: {
+        } 
+        default: {
             config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
             const presetFile = `${randoPath}/presets/${req.query.id}.json`;
             if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
@@ -633,6 +627,7 @@ function deleteALBWStuff(req, randoPath) {
 async function genGameZip(req, res) {
     function handleError(e) {
         console.error(e);
+        if (req.headers.connection != "upgrade") res.status(404);
         res.send(e.toString());
     }
     if (!userIsRandomizingGame) return handleError("Someone needs to randomize ALBW in order to generate a zip file.")
@@ -655,16 +650,13 @@ async function genGameZip(req, res) {
             case "z17-rando": {
                 config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'))
                 break;
-            } case "z17-local": {
-                config = parseTOML(fs.readFileSync(`${randoPath}/z17-randomizer/config/Rando.toml`).toString('utf-8'))
+            } 
+            case "albw": config = 'albw';
+            case "z17-local": {
+                config = parseTOML(fs.readFileSync(`${randoPath}/${config || 'z17'}-randomizer/config/Rando.toml`).toString('utf-8'))
                 break;
-            } case "albw": {
-                config = {
-                    output: 'generated',
-                    rom: 'albw.3ds'
-                }
-                break;
-            } default: config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
+            } 
+            default: config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
         }
         c(`${randoPath}/${config.output}`, zip);
         deleteALBWStuff(req, randoPath);
@@ -689,14 +681,25 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
             let toml = '';
             for (const i in req.query.settings) {
                 toml += `[${i}]\r\n`;
-                if (i == "exclude" && !newToml) {
-                    console.log(req.query.settings.exclude)
-                } else if (i == "exclusions" && newToml) toml += `"exclusions" = ${JSON.stringify(req.query.settings.exclusions.exclusions, null, "\t")}`
-                else {
-                    for (const c in req.query.settings[i]) toml += `${!newToml ? `# ` : ''}${c} = ${
-                        typeof string2boolean(req.query.settings[i][c]) == "string" ? `'${req.query.settings[i][c]}'` : req.query.settings[i][c]
-                    }\r\n`;
-                }
+                if (i == "exclude") {
+                    if (!newToml) {
+                        for (const i in req.query.settings.exclude) {
+                            toml += `# [${i}]\r\n`;
+                            for (const b in req.query.settings.exclude[i]) {
+                                toml += `# '${b}' = [\r\n`;
+                                for (var h = 0; h < req.query.settings.exclude[i][b].length; h++) {
+                                    const check = req.query.settings.exclude[i][b][h];
+                                    toml += Object.keys(check).map(v => `#    '${v}'`).join(h != req.query.settings.exclude[i][b].length ? ',' : '' + '\r\n');
+                                } 
+                                toml += `\r\n# ]\r\n`;
+                            }
+                        }
+                    }
+                } else if (i == "exclusions") {
+                    if (newToml) toml += `"exclusions" = ${JSON.stringify(req.query.settings.exclusions.exclusions, null, "\t")}\r\n`
+                } else for (const c in req.query.settings[i]) toml += `${!newToml ? `# ` : ''}${c} = ${
+                    typeof string2boolean(req.query.settings[i][c]) == "string" ? `'${req.query.settings[i][c]}'` : req.query.settings[i][c]
+                }\r\n`;
             }
             return toml;
         }
@@ -713,20 +716,13 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
                 break;
             } case "albw": {
-                config = {
-                    rom: 'albw.3ds',
-                    output: 'generated'
-                };
+                config = "albw";
                 if (versions[req.query.execVersion]?.useVerbose && !req.query.noVerbose) command.push(`--verbose`);
-                if (req.query.settings && typeof req.query.settings == "object" && writeNewPreset) {
-                    fs.renameSync(`${randoPath}/presets/Standard.toml`, `${randoPath}/presets/Standardold.toml`);
-                    fs.writeFileSync(`${randoPath}/presets/Standard.toml`, writeOldToml());
-                }
-                break;
             } case "z17-local": {
-                config = parseTOML(fs.readFileSync(`${randoPath}/z17-randomizer/config/Rando.toml`).toString('utf-8'));
+                const t = config || "z17";
+                config = parseTOML(fs.readFileSync(`${randoPath}/${t}-randomizer/config/Rando.toml`).toString('utf-8'));
                 if (req.query.settings && typeof req.query.settings == "object" && writeNewPreset) {
-                    const presetFile = `${randoPath}/z17-randomizer/config/presets/${req.params.id}.toml`
+                    const presetFile = `${randoPath}/${t}-randomizer/config/presets/${req.params.id}.toml`
                     if (!fs.existsSync(presetFile)) fs.writeFileSync(presetFile, writeOldToml());
                 }
                 if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
@@ -747,9 +743,10 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                         } else fs.writeFileSync(path.join(process.env.APPDATA, `${k}/${j}`), fs.readFileSync(`${randoPath}/${k}/${j}`));
                     }
                 }
-                c('z17-randomizer')
+                c(`${t}-randomizer`)
                 break;
-            } default: {
+            } 
+            default: {
                 const info = req.query.v == "z17v3" ? req.query.settings : req.query;
                 if (info && typeof info == "object" && writeNewPreset) {
                     const presetFile = `${randoPath}/presets/${req.params.id}`

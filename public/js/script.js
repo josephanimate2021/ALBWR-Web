@@ -83,7 +83,7 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                                 URL.createObjectURL(blob)
                             }" download="albw-randomized.zip">${buttonName} -></a>`);
                             output.appendChild(back2randobtn);
-                        } else handleError(`Could not get your randomized game due to an error: ${await res.text()}. Please try randomizing your game again.`)
+                        } else handleError(`Could not get your randomized game due to an error:\r\n${await res.text()}.\r\nPlease try randomizing your game again.`);
                     } catch (e) {
                         handleError(e.toString());
                     }
@@ -345,7 +345,7 @@ function randomizerSettings(d, clearSettingsHTML = false) {
                             html += `<input id="${l.split(' ').join('').split("'").join('')}" type="checkbox" name="settings[${setting}]${
                                 !noSetting2 ? `[${setting2}]` : ''
                             }[${l}]"/>`
-                            html += `<label for="${l.split(' ').join('').split("'").join('')}">${l}</label><br>`;
+                            html += `<label for="${l.split(' ').join('').split("'").join('')}">${l}</label><br><br>`;
                             if (info2[l].comment) html += `</div>`
                         }
                     } else for (var i = 0; i < info2[l].length; i++) {
@@ -353,8 +353,8 @@ function randomizerSettings(d, clearSettingsHTML = false) {
                         const defaultValuePlaceInfo = info.defaultValue[p];
                         let defaultValue;
                         if (defaultValuePlaceInfo) defaultValue = defaultValuePlaceInfo[l]?.find(i => i == check);
-                        html += `<input${defaultValue ? ' checked=""' : ''} id="${check.split(" ").join('')}" type="checkbox" name='settings[${setting}][${setting}.${p}]["${l}"][${i}][${check}]'/>`
-                        html += `<label for="${check.split(" ").join('')}">${l} ${check}</label><br>`;
+                        html += `<input${defaultValue ? ' checked=""' : ''} id="${check.split(" ").join('')}" type="checkbox" name='settings[${setting}][${setting}.${p}][${l}][${i}][${check}]'/>`
+                        html += `<label for="${check.split(" ").join('')}">${l} ${check}</label><br><br>`;
                     }
                 }
                 return html;

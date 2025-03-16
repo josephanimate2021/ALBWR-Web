@@ -49,12 +49,22 @@
                         <option value="z17-local">z17 (Older)</option>
                         <option value="albw">albw</option>
                     </select><br>
-                    <input id="link2cli" type="button" value="Randomize Game With The CLI" class="greenBtn" onclick="location.href = `/cli?v=${this.getAttribute('data-v')}&execV=${this.getAttribute('data-execv')}&sourceVersion=stable`"/>
+                    <input id="link2cli" type="button" value="Randomize Game With The CLI" class="greenBtn" onclick="location.href = `/cli?v=${this.getAttribute('data-v')}&execV=${this.getAttribute('data-execv')}&sourceVersion=stable&type=randomizer`"/>
                 </div>
                 <h2>Randomizer Settings</h2>
-                <h6>This page can go up to v3 of the ALBW Randomizer. To use the latest versions of the albw randomizer, please click <a href="/v4">here</a>.</h6>
-                <p>You have uploaded a North America Rom File for A Legend Of Zelda: A Link Between Worlds. Now you may randomize away!</p>
-                <small>For more infomation about installing/uninstalling your randomized game seed, please refer <a href="https://github.com/rickfay/z17-randomizer?tab=readme-ov-file#installing-seeds">here</a>.</small>
+                <h6>
+                    This page can go up to v3 of the ALBW Randomizer. 
+                    To use the latest versions of the albw randomizer, please click <a href="/v4">here</a>.
+                </h6>
+                <p>
+                    You have uploaded a Decrpyted North America Rom File for A Legend Of Zelda: A Link Between Worlds.<br>
+                    If you have uploaded the wrong file by accident, you may click <a href="/deleteFile">here</a> to delete it.<br>
+                    Otherwise, have fun randomizing your game!
+                </p>
+                <small>
+                    For more infomation about installing/uninstalling your randomized game seed, 
+                    please refer <a href="https://github.com/rickfay/z17-randomizer?tab=readme-ov-file#installing-seeds">here</a>.
+                </small>
                 <hr>
                 <div id="options">
                     <div title="Adds a flag/arguement to the albw randomizer executable where it is told to not patch your game at all.">
