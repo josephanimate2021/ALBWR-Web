@@ -684,20 +684,20 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 if (i == "exclude") {
                     if (!newToml) {
                         for (const i in req.query.settings.exclude) {
-                            toml += `# [${i}]\r\n`;
+                            toml += `[${i}]\r\n`;
                             for (const b in req.query.settings.exclude[i]) {
-                                toml += `# '${b}' = [\r\n`;
+                                toml += `'${b}' = [\r\n`;
                                 for (var h = 0; h < req.query.settings.exclude[i][b].length; h++) {
                                     const check = req.query.settings.exclude[i][b][h];
-                                    toml += Object.keys(check).map(v => `#    '${v}'`).join(h != req.query.settings.exclude[i][b].length ? ',' : '' + '\r\n');
+                                    toml += Object.keys(check).map(v => `    '${v}'`).join(h != req.query.settings.exclude[i][b].length ? ',' : '' + '\r\n');
                                 } 
-                                toml += `\r\n# ]\r\n`;
+                                toml += `\r\n]\r\n`;
                             }
                         }
                     }
                 } else if (i == "exclusions") {
                     if (newToml) toml += `"exclusions" = ${JSON.stringify(req.query.settings.exclusions.exclusions, null, "\t")}\r\n`
-                } else for (const c in req.query.settings[i]) toml += `${!newToml ? `# ` : ''}${c} = ${
+                } else for (const c in req.query.settings[i]) toml += `${c} = ${
                     typeof string2boolean(req.query.settings[i][c]) == "string" ? `'${req.query.settings[i][c]}'` : req.query.settings[i][c]
                 }\r\n`;
             }
