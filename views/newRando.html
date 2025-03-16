@@ -545,6 +545,7 @@
                 elem.setAttribute(attr, val);
               }
               function initTerminal(btnLoadText) {
+                document.getElementById('terminal').innerHTML = '';
                 terminalProcessOngoing = true;
                 updateAttribute(document.getElementById('modalRandoRepoCloneOpenBtn'), "data-bs-toggle", "");
                 for (const elem of document.getElementsByClassName('hideDuringRandomization')) elem.style.display = 'none';

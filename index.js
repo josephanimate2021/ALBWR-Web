@@ -155,7 +155,7 @@ wss.on('connection', (ws, req) => {
                     break;
                 } case "/uploadFile": { // Uploads the ALBW rom file
                     if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
-                    const ipbse64 = Buffer.from(req.headers['x-forwarded-for']).toString('base64');
+                    const ipbse64 = Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64');
                     fs.writeFileSync(`./uploads/rom-${ipbse64}.3ds`, '');
                     ws.on("message", e => {
                         fs.appendFileSync(`./uploads/rom-${ipbse64}.3ds`, e);
@@ -224,7 +224,7 @@ function parseTOML(configToml) {
 }
 // Define routes
 app.get('/', (req, res) => {
-    const ipbse64 = Buffer.from(req.headers['x-forwarded-for']).toString('base64');
+    const ipbse64 = Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64');
     if (!req.query.fileUploaded) {
         if (fs.existsSync(`./uploads/rom-${ipbse64}.3ds`)) {
             res.writeHead(302, '', {
@@ -249,21 +249,21 @@ app.get('/', (req, res) => {
         res.end();
     } else res.sendFile(path.join(__dirname, `views/interactiveShell.html`))
 }).get('/v4', (req, res) => {
-    if (!fs.existsSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for']).toString('base64')}.3ds`)) {
+    if (!fs.existsSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`)) {
         res.writeHead(302, '', {
             location: "/"
         });
         res.end();
     } else res.sendFile(path.join(__dirname, 'views', 'newRando.html'));
 }).get('/cli', (req, res) => {
-    if (!fs.existsSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for']).toString('base64')}.3ds`)) {
+    if (!fs.existsSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`)) {
         res.writeHead(302, '', {
             location: "/"
         });
         res.end();
     } else res.sendFile(path.join(__dirname, 'views', 'randoCli.html'));
 }).get('/deleteFile', (req, res) => {
-    fs.unlinkSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for']).toString('base64')}.3ds`)
+    fs.unlinkSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`)
     res.writeHead(302, '', {
         location: "/"
     });
@@ -628,7 +628,7 @@ function deleteALBWStuff(req, randoPath) {
         recursive: true, 
         force: true 
     });
-    if (fs.existsSync(`${randoPath}/${config.rom}`)) fs.unlinkSync(`${randoPath}/${config.rom}`);
+    if (fs.existsSync(`${randoPath}/${config.rom}`)) fs.renameSync(`${randoPath}/${config.rom}`, `./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`);
 }
 async function genGameZip(req, res) {
     function handleError(e) {
@@ -700,20 +700,29 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
             }
             return toml;
         }
+        let config;
         switch (req.query.v) {
-            case "albw": {
+            case "z17r":
+            case "z17-rando": {
+                config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'));
+                if (
+                    req.query.settings && typeof req.query.settings == "object" && writeNewPreset
+                ) fs.writeFileSync(`${randoPath}/presets/${req.params.id}.toml`, writeOldToml(true));
+                if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
+                break;
+            } case "albw": {
+                config = {
+                    rom: 'albw.3ds',
+                    output: 'generated'
+                };
                 if (versions[req.query.execVersion]?.useVerbose && !req.query.noVerbose) command.push(`--verbose`);
-                if (!fs.existsSync(`${randoPath}/generated`)) fs.mkdirSync(`${randoPath}/generated`);
-                fs.writeFileSync(`${randoPath}/albw.3ds`, fs.readFileSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for']).toString('base64')}.3ds`));
                 if (req.query.settings && typeof req.query.settings == "object" && writeNewPreset) {
                     fs.renameSync(`${randoPath}/presets/Standard.toml`, `${randoPath}/presets/Standardold.toml`);
                     fs.writeFileSync(`${randoPath}/presets/Standard.toml`, writeOldToml());
                 }
                 break;
             } case "z17-local": {
-                const config = parseTOML(fs.readFileSync(`${randoPath}/z17-randomizer/config/Rando.toml`).toString('utf-8'))
-                if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
-                fs.writeFileSync(`${randoPath}/${config.rom}`, fs.readFileSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for']).toString('base64')}.3ds`));
+                config = parseTOML(fs.readFileSync(`${randoPath}/z17-randomizer/config/Rando.toml`).toString('utf-8'));
                 if (req.query.settings && typeof req.query.settings == "object" && writeNewPreset) {
                     const presetFile = `${randoPath}/z17-randomizer/config/presets/${req.params.id}.toml`
                     if (!fs.existsSync(presetFile)) fs.writeFileSync(presetFile, writeOldToml());
@@ -738,17 +747,6 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 }
                 c('z17-randomizer')
                 break;
-            } 
-            case "z17r":
-            case "z17-rando": {
-                const config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'))
-                if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
-                fs.writeFileSync(`${randoPath}/${config.rom}`, fs.readFileSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for']).toString('base64')}.3ds`));
-                if (
-                    req.query.settings && typeof req.query.settings == "object" && writeNewPreset
-                ) fs.writeFileSync(`${randoPath}/presets/${req.params.id}.toml`, writeOldToml(true));
-                if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
-                break;
             } default: {
                 const info = req.query.v == "z17v3" ? req.query.settings : req.query;
                 if (info && typeof info == "object" && writeNewPreset) {
@@ -764,12 +762,12 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                         req.params.id && !fs.existsSync(`${presetFile}.json`)
                     ) fs.writeFileSync(`${presetFile}.json`, JSON.stringify(info, null, "\t"));
                 }
-                const config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
-                if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
-                fs.writeFileSync(`${randoPath}/${config.rom}`, fs.readFileSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for']).toString('base64')}.3ds`));
+                config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
                 if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
             }
         }
+        if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
+        fs.renameSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`, `${randoPath}/${config.rom}`);
         return true
     } catch (e) {
         console.log(e);
