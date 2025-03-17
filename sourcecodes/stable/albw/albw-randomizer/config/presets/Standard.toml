@@ -1,29 +1,29 @@
 ## Modifications to the game's core mechanics.
 [modifications]
-## Enabled the Y button from the start.
+## Enables the Y button from the start.
 # y_button_enabled = false
 
-## Modifications to logic.
+## Modifications to the game's logic.
 [logic]
-## Disables lamp requirement for dark areas.
+## Disables the requirement for the lamp in dark areas.
 # dont_require_lamp_for_darkness = false
-## Requires seller's golden bee for Bee Badge check.
+## Requires the seller's golden bee for the Bee Badge check.
 # require_golden_bee_for_sale = false
-## Allows keys to be placed in an order that can lead to softlocks.
+## Allows all of the keys to be placed in an order where one or more softlocks can occur.
 # unsafe_key_placement = false
 
-## Modifications to certain items.
+## Modifications to certain items in the game.
 [items]
-## Skips the Captain's Sword.
+## The action that should be done to the Captain's Sword.
 # captains_sword = 'Unchanged'
-## Shuffles the Borrowed Sword.
+## The action that should be done to the Borrowed Sword.
 # borrowed_sword = 'Unchanged'
-## Shuffles the Lamp.
+## The action that should be done to the Lamp.
 # lamp = 'Unchanged'
-## Skips Ravio's first bracelet.
+## The action that should be done to Ravio's First Bracelet.
 # first_bracelet = 'Unchanged'
 
-## Modifications to game behavior.
+## Modifications to the game's behavior.
 [behavior]
 ## Starts the game in a pseudo-post-Sanctuary state.
 # open = false
