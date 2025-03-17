@@ -751,6 +751,13 @@
                 <input type="checkbox" class="form-check-input" id="noSpoilers" name="noSpoilers">
                 <label class="form-check-label" for="noSpoilers">Disable Spoiler Log</label>
               </div>
+              <div title="Limits the amount of attempts your game can get randomized for before stopping entirely. Please select a number based off of how you know the console reacts sometimes and how many attempts it may need before stopping your game randomization entirely. Otherwise, leave the default limit at 180.">
+                <label for="genLimit" class="form-label">Game Generation Attempt Limit</label>
+                <select id="genLimit" name="limit" class="form-select">
+                    <option value="180">180</option>
+                    <option value="360">360</option>
+                </select>
+              </div>
               <hr class="my-4 hideDuringRandomization">
               <button class="btn btn-primary btn-lg" type="submit" id="randoGameBtn">Randomize Game</button>
               <center class="btn-group">

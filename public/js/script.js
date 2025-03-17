@@ -76,13 +76,15 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                         });
                         if (res.ok) {
                             const blob = await res.blob();
-                            evt.submitter.textContent = "Game Randomization Successful";
-                            const buttonName = "Download Your Randomized Game"
-                            term.write(`Your randomized game was retrieved successfully!\r\nTo download it, click on the "${buttonName}" button below.`);
-                            output.insertAdjacentHTML('afterend', `<a class="greenBtn" id="randomizedGameDownload" href="${
-                                URL.createObjectURL(blob)
-                            }" download="albw-randomized.zip">${buttonName} -></a>`);
-                            output.appendChild(back2randobtn);
+                            if (blob) {
+                                evt.submitter.textContent = "Game Randomization Successful";
+                                const buttonName = "Download Your Randomized Game"
+                                term.write(`Your randomized game was retrieved successfully!\r\nTo download it, click on the "${buttonName}" button below.`);
+                                output.insertAdjacentHTML('afterend', `<a class="greenBtn" id="randomizedGameDownload" href="${
+                                    URL.createObjectURL(blob)
+                                }" download="albw-randomized.zip">${buttonName} -></a>`);
+                                output.appendChild(back2randobtn);
+                            } else handleError("An unknown error occured while retrieving your game's ZIP file.")
                         } else handleError(`Could not get your randomized game due to an error:\r\n${await res.text()}.\r\nPlease try randomizing your game again.`);
                     } catch (e) {
                         handleError(e.toString());
@@ -141,7 +143,11 @@ function versionsChecker(obj) {
                 for (const settingCat in preset.settings) array[i].settings[settingCat] = array[i].settings[settingCat] || Object.assign({}, preset.settings[settingCat])
                 for (const option of info) {
                     const [key, value] = option.split(".");
-                    if (array[i].settings[key][value]) delete array[i].settings[key][value]
+                    if (key && value) {
+                        if (array[i].settings[key][value]) delete array[i].settings[key][value]
+                    } else if (key) {
+                        if (array[i].settings[key]) delete array[i].settings[key]
+                    }
                 }
             }
         }

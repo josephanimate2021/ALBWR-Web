@@ -14,14 +14,14 @@
 
 ## Modifications to certain items in the game.
 [items]
-## The action that should be done to the Captain's Sword.
-# captains_sword = 'Unchanged'
-## The action that should be done to the Borrowed Sword.
+## The action that should be done to the Captain's Sword<br><br>WARNING: Depending on the executable version selected, the console will freak out if you change this setting from Skip to something else you want. Please change this setting at your own risk.
+# captains_sword = 'Skip'
+## The action that should be done to the Borrowed Sword.<br><br>WARNING: Changing this to Shuffled will cause the console to freak out in some versions. Please change this setting at your own risk.
 # borrowed_sword = 'Unchanged'
 ## The action that should be done to the Lamp.
-# lamp = 'Unchanged'
-## The action that should be done to Ravio's First Bracelet.
-# first_bracelet = 'Unchanged'
+# lamp = 'Shuffled'
+## The action that should be done to Ravio's First Bracelet.<br><br>WARNING: Depending on the executable version selected, the console will freak out if you change this setting from Skip to something else you want. Please change this setting at your own risk.
+# first_bracelet = 'Skip'
 
 ## Modifications to the game's behavior.
 [behavior]

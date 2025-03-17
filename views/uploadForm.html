@@ -67,6 +67,7 @@
                 </small>
                 <hr>
                 <div id="options">
+                    <h3 title="Allows you to apply options that change the behavior of the albw randomizer executable.">Generation Options</h3>
                     <div title="Adds a flag/arguement to the albw randomizer executable where it is told to not patch your game at all.">
                         <input type="checkbox" id="noPatch" name="noPatch">
                         <label for="noPatch">Disable Game Patching</label>
@@ -79,12 +80,19 @@
                     </div>
                     <div title="Allows you to manually type in your own seed if you want to. You may even use seeds from the #seed-sharing channel on the ALBWR Discord Server if you wanted to.">
                         <label for="seed">Seed (Optional)</label><br>
-                        <input type="number" id="seed" name="seed">
+                        <input type="number" id="seed" name="seed"><br><br>
                     </div>
                     <div id="noVerboseDiv" style="display: none;" title="Removes a flag/arguement from the albw randomizer executable where it is told to not use verbose mode for game generation.
                     removal only works on versions a0.0.2 and below">
                         <input type="checkbox" id="noVerbose" name="noVerbose">
-                        <label for="noVerbose">Disable Verbose Mode</label>
+                        <label for="noVerbose">Disable Verbose Mode</label><br><br>
+                    </div>
+                    <div title="Limits the amount of attempts your game can get randomized for before stopping entirely. Please select a number based off of how you know the console reacts sometimes and how many attempts it may need before stopping your game randomization entirely. Otherwise, leave the default limit at 180 which should be plenty for most albw randomizer executable versions.">
+                        <label for="genLimit">Game Generation Attempt Limit</label><br>
+                        <select id="genLimit" name="limit">
+                            <option value="180">180</option>
+                            <option value="360">360</option>
+                        </select>
                     </div>
                     <hr>
                 </div>

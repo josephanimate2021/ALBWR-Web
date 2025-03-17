@@ -25,7 +25,6 @@ app.use(express.static(publicDirectoryPath, {
     }
 }));
 const url = require("url");
-const { stdout, stderr } = require('process');
 const wss = new ws.WebSocketServer({ noServer: true });
 wss.on('connection', (ws, req) => {
     console.log(`ws`, req.method, req.url);
@@ -525,7 +524,7 @@ app.get('/', (req, res) => {
         function sForWord(word = 'attempt', num = 0) {
             return num > 1 ? (word + 's') : word
         }
-        function gameGeneration(currentAttempt) {
+        function gameGeneration(currentAttempt, limit) {
             scriptOutput+=`Attempt #${currentAttempt}\r\n`;
             okay2spitscript = true
             const liveOutput = spawn(`cd`, command, {
@@ -549,11 +548,25 @@ app.get('/', (req, res) => {
             liveOutput.on('close', function(code) {
                 console.log('closing code:', code)
                 if (code != 0) {
-                    scriptOutput += `The command closed unexpectedly with the ${code} code after ${currentAttempt} ${
-                        sForWord('attempt', currentAttempt)
-                    }.${code == 101 ? `\r\nRetrying...\r\n` : 'Press Enter to continue...'}`;
-                    okay2spitscript = true;
-                    if (code == 101) gameGeneration(currentAttempt + 1);
+                    if (limit) {
+                        scriptOutput += `The command closed unexpectedly with the ${code} code after ${currentAttempt} ${
+                            sForWord('attempt', currentAttempt)
+                        }.${
+                            code == 101 && currentAttempt < limit ? `\r\nRetrying with ${limit - currentAttempt} ${
+                                sForWord('attempt', limit - currentAttempt)
+                            } remaining...\r\n` : `\r\nERROR: you have reached a max limit of ${limit} ${
+                                sForWord('attempt', limit)
+                            }. Please try again later.Press Enter to continue...\r\n`
+                        }`;
+                        okay2spitscript = true;
+                        if (code == 101 && currentAttempt < limit) gameGeneration(currentAttempt + 1, limit);
+                    } else {
+                        scriptOutput += `The command closed unexpectedly with the ${code} code after ${currentAttempt} ${
+                            sForWord('attempt', currentAttempt)
+                        }.${code == 101 ? `\r\nRetrying...\r\n` : 'Press Enter to continue...'}`;
+                        okay2spitscript = true;
+                        if (code == 101) gameGeneration(currentAttempt + 1);
+                    }
                 } else {
                     scriptOutput += `Press Enter to continue...`;
                     okay2spitscript = true;
@@ -566,7 +579,7 @@ app.get('/', (req, res) => {
                 okay2spitscript = true;
             });
         }
-        if (writeALBWFile(req, versions, randoPath, true, command, res)) gameGeneration(1);
+        if (writeALBWFile(req, versions, randoPath, true, command, res)) gameGeneration(1, req.query.limit || '');
         scriptOutput += `Running Command: cd ${command.join(' ')}\r\n`;
         okay2spitscript = true;
     } catch (err) {
@@ -723,6 +736,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 config = parseTOML(fs.readFileSync(`${randoPath}/${t}-randomizer/config/Rando.toml`).toString('utf-8'));
                 if (req.query.settings && typeof req.query.settings == "object" && writeNewPreset) {
                     const presetFile = `${randoPath}/${t}-randomizer/config/presets/${req.params.id}.toml`
+                    if (t == "z17" && req.query.settings.items) req.query.settings.items.first_bracelet = 'Skip';
                     if (!fs.existsSync(presetFile)) fs.writeFileSync(presetFile, writeOldToml());
                 }
                 if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);

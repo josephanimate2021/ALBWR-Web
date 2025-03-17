@@ -19,5 +19,55 @@
         "versionName": "Glitched Logic Alpha 0.0.2",
         "desc": "alpha-0.0.2\r\n\r\nglitched logic update for blacksmith cave, behind blacksmith cave, rosso cave, and DM Fairy Cave",
         "useVerbose": true
+    },
+    "a0.0.3": {
+        "versionName": "Glitched Logic Alpha 0.0.3",
+        "desc": "Lorule Portals open from the start\r\nRavio gives out Bracelet at the start\r\nGlitched logic"
+    },
+    "a0.0.4": {
+        "versionName": "Z17 Alpha Build 0.0.4",
+        "desc": "Glitched + Normal Logic Options\r\nNew [logic] option in the toml: glitched_logic (bool)",
+        "addOptions": {
+            "logic": {
+                "glitched_logic": {
+                    "comment": "Place items using logic that potentially requires glitches to complete",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            }
+        }
+    },
+    "0.0.5": {
+        "versionName": "Glitched Logic Alpha 0.0.5",
+        "desc": "Skip Hilda Blacksmith Text + Activate Map Swap icon\r\nSkip Sahasrahla outside Link's House",
+        "addOptions": {
+            "logic": {
+                "glitched_logic": {
+                    "comment": "Place items using logic that potentially requires glitches to complete",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            }
+        }
+    },
+    "a0.0.6": {
+        "versionName": "Z17 Alpha Build 0.0.6",
+        "desc": "start the game with Ravio's Shop opened\r\nMaiamai available to be collected by default\r\nskip Monster Guts/Horn/Tail first time dialogue\r\nadd Master Ore UI element\r\ncreate new [behavior] setting portals_open (default is false)",
+        "addOptions": {
+            "logic": {
+                "glitched_logic": {
+                    "comment": "Place items using logic that potentially requires glitches to complete",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            },
+            "behavior": {
+                "portals_open": {
+                    "comment": "Opens up all of the cracks at the start of the game",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            }
+        }
     }
 }

@@ -1,3 +1,8 @@
+## Modifications to the game's core mechanics.
+[modifications]
+## Enables the Y button from the start.
+# y_button_enabled = false
+
 ## Modifications to the game's logic.
 [logic]
 ## Disables the requirement for the lamp in dark areas.
@@ -8,8 +13,22 @@
 # unsafe_key_placement = false
 ## Place items using logic that potentially requires glitches to complete
 # glitched_logic = false
-## Shuffles the location of Ravio's Bracelet
-# shuffle_bracelet = false
+
+## Modifications to certain items in the game.
+[items]
+## The action that should be done to the Captain's Sword<br><br>WARNING: Changing this to Shuffled will cause the console to freak out in some versions. Please change this setting at your own risk.
+# captains_sword = 'Unchanged'
+## The action that should be done to the Borrowed Sword.
+# borrowed_sword = 'Unchanged'
+## The action that should be done to the Lamp.
+# lamp = 'Unchanged'
+
+## Modifications to the game's behavior.
+[behavior]
+## Starts the game in a pseudo-post-Sanctuary state.
+# open = false
+## Enables the barrier around Hyrule Castle from the start.
+# barrier = 'Unchanged'
 
 ## Excludes certain locations from having progression items.
 [exclude]
