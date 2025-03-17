@@ -3,24 +3,15 @@
 ## Enables the Y button from the start.
 # y_button_enabled = false
 
-## Modifications to the game's logic.
-[logic]
-## Disables the requirement for the lamp in dark areas.
-# dont_require_lamp_for_darkness = false
-## Requires the seller's golden bee for the Bee Badge check.
-# require_golden_bee_for_sale = false
-## Allows all of the keys to be placed in an order where one or more softlocks can occur.
-# unsafe_key_placement = false
-
 ## Modifications to certain items in the game.
 [items]
-## The action that should be done to the Captain's Sword<br><br>WARNING: Depending on the executable version selected, the console will freak out if you change this setting from Skip to something else you want. Please change this setting at your own risk.
+## The action that should be done to the Captain's Sword<br><br>WARNING: Changing this setting from Skip to something else will cause the console to freak out on some executable versions. Please change this setting at your own risk.
 # captains_sword = 'Skip'
-## The action that should be done to the Borrowed Sword.<br><br>WARNING: Changing this to Shuffled will cause the console to freak out in some versions. Please change this setting at your own risk.
+## The action that should be done to the Borrowed Sword.<br><br>WARNING: Changing this setting to Shuffled will cause the console to freak out on some executable versions. Please change this setting at your own risk.
 # borrowed_sword = 'Unchanged'
 ## The action that should be done to the Lamp.
 # lamp = 'Shuffled'
-## The action that should be done to Ravio's First Bracelet.<br><br>WARNING: Depending on the executable version selected, the console will freak out if you change this setting from Skip to something else you want. Please change this setting at your own risk.
+## The action that should be done to Ravio's first bracelet.<br><br>WARNING: Changing this setting from Skip to something else will cause the console to freak out on some executable versions. Please change this setting at your own risk.
 # first_bracelet = 'Skip'
 
 ## Modifications to the game's behavior.

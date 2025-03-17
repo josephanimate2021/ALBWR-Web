@@ -123,14 +123,18 @@ function versionsChecker(obj) {
             const preset = presets[i];
             const infoPlaceholder = {
                 presetName: preset.presetName + ` Version ${e.value}`,
-                notes: [],
+                notes: preset.notes || [],
                 settings: {}
             }
             if (e.getAttribute('data-versionoptions')) {
                 array[i] = infoPlaceholder;
                 const info = JSON.parse(e.getAttribute('data-versionoptions'));
                 for (const settingCat in preset.settings) array[i].settings[settingCat] = Object.assign({}, preset.settings[settingCat]);
-                for (const settingCat in info) if (typeof array[i].settings[settingCat] == "object") Object.assign(array[i].settings[settingCat], info[settingCat]);
+                for (const settingCat in info) {
+                    if (
+                        !array[i].settings[settingCat] || typeof array[i].settings[settingCat] == "object"
+                    ) array[i].settings[settingCat] = Object.assign(array[i].settings[settingCat] || {}, info[settingCat]);
+                }
                 for (const settingCat in preset.settings) {
                     for (const d in preset.settings[settingCat]) if (
                         typeof array[i].settings[settingCat][d] == "object"
@@ -152,6 +156,7 @@ function versionsChecker(obj) {
             }
         }
     }
+    console.log(array);
     appendSettings(array.length == 0 ? presets : array);
 }
 
@@ -177,7 +182,7 @@ function loadSettings(id, callback) {
                 for (var i = 0; i < keys.length; i++) { // adds in the version options
                     const key = keys[i];
                     if (i == 0) cliLink.setAttribute("data-execv", key);
-                    html += `<option value="${key}" title="${d[key].desc}${d[key].warn ? `\r\nWARNING: ${d[key].warn}` : ''}"${d[key].addOptions ? ` data-versionoptions='${JSON.stringify(d[key].addOptions)}'` : ''}${d[key].removeOptions ? ` data-versionoptionstoremove='${JSON.stringify(d[key].removeOptions)}'` : ''}>${d[key].versionName}</option>`;
+                    html += `<option value="${key}" title="${d[key].desc || ''}${d[key].warn ? `\r\nWARNING: ${d[key].warn}` : ''}"${d[key].addOptions ? ` data-versionoptions='${JSON.stringify(d[key].addOptions)}'` : ''}${d[key].removeOptions ? ` data-versionoptionstoremove='${JSON.stringify(d[key].removeOptions)}'` : ''}>${d[key].versionName}</option>`;
                 }
                 return html;
             })()}`);
