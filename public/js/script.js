@@ -119,7 +119,7 @@ function versionsChecker(obj) {
         e.removeAttribute('selected')
         if (e.value != obj.value) continue;
         e.setAttribute('selected', '')
-        for (var i = 0; i < presets.length; i++) {
+        for (let i = 0; i < presets.length; i++) {
             const preset = presets[i];
             const infoPlaceholder = {
                 presetName: preset.presetName + ` Version ${e.value}`,
@@ -179,7 +179,7 @@ function loadSettings(id, callback) {
             div.insertAdjacentHTML("beforeend", `<select name="execVersion" onchange="versionsChecker(this)">${(() => {
                 let html = ''
                 const keys = Object.keys(d);
-                for (var i = 0; i < keys.length; i++) { // adds in the version options
+                for (let i = 0; i < keys.length; i++) { // adds in the version options
                     const key = keys[i];
                     if (i == 0) cliLink.setAttribute("data-execv", key);
                     html += `<option value="${key}" title="${d[key].desc || ''}${d[key].warn ? `\r\nWARNING: ${d[key].warn}` : ''}"${d[key].addOptions ? ` data-versionoptions='${JSON.stringify(d[key].addOptions)}'` : ''}${d[key].removeOptions ? ` data-versionoptionstoremove='${JSON.stringify(d[key].removeOptions)}'` : ''}>${d[key].versionName}</option>`;
@@ -289,9 +289,9 @@ function findJsonInfoFrom(json, val, isAttr = false) {
 }
 
 // opens a collapsible
-function toggleCollapsible(coll, elemId) {
+function toggleCollapsible(coll) {
     coll.classList.toggle("active");
-    var content = coll.nextElementSibling;
+    const content = coll.nextElementSibling;
     if (content.style.display === "block") content.style.display = "none";
     else content.style.display = "block";
 }
@@ -347,25 +347,26 @@ function randomizerSettings(d, clearSettingsHTML = false) {
             function createCheckmarks(info2, p) {
                 let html = '';
                 for (const l in info2) {
-                    if (!Array.isArray(info2[l])) {
-                        if (!info2[l].isChoice && !info2[l].comment) {
-                            html += `<input onclick="toggleCollapsible(this)" class="collapsible" type="button" value="${l}">`
-                            html += `<div class="collapsibleContent">${createCheckmarks(info2[l], l)}</div>`;
-                        } else {
-                            if (info2[l].comment) html += `<div title="${info2[l].comment}">`
-                            html += `<input id="${l.split(' ').join('').split("'").join('')}" type="checkbox" name="settings[${setting}]${
+                    if (typeof info2[l] == "object") {
+                        html += `<input onclick="toggleCollapsible(this)" class="collapsible" type="button" value="${l}">`
+                        html += `<div class="collapsibleContent">${createCheckmarks(info2[l], `${p || ''}.${l}`)}</div>`;
+                    } else if (typeof info.defaultValue == "object") {
+                        if (Array.isArray(info.defaultValue)) {
+                            const defaultValue = info.defaultValue.find(i => i == l);
+                            html += `<input${defaultValue ? ' checked=""' : ''} id="${l.split(' ').join('').split("'").join('')}" type="checkbox" name="settings[${setting}]${
                                 !noSetting2 ? `[${setting2}]` : ''
                             }[${l}]"/>`
                             html += `<label for="${l.split(' ').join('').split("'").join('')}">${l}</label><br><br>`;
-                            if (info2[l].comment) html += `</div>`
+                        } else {
+                            const [_, cat1, cat2] = p.split(".")
+                            const defaultValueProp = info.defaultValue[cat1];
+                            const defaultValue = defaultValueProp ? defaultValueProp[cat2]?.find(i => i == l) : '';
+                            const keys = Object.keys(info.allOptions[cat1][cat2]);
+                            for (let i = 0; i < keys.length; i++) html += `<input${defaultValue ? ' checked=""' : ''} id="${keys[i].split(' ').join('').split("'").join('')}${i}" type="checkbox" name="settings[${setting}]${
+                                !noSetting2 ? `[${setting2}]` : ''
+                            }[${setting}.${cat1}][${cat2}][${i}][${keys[i]}]"/><label for="${keys[i].split(' ').join('').split("'").join('')}${i}">${keys[i]}</label><br><br>`;
+                            break;
                         }
-                    } else for (var i = 0; i < info2[l].length; i++) {
-                        const check = info2[l][i];
-                        const defaultValuePlaceInfo = info.defaultValue[p];
-                        let defaultValue;
-                        if (defaultValuePlaceInfo) defaultValue = defaultValuePlaceInfo[l]?.find(i => i == check);
-                        html += `<input${defaultValue ? ' checked=""' : ''} id="${check.split(" ").join('')}" type="checkbox" name='settings[${setting}][${setting}.${p}][${l}][${i}][${check}]'/>`
-                        html += `<label for="${check.split(" ").join('')}">${l} ${check}</label><br><br>`;
                     }
                 }
                 return html;
@@ -391,7 +392,7 @@ function appendSettings(s) {
     document.getElementById('presetsSelection').innerHTML = '';
     document.getElementById('presetsSelection').removeEventListener("change", listener);
     document.getElementById('presetsSelection').addEventListener("change", listener);
-    for (var i = 0; i < s.length; i++) {
+    for (let i = 0; i < s.length; i++) {
         document.getElementById('presetsSelection').insertAdjacentHTML('afterbegin', `<option value="${i}">${s[i].presetName}</option>`);
         if (i == 0) listener({
             target: {
@@ -402,6 +403,16 @@ function appendSettings(s) {
     // shows user presets after they have been appended
     document.getElementById('presets').style.display = 'block';
 }
+
+window.addEventListener("load", e => { // handler for a function where a user is warned about progress on a webpage.
+    window.addEventListener("beforeunload", function (e) {
+        const confirmationMessage = 'It looks like you have been editing something. If you leave before saving, your changes will be lost.';
+        const stuff = (e || window.event);
+        stuff.preventDefault();
+        stuff.returnValue = confirmationMessage;
+        return confirmationMessage;
+    });
+})
 
 // The file input event handler
 function handleFileSelect(event) {

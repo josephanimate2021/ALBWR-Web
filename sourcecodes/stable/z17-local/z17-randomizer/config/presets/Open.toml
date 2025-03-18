@@ -33,7 +33,4 @@
 ## Excludes certain locations from having progression items.
 [exclude]
 ## Use the names from the spoiler log.
-# [exclude.Lorule]
-# 'Death Mountain' = [
-#     'Treacherous Tower (Intermediate)'
-# ]
+# [exclude.Hyrule]

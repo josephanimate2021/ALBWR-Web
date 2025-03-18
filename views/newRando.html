@@ -378,7 +378,6 @@
                 if (e.data == "success") {
                   randoGameBtn.textContent = "The clone was successful!";
                   term.write(`The source code was cloned successfuly! You will be redirected in a few moments`);
-                  let timeoutTime = 0;
                   setTimeout(() => {
                     window.location.href = `/dev?repoName=${this.info[this.provider][this.url].repo.name}`
                   }, 4096);
@@ -523,9 +522,7 @@
             </ul>
             <script>
               window.addEventListener("load", e => {
-                var terminalProcessOngoing = false;
                 window.addEventListener("beforeunload", function (e) {
-                  if (terminalProcessOngoing) return undefined;
                   var confirmationMessage = 'It looks like you have been editing something. If you leave before saving, your changes will be lost.';
                   const stuff = (e || window.event);
                   stuff.preventDefault();
@@ -546,7 +543,6 @@
               }
               function initTerminal(btnLoadText) {
                 document.getElementById('terminal').innerHTML = '';
-                terminalProcessOngoing = true;
                 updateAttribute(document.getElementById('modalRandoRepoCloneOpenBtn'), "data-bs-toggle", "");
                 for (const elem of document.getElementsByClassName('hideDuringRandomization')) elem.style.display = 'none';
                 for (const elem of document.getElementsByClassName('randoOutput')) elem.style.display = 'block';
@@ -600,11 +596,11 @@
                   back2randobtnlistenr,
                   logo,
                   term
-                } = initTerminal(`${gameRandoSourceCode.plandomizeGame ? 'Plandomizing' : 'Randomizing'} Game...`);
-                term.write(`Running ${gameRandoSourceCode.plandomizeGame ? 'Plandomizer' : 'Randomizer'}...`);
+                } = initTerminal(`Randomizing Game...`);
+                term.write(`Running Randomizer...`);
                 const v = document.getElementById('randoVer').textContent;
                 jQuery.post(
-                  `/${gameRandoSourceCode.plandomizeGame ? 'plandomizer' : 'randomizer'}/${(
+                  `/randomizer/${(
                     Math.random()
                   ).toString().substring(3)}?v=z17&execVersion=${v.startsWith("v") ? v.substring(1) : v}&${$(obj).serialize()}`, 
                   d => {
@@ -615,7 +611,7 @@
                           term.clear();
                           term.write(l.split(doneText).join(''));
                           function handleError(e) {
-                            randoGameBtn.textContent = `Game ${gameRandoSourceCode.plandomizeGame ? 'Plandomization' : 'Randomization'} Failed`;
+                            randoGameBtn.textContent = `Game Randomization Failed`;
                             term.write(e);
                             back2rando.addEventListener("click", back2randobtnlistenr);
                             back2rando.classList.remove("d-none");
@@ -623,24 +619,25 @@
                           }
                           if (!l.includes(doneText)) c();
                           else try {
-                            term.write(`\r\nRetrieving Your ${gameRandoSourceCode.plandomizeGame ? 'Plandomized' : 'Randomized'} Game...\r\n`);
+                            term.write(`\r\nRetrieving Your Randomized Game...\r\n`);
                             fetch(`/genZipFromRandomizedGame?${new URLSearchParams(d.data).toString()}&deletePreset=${obj.getAttribute("data-wantsPresetDeleted")}`, {
                               method: "POST"
                             }).then(async res => {
                               if (res.ok) {
                                 const blob = await res.blob();
-                                randoGameBtn.textContent = `Game ${gameRandoSourceCode.plandomizeGame ? 'Plandomization' : 'Randomization'} Successful`;
-                                term.write(
-                                  `Your ${gameRandoSourceCode.plandomizeGame ? 'plandomized' : 'randomized'} game was retrieved successfully!\r\nTo download it, click on the "Download Randomized Game" button below.`
-                                );
-                                back2rando.addEventListener("click", back2randobtnlistenr);
-                                back2rando.classList.remove("d-none");
-                                back2rando.classList.add("d-flex");
-                                zipfiledownload.href = URL.createObjectURL(blob);
-                                zipfiledownload.classList.remove('d-none');
-                                zipfiledownload.classList.add('d-flex');
-                                terminalProcessOngoing = false;
-                              } else handleError(`Could not get your ${gameRandoSourceCode.plandomizeGame ? 'plandomized' : 'randomized'} game due to an error: ${await res.text()}. Please try ${gameRandoSourceCode.plandomizeGame ? 'plandomizing' : 'randomizing'} your game again.`)
+                                if (blob) {
+                                  randoGameBtn.textContent = `Game Randomization Successful`;
+                                  term.write(
+                                    `Your randomized game was retrieved successfully!\r\nTo download it, click on the "Download Randomized Game" button below.`
+                                  );
+                                  back2rando.addEventListener("click", back2randobtnlistenr);
+                                  back2rando.classList.remove("d-none");
+                                  back2rando.classList.add("d-flex");
+                                  zipfiledownload.href = URL.createObjectURL(blob);
+                                  zipfiledownload.classList.remove('d-none');
+                                  zipfiledownload.classList.add('d-flex');
+                                } else handleError("Your ZIP file for the randomized version of albw could not be retrieved due to an unknown error")
+                              } else handleError(`Could not get your randomized game due to an error: ${await res.text()}. Please try randomizing your game again.`)
                             })
                           } catch (e) {
                             handleError(e);
@@ -705,7 +702,7 @@
               });
               function cliRedirect(e) {
                 const execV = document.getElementById('randoVer').textContent;
-                let link = `/cli?sourceVersion=stable&type=${gameRandoSourceCode.plandomizeGame ? "plandomizer" : "randomizer"}&v=z17&execV=${execV.startsWith("v") ? execV.substring(1) : execV}`;
+                let link = `/cli?sourceVersion=stable&type=randomizer&v=z17&execV=${execV.startsWith("v") ? execV.substring(1) : execV}`;
                 if (e.getAttribute("data-args")) link += ` ${e.getAttribute("data-args")}`;
                 window.open(link, '_blank');
               }
@@ -714,7 +711,7 @@
               <input type="button" class="btn btn-primary cliLink" value="Randomize Game With The CLI" onclick="cliRedirect(this)"/>
             </div>
             <div class="card p-1">
-              <input type="button" class="btn btn-secondary cliLink" data-args="--help" value="About RandoCLI" onclick="cliRedirect(this)" title="You may click on this button to help you ensure that you are really using your selected version of the CLI used to randomize your game."/>
+              <input type="button" class="btn btn-secondary cliLink" data-args="--help" value="About RandoCLI" onclick="cliRedirect(this)" title="You may click on this button to help you ensure that you are really using your selected version of the CLI that is used to randomize your game."/>
             </div>
           </div>
           <div class="col-md-7 col-lg-8">
@@ -734,29 +731,9 @@
                 <input type="checkbox" class="form-check-input" id="noPatch" name="noPatch">
                 <label class="form-check-label" for="noPatch">Disable Game Patching</label>
               </div>
-
-              <div class="form-check hideDuringRandomization" title="BROKEN FEATURE!!! DO NOT USE!!!
-              
-              This feature allows you to manually place items in check areas of ALBW by hand. 
-              Please note that this feature currently relies on hardcoded settings and not user input to get your job done. 
-              Loaded settings via user input should be coming soon for the general public though. 
-              right now, this feature can only be utilized to it's full extent if you decide to randomize ALBW using only it's source code.
-              As of right now, this feature is currently broken and is best if you do not click on this checkmark.
-              I only added the option in case rickfay decides to do some more work with the plandomizer.">
-                <input type="checkbox" class="form-check-input" onclick="gameRandoSourceCode.plandomizeGame = !gameRandoSourceCode.plandomizeGame">
-                <label class="form-check-label" for="plandoOnly">Plandomize Game (BETA)</label>
-              </div>
-
               <div class="form-check hideDuringRandomization" title="Adds a flag/arguement to the albw randomizer executable where it is told to not generate your spoiler log.">
                 <input type="checkbox" class="form-check-input" id="noSpoilers" name="noSpoilers">
                 <label class="form-check-label" for="noSpoilers">Disable Spoiler Log</label>
-              </div>
-              <div title="Limits the amount of attempts your game can get randomized for before stopping entirely. Please select a number based off of how you know the console reacts sometimes and how many attempts it may need before stopping your game randomization entirely. Otherwise, leave the default limit at 180.">
-                <label for="genLimit" class="form-label">Game Generation Attempt Limit</label>
-                <select id="genLimit" name="limit" class="form-select">
-                    <option value="180">180</option>
-                    <option value="360">360</option>
-                </select>
               </div>
               <hr class="my-4 hideDuringRandomization">
               <button class="btn btn-primary btn-lg" type="submit" id="randoGameBtn">Randomize Game</button>

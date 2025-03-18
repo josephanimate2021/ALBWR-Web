@@ -10,6 +10,7 @@ app.use((req, _, next) => {
     console.log(req.headers.origin ? req.headers.origin?.split(":")[0] : '', req.method, req.url, req.query);
     next();
 });
+const yaml = require("yaml");
 const http = require("http");
 // The folder containing the static files
 const publicDirectoryPath = path.join(__dirname, 'public');
@@ -304,7 +305,7 @@ app.get('/', (req, res) => {
                         tip: c.substring(3),
                         defaultValue: {},
                         useCheckmarks: true,
-                        allOptions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`))
+                        allOptions: yaml.parse(fs.readFileSync(`${randoPath}/excludableChecksList.yaml`).toString('utf-8')).layout
                     });
                     const line = setting.split("# ")[1].trim()
                     const key = line.split("[")[1].split("]")[0].split(".")[1];
@@ -316,8 +317,8 @@ app.get('/', (req, res) => {
                         const stuff2 = stuff.substring(n);
                         if (!stuff2.startsWith("[") && !stuff2.endsWith("]")) {
                             const unparsedArray = stuff2.split(' = ')[1].split('# ').join('');
-                            const words = unparsedArray.split('[')[1].split(']')[0].split("'").join('').split('  ').join('').trim().split(',');
-                            info.settings[settingCat].defaultValue[key][stuff2.split("'")[1].split("'")[0]] = words; 
+                            const words = unparsedArray.split('[')[1].split(']')[0].split("'").join('').split('  ').join('').split(',');
+                            info.settings[settingCat].defaultValue[key][stuff2.split("'")[1].split("'")[0]] = words.map(v => v.trim()); 
                             p2 = -1;
                         } else p2 = stuff.indexOf("# ", n);
                     }
@@ -362,7 +363,7 @@ app.get('/', (req, res) => {
                         info.settings.exclusions.exclusions = {
                             defaultValue: [],
                             useCheckmarks: true,
-                            allOptions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`))
+                            allOptions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`).toString('utf-8'))
                         }
                         for (const option of stuff) info.settings.exclusions.exclusions.defaultValue.push(
                             option.substring(4).slice(0, option.endsWith('",') ? -2 : -1)
@@ -507,8 +508,8 @@ app.get('/', (req, res) => {
             data: Object.assign({}, req.params, req.query)
         })
         userIsRandomizingGame = true;
-        scriptOutput = '';
-        okay2spitscript = false;
+        scriptOutput = `The albw ${req.params.type} is now up and running.\r\n`;
+        okay2spitscript = true;
         const randoPath = `./sourcecodes/${req.query.sourceVersion}${
             req.query.sourceVersion == "dev" ? `/${req.headers['x-forwarded-for'] || 'localhost'}` : ''
         }/${req.query.v}`;
@@ -551,19 +552,19 @@ app.get('/', (req, res) => {
                     if (limit) {
                         scriptOutput += `The command closed unexpectedly with the ${code} code after ${currentAttempt} ${
                             sForWord('attempt', currentAttempt)
-                        }.${
-                            code == 101 && currentAttempt < limit ? `\r\nRetrying with ${limit - currentAttempt} ${
+                        }.\r\n${
+                            code == 101 ? currentAttempt < limit ? `Retrying with ${limit - currentAttempt} ${
                                 sForWord('attempt', limit - currentAttempt)
-                            } remaining...\r\n` : `\r\nERROR: you have reached a max limit of ${limit} ${
+                            } remaining...` : `ERROR: you have reached a max limit of ${limit} ${
                                 sForWord('attempt', limit)
-                            }. Please try again later.Press Enter to continue...\r\n`
-                        }`;
+                            }. Please try again later.Press Enter to continue...` : 'Press Enter to continue...'
+                        }\r\n`;
                         okay2spitscript = true;
                         if (code == 101 && currentAttempt < limit) gameGeneration(currentAttempt + 1, limit);
                     } else {
                         scriptOutput += `The command closed unexpectedly with the ${code} code after ${currentAttempt} ${
                             sForWord('attempt', currentAttempt)
-                        }.${code == 101 ? `\r\nRetrying...\r\n` : 'Press Enter to continue...'}`;
+                        }.${code == 101 ? `Retrying...` : 'Press Enter to continue...'}\r\n`;
                         okay2spitscript = true;
                         if (code == 101) gameGeneration(currentAttempt + 1);
                     }
@@ -575,13 +576,18 @@ app.get('/', (req, res) => {
         
             liveOutput.on('error', function(code) {
                 console.log('error:', code);
-                scriptOutput += `The command errored out with ${code} after ${currentAttempt} ${sForWord('attempt', currentAttempt)}.Press Enter to continue...`;
+                scriptOutput += `The command errored out with ${code} after ${currentAttempt} ${sForWord('attempt', currentAttempt)}.\r\nPress Enter to continue...`;
                 okay2spitscript = true;
             });
         }
-        if (writeALBWFile(req, versions, randoPath, true, command, res)) gameGeneration(1, req.query.limit || '');
-        scriptOutput += `Running Command: cd ${command.join(' ')}\r\n`;
-        okay2spitscript = true;
+        if (writeALBWFile(req, versions, randoPath, true, command, res)) {
+            scriptOutput += `Running Command: cd ${command.join(' ')}\r\n`;
+            okay2spitscript = true;
+            gameGeneration(1, 100);
+        } else {
+            scriptOutput += `An unknown error occured while writting the required stuff to ${randoPath}.\r\n`;
+            okay2spitscript = true;
+        }
     } catch (err) {
         console.error(err)
         return res.status(500).json({
@@ -698,12 +704,13 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                     if (!newToml) {
                         for (const i in req.query.settings.exclude) {
                             toml += `[${i}]\r\n`;
-                            for (const b in req.query.settings.exclude[i]) {
-                                toml += `'${b}' = [\r\n`;
-                                for (var h = 0; h < req.query.settings.exclude[i][b].length; h++) {
-                                    const check = req.query.settings.exclude[i][b][h];
-                                    toml += Object.keys(check).map(v => `    '${v}'`).join(h != req.query.settings.exclude[i][b].length ? ',' : '' + '\r\n');
-                                } 
+                            const keys = Object.keys(req.query.settings.exclude[i])
+                            for (let b = 0; b < keys.length; b++) {
+                                const array = req.query.settings.exclude[i][keys[b]];
+                                const array2 = [];
+                                for (const info of array) array2.unshift(Object.keys(info)[0]);
+                                toml += `'${keys[b]}' = [\r\n`;
+                                for (var h = 0; h < array.length; h++) toml += `    '${array2[h]}'${h < array2.length - 1 ? ',\r\n' : ''}`;
                                 toml += `\r\n]\r\n`;
                             }
                         }
