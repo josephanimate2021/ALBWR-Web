@@ -363,7 +363,7 @@ app.get('/', (req, res) => {
                         info.settings.exclusions.exclusions = {
                             defaultValue: [],
                             useCheckmarks: true,
-                            allOptions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`).toString('utf-8'))
+                            allOptions: JSON.parse(fs.readFileSync(`${randoPath}/excludableChecksList.json`))
                         }
                         for (const option of stuff) info.settings.exclusions.exclusions.defaultValue.push(
                             option.substring(4).slice(0, option.endsWith('",') ? -2 : -1)
