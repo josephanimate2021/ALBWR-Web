@@ -526,7 +526,9 @@ app.get('/', (req, res) => {
             return num > 1 ? (word + 's') : word
         }
         function gameGeneration(currentAttempt, limit) {
-            scriptOutput+=`Attempt #${currentAttempt}\r\n`;
+            scriptOutput+=`Attempt #${currentAttempt}\r\nNOTE: There are cuurently ${limit - (currentAttempt - 1)} ${
+                sForWord('attempt', limit - (currentAttempt - 1))
+            } remaining until the randomizer stops entirely (unless you restart it).\r\nThis measure helps ensure that this website is still usable for everyone and that heavy loads are not being applied to the backend of this website.\r\n`;
             okay2spitscript = true
             const liveOutput = spawn(`cd`, command, {
                 shell: true
