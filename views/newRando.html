@@ -177,55 +177,66 @@
       <div class="modal-dialog">
         <form class="modal-content" action="javascript:;" onsubmit="gameRandoSourceCode.beginRepoClone(this)">
           <div class="modal-header">
-            <h5 class="modal-title">Randomize Game With It's Source Code</h5>
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <a class="nav-link active gameRandoSourceCodeTabBtn" href="javascript:;" data-show="cloneSourceCode">Clone Source Code</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link gameRandoSourceCodeTabBtn" data-show="mySourceCodes" href="javascript:;">Your Cloned Source Codes</a>
+              </li><!--
+              <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+              </li>-->
+            </ul>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">
-            <p>Please follow the instructions on the form in order to get the source code accordingly.</p>
-            <label for="provider">Source Code Provider</label>
-            <select class="form-control" id="provider" onchange="gameRandoSourceCode = new GameRandoSourceCode(this, gameRandoSourceCode)">
-              <option value="github">GitHub (Recommended for most users)</option>
-              <option value="gitlab">GitLab (Use at your own risk)</option>
-            </select>
-            <div id="alertBlock4GameRandoViaSourceCode"></div>
-            <div id="settings" style="display: none;">
-              <label for="branch">Source Code Branch</label>
-              <select class="form-control" id="branch" name="branch"></select>
-              <div id="forkOnlySettings" style="display: none;">
-                <label for="owner">Source Code Owner</label>
-                <select class="form-control" id="owner" onchange="gameRandoSourceCode.loadSourceCodeInfoFromAuthor(this)"></select>
+          <div id="cloneSourceCode" class="tabedDiv">
+            <div class="modal-body">
+              <p>Please follow the instructions on the form in order to get the source code accordingly.</p>
+              <div id="alertBlock4GameRandoViaSourceCode"></div>
+              <div id="settings" style="display: none;">
+                <label for="branch">Source Code Branch</label>
+                <select class="form-control" id="branch" name="branch"></select>
+                <div id="forkOnlySettings" style="display: none;">
+                  <label for="owner">Source Code Owner</label>
+                  <select class="form-control" id="owner" onchange="gameRandoSourceCode.loadSourceCodeInfoFromAuthor(this)"></select>
+                </div>
+                <div class="form-check text-start my-3">
+                  <input class="form-check-input" type="checkbox" id="forkTick" onchange="gameRandoSourceCode.show('forks')">
+                  <label class="form-check-label" for="forkTick">
+                    Use A Fork
+                  </label>
+                </div>
+                <div class="form-check text-start my-3">
+                  <input class="form-check-input" type="checkbox" id="commitTick" onchange="gameRandoSourceCode.show('commitsOnly')">
+                  <label class="form-check-label" for="commitTick">
+                    Use A Commit Instead of a Branch (Not Recommended)
+                  </label>
+                </div>
               </div>
-              <div class="form-check text-start my-3">
-                <input class="form-check-input" type="checkbox" id="forkTick" onchange="gameRandoSourceCode.show('forks')">
-                <label class="form-check-label" for="forkTick">
-                  Use A Fork
-                </label>
+              <div class="d-flex justify-content-center" id="settingsLoading">
+                <div class="spinner-border m-5" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
               </div>
-              <div class="form-check text-start my-3">
-                <input class="form-check-input" type="checkbox" id="commitTick" onchange="gameRandoSourceCode.show('commitsOnly')">
-                <label class="form-check-label" for="commitTick">
-                  Use A Commit Instead of a Branch (Not Recommended)
-                </label>
+              <hr>
+              <center>Source Code Fork Pages</center>
+              <hr>
+              <div class="btn-group d-flex">
+                <button type="button" class="btn btn-success randoPageBtn" id="pageBackward" disabled title="Go Back One Page"><-</button>
+                <span id="pageNum">0</span>
+                <button type="button" class="btn btn-success randoPageBtn" id="pageForward" disabled title="Go Forward One Page">-></button>
               </div>
             </div>
-            <div class="d-flex justify-content-center" id="settingsLoading">
-              <div class="spinner-border m-5" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-            </div>
-            <hr>
-            <center>Source Code Fork Pages</center>
-            <hr>
-            <div class="btn-group d-flex">
-              <button type="button" class="btn btn-success randoPageBtn" id="pageBackward" disabled title="Go Back One Page"><-</button>
-              <span id="pageNum">0</span>
-              <button type="button" class="btn btn-success randoPageBtn" id="pageForward" disabled title="Go Forward One Page">-></button>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary" id="repoCloneBtn" disabled title="This will use git to clone the source code over to ALBWR Web's uploads folder." data-bs-dismiss="modal">Begin Source Code Clone</button>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" id="repoCloneBtn" disabled title="This will use git to clone the source code over to ALBWR Web's uploads folder." data-bs-dismiss="modal">Begin Source Code Clone</button>
-          </div>
+          <div id="mySourceCodes" class="tabedDiv" style="display: none;">test</div>
         </form>
       </div>
     </div>
@@ -241,21 +252,10 @@
           class GameRandoSourceCode { 
             // Allows a user to randomize albw with the in-dev version of the source code without downloading rust + source code and figuring out the CLI 
             // (unless they want to use the CLI which is coming soon for this specific version)
-            constructor(elem, oldThis = {}) {
-              Object.assign(this, oldThis);
-              this.provider = elem.value;
+            constructor(url, p) {
               this.info ||= {};
-              this.info[this.provider] ||= {};
               this.showWhat ||= {};
-              switch (this.provider) {
-                case "github": {
-                  this.loadSourceCodeInfo('', `https://api.github.com/repos/rickfay/z17-randomizer`);
-                  break;
-                } case "gitlab": {
-                  this.loadSourceCodeInfo('', 'https://gitlab.com/api/v4/projects/25946545', '/repository');
-                  break;
-                }
-              }
+              this.loadSourceCodeInfo('', url, p);
             }
             displayAlert(type, text = '') {
               $("#alertBlock4GameRandoViaSourceCode").html(!text ? '' : `<div class="alert alert-${type}" role="alert">${text}</div>`)
@@ -265,7 +265,7 @@
             }
             async fetchUrl(url, type, options) {
               const res = await fetch(url, options);
-              if (!res.ok && url.includes(this.provider)) {
+              if (!res.ok) {
                 const json = await res.json();
                 this.displayAlert('error', json.message.replace("documentation", `<a href="${json.documentation_url}">documentation</a>`));
                 return;
@@ -273,11 +273,10 @@
               return await res[type]();
             }
             async loadSourceCodeInfo(callback, url, p) {
-              const info = this.info[this.provider][url || this.url] ||= {};
+              const info = this.info[url || this.url] ||= {};
               $("#pageNum").text(0);
               document.getElementById('pageBackward').setAttribute("disabled", "")
               document.getElementById('pageForward').setAttribute("disabled", "")
-              document.getElementById('provider').removeAttribute("disabled");
               this.displayAlert('', '');
               $("#settings").hide();
               if ($("#settingsLoading").hasClass("d-none")) $("#settingsLoading").removeClass("d-none");
@@ -289,8 +288,8 @@
                 info.commits ||= await this.fetchUrl(url + (p || '') + '/commits', 'json') || [];
                 info.forks ||= await this.fetchUrl(url + '/forks', 'json') || [];
                 if (url) {
+                  this.originalUrl ||= url;
                   this.url = url;
-                  this.originalUrl = !this.originalUrl?.includes(this.provider) ? url : this.originalUrl;
                 }
                 if (p) this.p ||= p; 
                 const d = this.showWhat.commitsOnly ? info.commits : info.branches;
@@ -298,15 +297,15 @@
                 for (let i = 0; i < d.length; i++) {
                   const v = d[i];
                   const val = this.showWhat.commitsOnly ? (() => {
-                    const maxLength = this.provider == "gitlab" ? 19 : this.provider == "github" ? 29 : 0;
+                    const maxLength = 29;
                     const oldCommit = info.commits[maxLength];
-                    if (d.length > maxLength) this.displayAlert("warning", `Not all of the commits will not show up as options due to a limit of commits that can show up in the ${this.provider} api. Any commits older than ${oldCommit.sha?.slice(0, -33) || oldCommit.short_id} will not show up in the options dropdown menu.`);
+                    if (d.length > maxLength) this.displayAlert("warning", `Not all of the commits will not show up as options due to a limit of commits that can show up all at once. Any commits older than ${oldCommit.sha?.slice(0, -33) || oldCommit.short_id} will not show up in the options dropdown menu.`);
                     return v.sha || v.id;
                   })() : v.name;
                   const title = v.message || v.commit?.message || (info.commits.find(i => i.id == v.commit?.id))?.message || (
                     info.commits.find(i => i.sha == v.commit?.sha)
                   )?.commit?.message || `No commit message was provided for this branch.`;
-                  const innerText = this.showWhat.commitsOnly ? `Commit ${v.sha?.slice(0, -33) || v.short_id}${i == 0 ? ` (Most Recent)` : ``}` : val;
+                  const innerText = this.showWhat.commitsOnly ? `Commit ${v.sha?.slice(0, -33) || v.short_id}${i == 0 ? ` (Recent)` : ``}` : val;
                   html += `<option value="${val}"${title ? ` title="${title}"` : ''}${info.repo.default_branch == val ? ' selected=""' : ''}>${innerText}</option>`
                 }
                 $("#branch").html(html);
@@ -324,7 +323,7 @@
             }
             async show(type) {
               this.showWhat[type] = !this.showWhat[type]
-              const info = this.info[this.provider][this.url];
+              const info = this.info[this.url];
               this.loadSourceCodeInfo(() => {
                 if (type == "forks") {
                   let html = '';
@@ -333,8 +332,7 @@
                       const fork = info.forks[i];
                       if (i == 0) this.loadSourceCodeInfo('', this.url.replace(info.repo.full_name || info.repo.id, fork.full_name || fork.id), this.p);
                       html += `<option value="${fork.full_name || fork.id}">${fork.namespace?.name || fork.owner?.login || ''}</option>`
-                    } 
-                    document.getElementById('provider').setAttribute("disabled", "")
+                    }
                     if (info.forks.length > 0) {
                       $("#forkOnlySettings").show();
                       $("#pageNum").text(1);
@@ -361,6 +359,8 @@
               }
             }
             loadSourceCodeInfoFromAuthor(obj) {
+              const info = this.info[this.originalUrl];
+              this.loadSourceCodeInfo('', this.originalUrl.replace(info.repo.full_name || info.repo.id, obj.value), this.p)
             }
             beginRepoClone(obj) {
               const info = Object.fromEntries(new URLSearchParams($(obj).serialize()));
@@ -379,7 +379,7 @@
                   randoGameBtn.textContent = "The clone was successful!";
                   term.write(`The source code was cloned successfuly! You will be redirected in a few moments`);
                   setTimeout(() => {
-                    window.location.href = `/dev?repoName=${this.info[this.provider][this.url].repo.name}`
+                    window.location.href = `/dev?repoName=${this.info[this.url].repo.name}`
                   }, 4096);
                 } else if (e.data == "fail") {
                   randoGameBtn.textContent = "The clone has failed";
@@ -390,7 +390,7 @@
               socket.addEventListener("open", e => socket.send(JSON.stringify(Object.assign({}, this, info))))
             }
           }
-          let gameRandoSourceCode = new GameRandoSourceCode(document.getElementById('provider'));
+          let gameRandoSourceCode = new GameRandoSourceCode(`https://api.github.com/repos/rickfay/z17-randomizer`);
           function setVersion(obj) {
             document.getElementById('randoVer').innerText = obj.id;
             for (const eI of document.getElementById('versions').children) eI.classList.remove("bg-body-tertiary");
@@ -399,6 +399,16 @@
           }
           function grabURL4WebSocket() {
             return `${window.location.protocol.startsWith("https") ? 'wss' : 'ws'}://${window.location.host}`;
+          }
+          for (const elem of document.getElementsByClassName('gameRandoSourceCodeTabBtn')) {
+            elem.addEventListener("click", e => {
+              if (!e.target.classList.contains("active")) {
+                for (const elem of document.getElementsByClassName('gameRandoSourceCodeTabBtn')) elem.classList.remove("active");
+                for (const elem of document.getElementsByClassName('tabedDiv')) elem.style.display = 'none';
+                document.getElementById(e.target.getAttribute("data-show")).style.display = 'block';
+                e.target.classList.add("active");
+              }
+            })
           }
         </script>
         <div class="row g-5">
@@ -420,7 +430,7 @@
               </li>
               <li id="v0.4.0-beta-2025-02-06" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
                 <div>
-                  <h6 class="my-0">v0.4.0-beta-2025-02-06</h6>
+                  <h6 class="my-0">v0.4.0 - Beta Build 2025-02-06</h6>
                   <small class="text-body-secondary">
                     <strong>Full Changelog</strong>: 
                     <a href="https://github.com/rickfay/z17-randomizer/compare/v0.4.0-beta-2025-01-16...v0.4.0-beta-2025-02-06" target="_blank">
@@ -432,7 +442,7 @@
               </li>
               <li id="v0.4.0-beta-2025-01-16" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
                 <div>
-                  <h6 class="my-0">v0.4.0-beta-2025-01-16</h6>
+                  <h6 class="my-0">v0.4.0 - Beta Build 2025-01-16</h6>
                   <small class="text-body-secondary">
                     <strong>Full Changelog</strong>: 
                     <a href="https://github.com/rickfay/z17-randomizer/compare/v0.4.0-beta-2024-12-02...v0.4.0-beta-2025-01-16" target="_blank">
@@ -444,7 +454,7 @@
               </li>
               <li id="v0.4.0-beta-2024-12-02" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
                 <div>
-                  <h6 class="my-0">v0.4.0-beta-2024-12-02</h6>
+                  <h6 class="my-0">v0.4.0 - Beta Build 2024-12-02</h6>
                   <small class="text-body-secondary">
                     <strong>Full Changelog</strong>: 
                     <a href="https://github.com/rickfay/z17-randomizer/compare/v0.4.0-beta-2024-09-05...v0.4.0-beta-2024-12-02" target="_blank">
@@ -466,7 +476,7 @@
               </li>
               <li id="v0.4.0-beta-2024-09-05" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
                 <div>
-                  <h6 class="my-0">v0.4.0-beta-2024-09-05</h6>
+                  <h6 class="my-0">v0.4.0 - Beta Build 2024-09-05</h6>
                   <small class="text-body-secondary">
                     <strong>Full Changelog</strong>: 
                     <a href="https://github.com/rickfay/z17-randomizer/compare/v0.4.0-beta-2024-08-26...v0.4.0-beta-2024-09-05" target="_blank">
@@ -478,7 +488,7 @@
               </li>
               <li id="v0.4.0-beta-2024-08-26" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
                 <div>
-                  <h6 class="my-0">v0.4.0-beta-2024-08-26</h6>
+                  <h6 class="my-0">v0.4.0 - Beta Build 2024-08-26</h6>
                   <small class="text-body-secondary">
                     <strong>Full Changelog</strong>: 
                     <a href="https://github.com/rickfay/z17-randomizer/compare/v0.4.0-beta-2024-08-15...v0.4.0-beta-2024-08-26" target="_blank">
@@ -490,7 +500,7 @@
               </li>
               <li id="v0.4.0-beta-2024-08-15" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
                 <div>
-                  <h6 class="my-0">v0.4.0-beta-2024-08-15</h6>
+                  <h6 class="my-0">v0.4.0 - Beta Build 2024-08-15</h6>
                   <small class="text-body-secondary">
                     <strong>Full Changelog</strong>: 
                     <a href="https://github.com/rickfay/z17-randomizer/compare/v0.4.0-beta-2024-08-06...v0.4.0-beta-2024-08-15" target="_blank">
@@ -502,7 +512,7 @@
               </li>
               <li id="v0.4.0-beta-2024-08-06" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
                 <div>
-                  <h6 class="my-0">v0.4.0-beta-2024-08-06</h6>
+                  <h6 class="my-0">v0.4.0 - Beta Build 2024-08-06</h6>
                   <small class="text-body-secondary">
                     <strong>Full Changelog</strong>: 
                     <a href="https://github.com/rickfay/z17-randomizer/compare/v0.3.1-release...v0.4.0-beta-2024-08-06" target="_blank">
@@ -514,7 +524,7 @@
               </li>
               <li id="sgl-2024" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
                 <div>
-                  <h6 class="my-0">SGL Tournament 2024 - Build #1</h6>
+                  <h6 class="my-0">v0.4.0 - SGL Tournament Build #1</h6>
                   <small class="text-body-secondary">This is a special release for the <strong>SpeedGaming Live 2024 Tournament</strong>.</small>
                 </div>
                 <span class="text-info">For more information visit the Discord: <a href="https://discord.gg/pD83S8WgJ7">https://discord.gg/pD83S8WgJ7</a></span>
@@ -550,7 +560,9 @@
                 const back2rando = document.getElementById('back2randobtn');
                 const zipfiledownload = document.getElementById('zipfiledownload');
                 const back2randobtnlistenr = evt => {
-                  for (const elem of document.getElementsByClassName('hideDuringRandomization')) elem.style.display = 'block';
+                  for (
+                    const elem of document.getElementsByClassName('hideDuringRandomization')
+                  ) elem.style.display = elem.getAttribute("data-isFlex") != undefined ? 'flex' : 'block';
                   for (const elem of document.getElementsByClassName('randoOutput')) elem.style.display = 'none';
                   term.clear()
                   logo.style.display = 'block';
@@ -654,7 +666,7 @@
                 elem.value = Math.floor(Math.random() * Number(elem.max) || 7);
               }
               function appendSetting(preset) {
-                let html = `<div class="input-grpup">
+                let html = `<div class="input-grpup" title="Allows you to manually type in your own seed if you want to.">
                   <label class="form-check-label" for="seed">Seed (Optional)</label>
                   <input type="number" class="form-control" id="seed" name="seed" value="${preset.seed}">
                 </div>`
@@ -723,7 +735,7 @@
             <h4 class="mb-3 hideDuringRandomization">Randomizer Settings</h4>
             <form action="javascript:;" onsubmit="randomizeGame(this)">
               <input type="hidden" name="version" value="v0.4.0"/>
-              <div class="row g-3 hideDuringRandomization" id="randoSettings"></div>
+              <div class="row g-3 hideDuringRandomization" id="randoSettings" data-isFlex></div>
               <input type="hidden" name="sourceVersion" value="stable"/>
               <hr class="my-4 hideDuringRandomization">
               <h4 class="mb-3 hideDuringRandomization">Game Generation Options</h4>

@@ -1,19 +1,3 @@
-// Example starter JavaScript for disabling form submissions if there are invalid fields
-(() => {
-  'use strict'
-
-  // Fetch all the forms we want to apply custom Bootstrap validation styles to
-  const forms = document.querySelectorAll('.needs-validation')
-
-  // Loop over them and prevent submission
-  Array.from(forms).forEach(form => {
-    form.addEventListener('submit', event => {
-      if (!form.checkValidity()) {
-        event.preventDefault()
-        event.stopPropagation()
-      }
-
-      form.classList.add('was-validated')
-    }, false)
-  })
-})()
+fetch(`/settings/dev/${repoName}`).then(res => res.json()).then(d => {
+    if (d.length == 0) document.getElementById('settingsLoading').innerHTML = 'No settings were loaded because the cloned repo does not exist'
+})

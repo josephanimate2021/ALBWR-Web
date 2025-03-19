@@ -6,6 +6,15 @@ let presets; // variable to store all of the presets
 
 // shows an element to the user depending on whatever or not the user uploaded the file.
 if (new URLSearchParams(window.location.search).get("fileUploaded")) loadSettings(document.getElementById('version').value, s => {
+    window.addEventListener("load", e => { // handler for a function where a user is warned about progress on a webpage.
+        window.addEventListener("beforeunload", function (e) {
+            const confirmationMessage = 'It looks like you have been editing something. If you leave before saving, your changes will be lost.';
+            const stuff = (e || window.event);
+            stuff.preventDefault();
+            stuff.returnValue = confirmationMessage;
+            return confirmationMessage;
+        });
+    })
     const elem = document.getElementById('step02');
     elem.addEventListener("submit", randomizeGame);
     elem.style.display = 'block';
@@ -403,16 +412,6 @@ function appendSettings(s) {
     // shows user presets after they have been appended
     document.getElementById('presets').style.display = 'block';
 }
-
-window.addEventListener("load", e => { // handler for a function where a user is warned about progress on a webpage.
-    window.addEventListener("beforeunload", function (e) {
-        const confirmationMessage = 'It looks like you have been editing something. If you leave before saving, your changes will be lost.';
-        const stuff = (e || window.event);
-        stuff.preventDefault();
-        stuff.returnValue = confirmationMessage;
-        return confirmationMessage;
-    });
-})
 
 // The file input event handler
 function handleFileSelect(event) {
