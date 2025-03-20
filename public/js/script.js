@@ -485,6 +485,7 @@ document.getElementById('uploadButtonChunk').addEventListener('click', function(
         // Check if a file was uploaded
     if (isFileUploaded()) {
         setBar(0);
+        document.getElementById('dropArea').style.display = "none";
         event.target.setAttribute("disabled", "");
         event.target.innerHTML = 'Uploading File...';
         uploadChunks();
