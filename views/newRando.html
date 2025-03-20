@@ -539,6 +539,7 @@
                   stuff.returnValue = confirmationMessage;
                   return confirmationMessage;
                 });
+                loadSettings();
               })
               let presets;
               function capWord(d) {
@@ -667,7 +668,7 @@
               }
               function appendSetting(preset) {
                 let html = `<div class="input-grpup" title="Allows you to manually type in your own seed if you want to.">
-                  <label class="form-check-label" for="seed">Seed (Optional)</label>
+                  <label class="form-label" for="seed">Seed (Optional)</label>
                   <input type="number" class="form-control" id="seed" name="seed" value="${preset.seed}">
                 </div>`
                 for (const settingName in preset.settings) {
@@ -695,23 +696,50 @@
                 }
                 document.getElementById('randoSettings').innerHTML = html;
               }
-              jQuery.getJSON(`/settings/stable/z17`, d => {
-                presets = d;
-                appendSetting(d[0]);
-                for (var i = 0; i < d.length; i++) document.getElementById('presets').insertAdjacentHTML(
-                  "beforeend", `<li class="dropdown-item d-flex justify-content-between bg-body-tertiary" onclick="selectPreset('${i}')">
-                    <div>
-                      <h6 class="my-0">${d[i].presetName}</h6>
-                      <small class="text-body-secondary">
-                        NOTES:
-                        <ul>${d[i].notes.map(v => `<li>${v}</li>`)}</ul>
-                      </small>
-                    </div>
-                    <span class="text-info">${d[i].version}</span>
-                  </li>`
-                );
-                document.getElementById('preset').innerText = `${d[0].version}`
-              });
+              function loadSettings() {
+                $("#randoSettings").html('');
+                document.getElementById('presets').innerHTML = ''
+                const presetSettingsloading = $("#presetSettingsLoading");
+                if (presetSettingsloading.hasClass("d-none")) {
+                  presetSettingsloading.removeClass("d-none");
+                  presetSettingsloading.addClass("d-flex")
+                }
+                jQuery.getJSON(`/settings/stable/z17`, d => {
+                  presets = d;
+                  if (document.getElementById('presetCustomization').value != "disabled") appendSetting(d[0]);
+                  for (var i = 0; i < d.length; i++) document.getElementById('presets').insertAdjacentHTML(
+                    "beforeend", `<li class="dropdown-item d-flex justify-content-between${i == 0 ? ' bg-body-tertiary' : ''}" onclick="selectPreset('${i}')">
+                      <div>
+                        <h6 class="my-0">${d[i].presetName}</h6>
+                        <small class="text-body-secondary">
+                          NOTES:
+                          <ul>${d[i].notes.map(v => `<li>${v}</li>`)}</ul>
+                        </small>
+                      </div>
+                      <span class="text-info">${d[i].version}</span>
+                    </li>`
+                  );
+                  document.getElementById('preset').innerText = `${d[0].version}`;
+                  document.getElementById('presets').insertAdjacentHTML(
+                    "beforeend", `<li class="dropdown-item d-flex justify-content-between" onclick="uploadPreset()">
+                      <div>
+                        <h6 class="my-0">Bring Your Own Preset</h6>
+                        <small class="text-body-secondary">
+                          With this feature, you may upload a preset file that will be used during game randomization!<br> 
+                          You may choose to publish your preset after the file upload is complete<br> 
+                          (if you want to. otherwise, the preset will be deleted after game randomization)
+                        </small>
+                      </div>
+                      <span class="text-warning">BETA FEATURE</span>
+                    </li>`
+                  );
+                  const presetSettingsloading = $("#presetSettingsLoading");
+                  if (presetSettingsloading.hasClass("d-flex")) {
+                    presetSettingsloading.removeClass("d-flex");
+                    presetSettingsloading.addClass("d-none")
+                  }
+                });
+              }
               function cliRedirect(e) {
                 const execV = document.getElementById('randoVer').textContent;
                 let link = `/cli?sourceVersion=stable&type=randomizer&v=z17&execV=${execV.startsWith("v") ? execV.substring(1) : execV}`;
@@ -731,10 +759,22 @@
               <span>Setting Presets</span>
               <span class="badge bg-primary rounded-pill" id="preset"></span>
             </button>
+            <div title="If disabled, you won't have to worry about customizing your preset with the GUI until you reload this page. You will just instead select a preset option provided for game generation.">
+              <label for="presetCustomization" class="form-label">Disable Preset Editor</label><br>
+              <select id="presetCustomization" onchange="loadSettings()" class="form-select">
+                  <option>enabled</option>
+                  <option>disabled</option>
+              </select>
+            </div>
             <ul class="dropdown-menu mb-3" id="presets"></ul>
             <h4 class="mb-3 hideDuringRandomization">Randomizer Settings</h4>
             <form action="javascript:;" onsubmit="randomizeGame(this)">
               <input type="hidden" name="version" value="v0.4.0"/>
+              <div class="d-flex justify-content-center" id="presetSettingsLoading">
+                <div class="spinner-border m-5" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
               <div class="row g-3 hideDuringRandomization" id="randoSettings" data-isFlex></div>
               <input type="hidden" name="sourceVersion" value="stable"/>
               <hr class="my-4 hideDuringRandomization">

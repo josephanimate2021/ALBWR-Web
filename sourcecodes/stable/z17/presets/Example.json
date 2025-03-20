@@ -3,7 +3,7 @@
   "seed": 0,
   "version": "v0.4.0 - SGL Tournament Build #1",
   "settings": {
-
+    "dev_mode": false, // If enabled, developer mode will be used during game generation.
 
     "logic_mode":                  "Normal",                  // "Normal", "Hard", "Glitched", "AdvGlitched", "Hell", "NoLogic"
     "lc_requirement":              7,                         // Sage Portraits needed to enter Lorule Castle's front door.

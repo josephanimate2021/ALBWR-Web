@@ -261,8 +261,10 @@ app.get('/', (req, res) => {
     const info = {}
     const presets = [];
     for (const file of fs.readdirSync('./uploads').filter(i => i.startsWith(`settingsPreset-${req.params.v}-`) && i.endsWith(".json"))) {
-        const info = JSON.parse(fs.readFileSync(`./uploads/${file}`));
-        info.id = file.split("-")[2];
+        const info = decodeSettingsJSON(fs.readFileSync(`./uploads/${file}`).toString('utf-8'), {
+            id: file.split("-")[2]
+        });
+        info.presetName ||= "Untitled Preset";
         presets.unshift(info);
     }
     const randoPath = `./sourcecodes/${req.params.sourceVersion}${
@@ -348,7 +350,7 @@ app.get('/', (req, res) => {
                                 comment,
                                 defaultValue: val
                             }
-                            const name = setting.startsWith("# ") ? setting.split("# ")[1].split(" =")[0] : setting.split(" =")[0];
+                            const name = setting.split(" =")[0];
                             if (wordOptions[name]) info2.allOptions = wordOptions[name];
                             else info2.useBooleanOptions = true;
                             info.settings[settingCat][name] = info2
@@ -360,8 +362,7 @@ app.get('/', (req, res) => {
         }
         return info;
     }
-    function decodeSettingsJSON() {
-        let json = fs.readFileSync(`${randoPath}/presets/Example.json`).toString('utf-8');
+    function decodeSettingsJSON(json, info) {
         const wordOptions = {
             logic_mode: ["Normal", "Hard", "Glitched", "AdvGlitched", "Hell", "NoLogic"],
             lc_requirement: 7,
@@ -376,6 +377,7 @@ app.get('/', (req, res) => {
             treacherous_tower_floors: 66,
             user_exclusions: excludableChecksJSON
         }
+        wordOptions.exclusions = wordOptions.user_exclusions;
         if (req.params.v == "z17v3") {
             wordOptions.ped_requirement[1] = "Charmed";
             wordOptions.ped_requirement[2] = "Standard";
@@ -390,55 +392,48 @@ app.get('/', (req, res) => {
             pos = json.indexOf("// ", pos + 3);
         }
         info.notes = info.notes || [comments[0]];
-        if (!info.settings) Object.assign(info, JSON.parse(json));
+        Object.assign(info, JSON.parse(json));
         function c(k) {
             for (const settingName in k) {
-                if (typeof k[settingName] == "object" && !k[settingName].exclusions && settingName != "user_exclusions") c(k[settingName]);
+                if (typeof k[settingName] == "object" && !Array.isArray(k[settingName])) c(k[settingName]);
                 else {
-                    if (k[settingName].exclusions) {
-                        const defaultValue = k[settingName].exclusions;
-                        k[settingName].exclusions = {
-                            comment: comments[commentCount],
-                            defaultValue,
-                            useCheckmarks: true,
-                            allOptions: wordOptions.user_exclusions
-                        }
-                    } else {
-                        const info2 = {
-                            comment: comments[commentCount],
-                            defaultValue: k[settingName]
-                        }
-                        switch (typeof k[settingName]) {
-                            case "boolean": {
-                                info2.useBooleanOptions = true;
-                                break;
-                            } default: {
-                                if (settingName.includes("exclu")) info2.useCheckmarks = true;
-                                if (
-                                    wordOptions[settingName]
-                                ) info2[typeof k[settingName] == "number" ? 'rangeNumOptionsTo' : 'allOptions'] = wordOptions[settingName]
-                            }
-                        }
-                        k[settingName] = info2;
+                    const info2 = {
+                        comment: comments[commentCount],
+                        defaultValue: k[settingName]
                     }
+                    switch (typeof k[settingName]) {
+                        case "boolean": {
+                            info2.useBooleanOptions = true;
+                            break;
+                        } default: {
+                            if (Array.isArray(k[settingName])) info2.useCheckmarks = true;
+                            if (
+                                wordOptions[settingName]
+                            ) info2[typeof k[settingName] == "number" ? 'rangeNumOptionsTo' : 'allOptions'] = wordOptions[settingName]
+                        }
+                    }
+                    k[settingName] = info2;;
                     commentCount++
                 }
             }
         }
         c(info.settings)
+        return info;
     }
-    let localPrefix;
+    let localPrefix, examplePreset = fs.existsSync(`${randoPath}/presets/Example.json`) ? fs.readFileSync(`${randoPath}/presets/Example.json`).toString('utf-8') : {};
     if (req.params.sourceVersion == "stable") switch (req.params.v) {
         case "albw": localPrefix = "albw";
         case "z17-local": {
             localPrefix ||= "z17";
             presets.unshift(decodeSettingsToml({
                 presetName: `Default${localPrefix == "z17" ? ' z17' : ''} ALBWR Standard Template`,
+                id: "Standard",
                 notes: [],
                 settings: {}
             }, `${randoPath}/${localPrefix}-randomizer/config/presets/Standard.toml`));
             presets.unshift(decodeSettingsToml({
                 presetName: `Default${localPrefix == "z17" ? ' z17' : ''} ALBWR Open World Template`,
+                id: "Open",
                 notes: [],
                 settings: {}
             }, `${randoPath}/${localPrefix}-randomizer/config/presets/Open.toml`));
@@ -447,6 +442,7 @@ app.get('/', (req, res) => {
             Object.assign(info, {
                 presetName: "Default z17 ALBWR Template",
                 notes: [],
+                id: "Standard",
                 settings: {}
             });
             decodeSettingsToml(info, `${randoPath}/presets/Standard.toml`);
@@ -455,6 +451,7 @@ app.get('/', (req, res) => {
         } case "z17r": {
             Object.assign(info, {
                 presetName: "Default z17 ALBWR Template",
+                id: "Example",
                 notes: [],
                 settings: {}
             });
@@ -466,8 +463,8 @@ app.get('/', (req, res) => {
             info.settings = JSON.parse(fs.readFileSync(`${randoPath}/presets/Example.json`));
         } default: {
             info.presetName = "Default z17 ALBWR Template";
-            decodeSettingsJSON();
-            presets.unshift(info);
+            info.id = "Example";
+            presets.unshift(decodeSettingsJSON(examplePreset, info));
             break;
         }
     } else {
@@ -476,8 +473,7 @@ app.get('/', (req, res) => {
             if (fs.existsSync(presetFile)) {
                 if (file.endsWith(".json")) {
                     info.presetName = "Default z17 ALBWR Template";
-                    decodeSettingsJSON();
-                    presets.unshift(info);
+                    presets.unshift(decodeSettingsJSON(examplePreset, info));
                 } else if (file.endsWith(".toml")) {
                     presets.unshift(decodeSettingsToml({
                         presetName: `Default ALBWR Standard Template`,
@@ -573,7 +569,7 @@ app.get('/', (req, res) => {
                 okay2spitscript = true;
             });
         }
-        if (writeALBWFile(req, versions, randoPath, true, command, res)) {
+        if (writeALBWFile(req, versions, randoPath, req.query.writeNewPreset, command, res)) {
             scriptOutput += `Running Command: cd ${command.join(' ')}\r\n`;
             okay2spitscript = true;
             gameGeneration(1, 100);
@@ -622,8 +618,7 @@ function deleteALBWStuff(req, randoPath) {
             const presetFile = `${randoPath}/presets/${req.query.id}.toml`;
             if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
             break;
-        } 
-        default: {
+        } default: {
             config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
             const presetFile = `${randoPath}/presets/${req.query.id}.json`;
             if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
@@ -634,7 +629,9 @@ function deleteALBWStuff(req, randoPath) {
         recursive: true, 
         force: true 
     });
-    if (fs.existsSync(`${randoPath}/${config.rom}`)) fs.renameSync(`${randoPath}/${config.rom}`, `./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`);
+    if (fs.existsSync(`${randoPath}/${config.rom}`)) fs.renameSync(
+        `${randoPath}/${config.rom}`, `./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`
+    );
 }
 async function genGameZip(req, res) {
     function handleError(e) {
@@ -667,8 +664,7 @@ async function genGameZip(req, res) {
             case "z17-local": {
                 config = parseTOML(fs.readFileSync(`${randoPath}/${config || 'z17'}-randomizer/config/Rando.toml`).toString('utf-8'))
                 break;
-            } 
-            default: config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
+            } default: config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
         }
         c(`${randoPath}/${config.output}`, zip);
         deleteALBWStuff(req, randoPath);
@@ -759,8 +755,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 }
                 c(`${t}-randomizer`)
                 break;
-            } 
-            default: {
+            } default: {
                 const info = req.query.v == "z17v3" ? req.query.settings : req.query;
                 if (info && typeof info == "object" && writeNewPreset) {
                     const presetFile = `${randoPath}/presets/${req.params.id}`

@@ -1,25 +1,25 @@
 ## Modifications to the game's core mechanics.
 [modifications]
 ## Enables the Y button from the start.
-# y_button_enabled = true
+y_button_enabled = true
 
 ## Modifications to certain items in the game.
 [items]
 ## The action that should be done to the Captain's Sword<br><br>WARNING: Changing this setting from Skip to something else will cause the console to freak out on some executable versions. Please change this setting at your own risk.
-# captains_sword = 'Skip'
+captains_sword = 'Skip'
 ## The action that should be done to the Borrowed Sword.<br><br>WARNING: Changing this setting to Shuffled will cause the console to freak out on some executable versions. Please change this setting at your own risk.
-# borrowed_sword = 'Unchanged'
+borrowed_sword = 'Unchanged'
 ## The action that should be done to the Lamp.
-# lamp = 'Shuffled'
+lamp = 'Shuffled'
 ## The action that should be done to Ravio's first bracelet.<br><br>WARNING: Changing this setting from Skip to something else will cause the console to freak out on some executable versions. Please change this setting at your own risk.
-# first_bracelet = 'Skip'
+first_bracelet = 'Skip'
 
 ## Modifications to the game's behavior.
 [behavior]
 ## Starts the game in a pseudo-post-Sanctuary state.
-# open = true
+open = true
 ## Enables the barrier around Hyrule Castle from the start.
-# barrier = 'Unchanged'
+barrier = 'Unchanged'
 
 ## Excludes certain locations from having progression items.
 [exclude]

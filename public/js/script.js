@@ -23,7 +23,7 @@ if (new URLSearchParams(window.location.search).get("fileUploaded")) loadSetting
 else document.getElementById(`step01`).style.display = 'block';
 
 // Randomizes ALBW
-function randomizeGame(evt, deletePresetAfterRandomization = true) {
+function randomizeGame(evt) {
     document.getElementById('logo').style.display = 'none';
     document.getElementById('options').style.display = 'none';
     evt.submitter.textContent = "Randomizing Game...";
@@ -46,7 +46,14 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
     const params = new URLSearchParams();
     
     for (const [key, value] of formData.entries()) params.append(key, value);
-    fetch(`/randomizer/${(Math.random()).toString().substring(2)}?${params.toString()}`, {
+    const id = document.getElementById('presetCustomization').value != "disabled" ? (Math.random()).toString().substring(2) : (() => {
+        const elem = document.getElementById('presetsSelection');
+        for (const child of elem.children) {
+            if (child.value != elem.value) continue;
+            return child.id;
+        }
+    })();
+    fetch(`/randomizer/${id}?${params.toString()}`, {
         method: "POST"
     }).then(res => res.json()).then(d => {
         if (d.isRandomizing) (async () => {
@@ -80,7 +87,7 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                     }
                     try {
                         term.write('\r\nRetrieving Your Randomized Game...\r\n');
-                        const res = await fetch(`/genZipFromRandomizedGame?${new URLSearchParams(d.data).toString()}&deletePreset=${deletePresetAfterRandomization}`, {
+                        const res = await fetch(`/genZipFromRandomizedGame?${new URLSearchParams(d.data).toString()}`, {
                             method: "POST"
                         });
                         if (res.ok) {
@@ -175,6 +182,7 @@ function loadSettings(id, callback) {
     cliLink.style.display = 'block';
     cliLink.setAttribute("data-v", id);
     document.getElementById('noVerboseDiv').style.display = 'none';
+    document.getElementById('devModeDiv').style.display = "none";
     const settings = document.getElementById('randoSettings');
     settings.innerHTML = '';
     let typeInTitle = '', type;
@@ -202,7 +210,7 @@ function loadSettings(id, callback) {
     }
     fetch(`/settings/stable/${id}`).then(res => res.json()).then(d => {
         switch (id) { // loads executable versions for specific randomizer versions
-            case "z17v3": if (!typeInTitle) typeInTitle = 'Z17 Randomizer v3'; 
+            case "z17v3": if (!typeInTitle) typeInTitle = 'Z17 Randomizer v3', document.getElementById('devModeDiv').style.display = "block"; 
             case "z17r": if (!typeInTitle) typeInTitle = 'Z17 Randomizer Beta'; 
             case "z17-rando": if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Old)'; 
             case "z17-local": {
@@ -306,12 +314,12 @@ function toggleCollapsible(coll) {
 }
 
 // loads randomizer settings based off of a user's selected preset.
-function randomizerSettings(d, clearSettingsHTML = false) {
-    if (clearSettingsHTML) document.getElementById('randoSettings').innerHTML = document.getElementById('versionSelect')?.outerHTML || '';
+function randomizerSettings(d) {
+    if (document.getElementById('presetCustomization').value == "disabled") return;
     const booleans = [true, false];
     for (const setting in d.settings) {
         if (typeof d.settings[setting] != "object") continue;
-        let html = '';
+        let html = '<input type="hidden" name="writeNewPreset" value="true"/><input type="hidden" name="deletePreset" value="true"/>';
         switch (setting) {
             case "exclude": {
                 html += `<h3>${setting.split("_").map(captializeBegLetterInWord).join(" ")}</h3>`;
@@ -395,14 +403,14 @@ function randomizerSettings(d, clearSettingsHTML = false) {
 function appendSettings(s) {
     // Loads the presets
     function listener(evt) {
-        randomizerSettings(s[evt.target.value], true)
+        randomizerSettings(s[evt.target.value])
     }
     document.getElementById('presets').style.display = 'none';
     document.getElementById('presetsSelection').innerHTML = '';
     document.getElementById('presetsSelection').removeEventListener("change", listener);
     document.getElementById('presetsSelection').addEventListener("change", listener);
     for (let i = 0; i < s.length; i++) {
-        document.getElementById('presetsSelection').insertAdjacentHTML('afterbegin', `<option value="${i}">${s[i].presetName}</option>`);
+        document.getElementById('presetsSelection').insertAdjacentHTML('afterbegin', `<option value="${i}" id="${s[i].id}">${s[i].presetName}</option>`);
         if (i == 0) listener({
             target: {
                 value: i
