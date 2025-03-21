@@ -819,13 +819,27 @@
                             }));
                           }
                           break;
+                        } case "success": {
+                          loadSettings(() => {
+                            socket.close();
+                            handleError('')
+                            displayAlert("success", `Your successfuly brought in your own preset! If things were done correctly, 
+                            you or the other user should be able to use your preset at any time.`)
+                          });
+                          break;
+                        } case "fail": {
+                          socket.close();
+                          handleError('An unknown error occured while uploading your preset to the server.');
+                        } case "incompatiableVersionError": {
+                          socket.close();
+                          handleError('Your preset does not meet the version requirements needed in order to be loaded with the v0.4 family of the albw randomizer. Please upload a preset that is compatiable with the v0.4 family of albwr.');
                         }
                       }
                     })
                   }
                 } else $("#presetUploader").modal("show");
               }
-              function loadSettings() {
+              function loadSettings(callback) {
                 $("#randoSettings").html('');
                 document.getElementById('presets').innerHTML = `<li class="dropdown-item d-flex justify-content-between" onclick="uploadPreset()">
                   <div>
@@ -864,6 +878,7 @@
                     presetSettingsloading.removeClass("d-flex");
                     presetSettingsloading.addClass("d-none")
                   }
+                  if (typeof callback == "function") callback();
                 });
               }
               function cliRedirect(e) {

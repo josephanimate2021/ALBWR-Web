@@ -168,17 +168,18 @@ wss.on('connection', (ws, req) => {
                                             } catch { 
                                                 // most preset files made with JSON have comments so the JSON won't be able to get parsed. 
                                                 // As a result of this, we will have to manually input data without parsing the JSON string.
-                                                for (const i in info.publishingPreset) preset = preset.replace("{", `{\n\t"${i}": "${info.publishingPreset[i]}",`);
-                                                console.log(preset);
+                                                for (const i in info.publishingPreset) preset = preset.replace("{", `{\n\t"${i}": ${
+                                                    typeof info.publishingPreset[i] == "object" ? JSON.stringify(info.publishingPreset[i]) : `"${info.publishingPreset[i]}"`
+                                                },`);
+                                                fs.writeFileSync(`./uploads/settingsPreset-${info.expectedPresetV}-${preset.seed}.json`, preset);
                                             }
                                             break;
                                         } case "yaml": { 
                                             /**
-                                             * Spoiler logs in yamls will only work with specific versions. 
+                                             * Spoiler logs in yamls will only work with versions older than v3 and newer. 
                                              * so it's better to just upload a spoiler log as a JSON file 
                                              * as that's how most people are sharing their albwr presets/spoiler logs nowadays.
-                                             * Not sure why i included this. but i guess that it has something to do with compaibility with older versions???
-                                             * I'm not sure as using a yaml spoiler log as a preset file has been untested as of right now.
+                                             * Not sure why i included this, but for all i know, i wanted to support spoiler logs as well, not just presets.
                                              * Considering the fact that yaml spoiler logs first popped up during albwr's early stages of developement,
                                              * i wouldn't be suprised if the randomizer algorithm does not keep the seed and eveything else the same considering how
                                              * old yaml spoiler logs are to this day.
@@ -188,12 +189,17 @@ wss.on('connection', (ws, req) => {
                                                 case "z17v3": fs.unlinkSync(`./uploads/${name}`); return ws.send('incompatiableVersionError');
                                                 default: {
                                                     preset = yaml.parse(preset);
-                                                    for (const i in preset.settings) preset[i] = preset.settings[i];
-                                                    delete preset.settings;
-                                                    Object.assign(preset, info.publishingPreset)
-                                                    fs.writeFileSync(
-                                                        `./uploads/settingsPreset-${info.expectedPresetV}-${preset.seed}.json`, JSON.stringify(preset, null, "\t")
-                                                    );
+                                                    if (preset.settings && preset.layout && preset.seed) {
+                                                        if (preset.layout.Hyrule && preset.layout.Lorule && preset.layout.Dungeons) {
+                                                            for (const i in preset.settings) preset[i] = preset.settings[i];
+                                                            delete preset.settings;
+                                                            Object.assign(preset, info.publishingPreset)
+                                                            fs.writeFileSync(
+                                                                `./uploads/settingsPreset-${info.expectedPresetV}-${preset.seed}.json`, 
+                                                                JSON.stringify(preset, null, "\t")
+                                                            );
+                                                        } else ws.send('noExpectedLayoutsError')
+                                                    } else ws.send('inproperSpoilerLogError')
                                                 }
                                             }
                                             break;
