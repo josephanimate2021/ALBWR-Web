@@ -1,32 +1,23 @@
+/**
+ * ALBWR Web Server
+ */
+// modules
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const {spawn} = require("child_process");
 const JSZip = require("jszip");
-let scriptOutput = '', okay2spitscript = false, userIsRandomizingGame = false
 const ws = require("ws");
 const app = express();
-app.use((req, _, next) => {
-    console.log(req.headers.origin ? req.headers.origin?.split(":")[0] : '', req.method, req.url, req.query);
-    next();
-});
 const yaml = require("yaml");
 const http = require("http");
-// The folder containing the static files
+const url = require("url");
+// variables
+let scriptOutput = '', okay2spitscript = false, userIsRandomizingGame = false
 const publicDirectoryPath = path.join(__dirname, 'public');
 const server = http.createServer(app);
-// Handling the MIME types for CSS and JS files
-app.use(express.static(publicDirectoryPath, {
-    setHeaders: (res, filePath, stat) => {
-        if (filePath.endsWith('.js')) {
-            res.set('Content-Type', 'text/javascript');
-        } else if (filePath.endsWith('.css')) {
-            res.set('Content-Type', 'text/css');
-        }
-    }
-}));
-const url = require("url");
 const wss = new ws.WebSocketServer({ noServer: true });
+// handle WebSocket connections
 wss.on('connection', (ws, req) => {
     console.log(`ws`, req.method, req.url);
     const parsedUrl = url.parse(req.url, true);
@@ -145,13 +136,80 @@ wss.on('connection', (ws, req) => {
                         env: process.env
                     }))
                     break;
-                } case "/uploadFile": { // Uploads the ALBW rom file
+                } case "/uploadFile": { // Uploads a file via websockets
                     if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
                     const ipbse64 = Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64');
-                    fs.writeFileSync(`./uploads/rom-${ipbse64}.3ds`, '');
+                    const name = parsedUrl.query.value?.substring(parsedUrl.query.value?.lastIndexOf("\\") + 1) || parsedUrl.query.name;
+                    const ext = name.substring(name.lastIndexOf(".") + 1);
+                    fs.writeFileSync(`./uploads/${name}`, '');
                     ws.on("message", e => {
-                        fs.appendFileSync(`./uploads/rom-${ipbse64}.3ds`, e);
-                        ws.send("ok");
+                        try {
+                            const info = JSON.parse(e);
+                            switch (info.onFileUploadAfter) { // functions for after a file is done uploading on websockets
+                                case "make3dsrom": { // creates a 3ds rom when told to
+                                    fs.renameSync(`./uploads/${name}`, `./uploads/rom-${ipbse64}.3ds`)
+                                    ws.send('success');
+                                    break;
+                                } case "convert2preset": { 
+                                    // when called, the uploaded file will be converted into a settings preset. 
+                                    // If the file is not supported, then this won't work.
+                                    let preset = fs.readFileSync(`./uploads/${name}`).toString("utf-8");
+                                    info.publishingPreset.presetName ||= "Untitled Preset";
+                                    info.publishingPreset.notes = info.publishingPreset.notes ? info.publishingPreset.notes.split("\r").join('').split("\n") : [];
+                                    if (info.publishingPreset.private) info.publishingPreset.publisherIP = req.headers['x-forwarded-for'];
+                                    switch (ext) {
+                                        case "json": { 
+                                            // JSON spoiler logs are quite universal to the ALBWR community nowadays so there shouldn't be too much
+                                            // concern with this method.
+                                            try { // most spoiler logs don't have comments so it should be fine.
+                                                preset = JSON.parse(preset)
+                                                Object.assign(preset, info.publishingPreset);
+                                                console.log(preset);
+                                            } catch { 
+                                                // most preset files made with JSON have comments so the JSON won't be able to get parsed. 
+                                                // As a result of this, we will have to manually input data without parsing the JSON string.
+                                                for (const i in info.publishingPreset) preset = preset.replace("{", `{\n\t"${i}": "${info.publishingPreset[i]}",`);
+                                                console.log(preset);
+                                            }
+                                            break;
+                                        } case "yaml": { 
+                                            /**
+                                             * Spoiler logs in yamls will only work with specific versions. 
+                                             * so it's better to just upload a spoiler log as a JSON file 
+                                             * as that's how most people are sharing their albwr presets/spoiler logs nowadays.
+                                             * Not sure why i included this. but i guess that it has something to do with compaibility with older versions???
+                                             * I'm not sure as using a yaml spoiler log as a preset file has been untested as of right now.
+                                             * Considering the fact that yaml spoiler logs first popped up during albwr's early stages of developement,
+                                             * i wouldn't be suprised if the randomizer algorithm does not keep the seed and eveything else the same considering how
+                                             * old yaml spoiler logs are to this day.
+                                             */ 
+                                            switch (info.expectedPresetV) {
+                                                case "z17":
+                                                case "z17v3": fs.unlinkSync(`./uploads/${name}`); return ws.send('incompatiableVersionError');
+                                                default: {
+                                                    preset = yaml.parse(preset);
+                                                    for (const i in preset.settings) preset[i] = preset.settings[i];
+                                                    delete preset.settings;
+                                                    Object.assign(preset, info.publishingPreset)
+                                                    fs.writeFileSync(
+                                                        `./uploads/settingsPreset-${info.expectedPresetV}-${preset.seed}.json`, JSON.stringify(preset, null, "\t")
+                                                    );
+                                                }
+                                            }
+                                            break;
+                                        } case "toml": { // There were presets made with toml in the past. so converting this to a JSON might be tricky.
+                                            break;
+                                        }
+                                    }
+                                    fs.unlinkSync(`./uploads/${name}`);
+                                    ws.send('success');
+                                    break;
+                                }
+                            }
+                        } catch {
+                            fs.appendFileSync(`./uploads/${name}`, e);
+                            ws.send("ok");
+                        }
                     });
                     ws.send("ok")
                     break;
@@ -201,18 +259,23 @@ server.on('upgrade', (request, socket, head) => {
         wss.emit('connection', ws, request);
     });
 });
-// parses a toml config file.
-function parseTOML(configToml) {
-    const config = {};
-    for (const line of configToml.split('\n')) {
-        if (!line) continue;
-        const [key, value] = line.split(" = '");
-        config[key] = value.split("'")[0]
+// handle console logging
+app.use((req, _, next) => {
+    console.log(req.headers.origin ? req.headers.origin?.split(":")[0] : '', req.method, req.url, req.query);
+    next();
+})
+// Handling the MIME types for CSS and JS files
+.use(express.static(publicDirectoryPath, {
+    setHeaders: (res, filePath, stat) => {
+        if (filePath.endsWith('.js')) {
+            res.set('Content-Type', 'text/javascript');
+        } else if (filePath.endsWith('.css')) {
+            res.set('Content-Type', 'text/css');
+        }
     }
-    return config;
-}
-// Define routes
-app.get('/', (req, res) => {
+}))
+// Main page
+.get('/', (req, res) => {
     const ipbse64 = Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64');
     if (!req.query.fileUploaded) {
         if (fs.existsSync(`./uploads/rom-${ipbse64}.3ds`)) {
@@ -230,43 +293,54 @@ app.get('/', (req, res) => {
         }
     }
     res.sendFile(path.join(__dirname, 'views', 'uploadForm.html'));
-}).get('/shell', (req, res) => {
+}) // shell page
+.get('/shell', (req, res) => {
     if (!req.headers.host.startsWith("localhost") && !req.headers.host.startsWith("127.0.0.1")) {
         res.writeHead(302, '', {
             location: "/"
         });
         res.end();
     } else res.sendFile(path.join(__dirname, `views/interactiveShell.html`))
-}).get('/v4', (req, res) => {
+}) // Page for the v0.4 family of the albw randomizer which as of right now is currently the latest family of versions that are currently out.
+.get('/v4', (req, res) => {
     if (!fs.existsSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`)) {
         res.writeHead(302, '', {
             location: "/"
         });
         res.end();
     } else res.sendFile(path.join(__dirname, 'views', 'newRando.html'));
-}).get('/cli', (req, res) => {
+}) // RandoCLI page for users who prefer the style.
+.get('/cli', (req, res) => {
     if (!fs.existsSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`)) {
         res.writeHead(302, '', {
             location: "/"
         });
         res.end();
     } else res.sendFile(path.join(__dirname, 'views', 'randoCli.html'));
-}).get('/deleteFile', (req, res) => {
+}) // Deletes a user's 3ds rom apon request.
+.get('/deleteFile', (req, res) => {
     fs.unlinkSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`)
     res.writeHead(302, '', {
         location: "/"
     });
     res.end();
-}).get('/settings/:sourceVersion/:v', (req, res) => {
+}) // Gets the settings using the provided version and source version.
+.get('/settings/:sourceVersion/:v', (req, res) => {
+    // Object variables
     const info = {}
     const presets = [];
+    // loop for pushing any uploaded presets into the presets array.
     for (const file of fs.readdirSync('./uploads').filter(i => i.startsWith(`settingsPreset-${req.params.v}-`) && i.endsWith(".json"))) {
         const info = decodeSettingsJSON(fs.readFileSync(`./uploads/${file}`).toString('utf-8'), {
             id: file.split("-")[2]
         });
+        // Keep the loop going if a private preset is detected but does not match the ip address provided by the user's browser.
+        if (info.private && info.publisherIP != req.headers['x-forwarded-for']) continue;
+        // Push the info if all checks cleared successfuly.
         info.presetName ||= "Untitled Preset";
         presets.unshift(info);
     }
+    // variables
     const randoPath = `./sourcecodes/${req.params.sourceVersion}${
         req.params.sourceVersion == "dev" ? `/${req.headers['x-forwarded-for'] || 'localhost'}` : ''
     }/${req.params.v}`;
@@ -278,7 +352,7 @@ app.get('/', (req, res) => {
     const excludableChecksYAML = fs.existsSync(`${randoPath}/excludableChecksList.yaml`) ? yaml.parse(
         fs.readFileSync(`${randoPath}/excludableChecksList.yaml`).toString('utf-8')
     ).layout : {}
-    function decodeSettingsToml(info, tomlFile) {
+    function decodeSettingsToml(info, tomlFile) { // Decodes some preset settings in a toml format (Work in progress).
         const toml = fs.readFileSync(tomlFile).toString('utf-8'), optionTypes = {
             Skippable: ['Unchanged', 'Shuffled', 'Skip'],
             Progression: ['Unchanged', 'Shuffled']
@@ -362,8 +436,8 @@ app.get('/', (req, res) => {
         }
         return info;
     }
-    function decodeSettingsJSON(json, info) {
-        const wordOptions = {
+    function decodeSettingsJSON(json, info) { // Decodes some settings written in JSON with comments.
+        const wordOptions = { // Used to provide options for some setting properties
             logic_mode: ["Normal", "Hard", "Glitched", "AdvGlitched", "Hell", "NoLogic"],
             lc_requirement: 7,
             ped_requirement: ["Vanilla", "Standard"],
@@ -377,15 +451,16 @@ app.get('/', (req, res) => {
             treacherous_tower_floors: 66,
             user_exclusions: excludableChecksJSON
         }
+        // exclusions are the same as user exclusions in v4, so who cares.
         wordOptions.exclusions = wordOptions.user_exclusions;
-        if (req.params.v == "z17v3") {
+        if (req.params.v == "z17v3") { // Add some extra stuff if the detected version is v3.
             wordOptions.ped_requirement[1] = "Charmed";
             wordOptions.ped_requirement[2] = "Standard";
         }
         const comments = [];
         let commentCount = 1;
         let pos = json.indexOf("// ");
-        while (pos > -1) {
+        while (pos > -1) { // Takes out all of the comments making it easier to parse the JSON output.
             const c = json.substring(pos).split(newLine)[0];
             comments.push(c.substring(3));
             json = json.split(c).join("")
@@ -393,7 +468,7 @@ app.get('/', (req, res) => {
         }
         info.notes = info.notes || [comments[0]];
         Object.assign(info, JSON.parse(json));
-        function c(k) {
+        function c(k) { // The function that converts setting values into selectable values. The randomizer takes care of converting this back to the original.
             for (const settingName in k) {
                 if (typeof k[settingName] == "object" && !Array.isArray(k[settingName])) c(k[settingName]);
                 else {
@@ -421,7 +496,7 @@ app.get('/', (req, res) => {
         return info;
     }
     let localPrefix, examplePreset = fs.existsSync(`${randoPath}/presets/Example.json`) ? fs.readFileSync(`${randoPath}/presets/Example.json`).toString('utf-8') : {};
-    if (req.params.sourceVersion == "stable") switch (req.params.v) {
+    if (req.params.sourceVersion == "stable") switch (req.params.v) { // Pushes a preset depending on the rando version.
         case "albw": localPrefix = "albw";
         case "z17-local": {
             localPrefix ||= "z17";
@@ -467,10 +542,11 @@ app.get('/', (req, res) => {
             presets.unshift(decodeSettingsJSON(examplePreset, info));
             break;
         }
-    } else {
-        for (const file of ['presets/Example.json', 'presets/Example.toml', 'presets/Standard.toml']) {
+    } else { // For cloned source codes, we need to take a different approach by pusing presets using trial and error.
+        for (const file of ['presets/Example.json', 'presets/Example.toml', 'presets/Standard.toml']) { 
+            // The given array is preset files to look for during the loop.
             const presetFile = path.join(randoPath, file);
-            if (fs.existsSync(presetFile)) {
+            if (fs.existsSync(presetFile)) { // gives presets a name based off of the found preset file.
                 if (file.endsWith(".json")) {
                     info.presetName = "Default z17 ALBWR Template";
                     presets.unshift(decodeSettingsJSON(examplePreset, info));
@@ -485,17 +561,22 @@ app.get('/', (req, res) => {
         }
     }
     res.json(presets);
-}).post('/:type/:id', (req, res) => {
+})
+// Randomizes ALBW using the provided user input (The core of this whole web application)
+.post('/:type/:id', (req, res) => {
     try {
-        if (userIsRandomizingGame) return res.json({
+        if (userIsRandomizingGame) return res.json({ 
+            // Due to the potential overlap of files during game randomization, 
+            // I will let one user randomize their gane at a time.
             error: {
                 message: "Someone else is randomizing their game right now. Please wait for a few minutes."
             }
         })
-        res.json({
+        res.json({ // No user needs to wait for the randomizer to start. So just kick into the rando status.
             isRandomizing: true,
             data: Object.assign({}, req.params, req.query)
         })
+        // variables and conditionals
         userIsRandomizingGame = true;
         const randoPath = `./sourcecodes/${req.query.sourceVersion}${
             req.query.sourceVersion == "dev" ? `/${req.headers['x-forwarded-for'] || 'localhost'}` : ''
@@ -509,10 +590,11 @@ app.get('/', (req, res) => {
         if (req.query.execVersion) command[2] += `-${req.query.execVersion}`;
         const versionsFile = `${randoPath}/versions.json`;
         const versions = fs.existsSync(versionsFile) ? JSON.parse(fs.readFileSync(versionsFile)) : {};
-        function sForWord(word = 'attempt', num = 0) {
+        function sForWord(word = 'attempt', num = 0) { // adds an s to a word via a given number
             return num > 1 ? (word + 's') : word
         }
-        function gameGeneration(currentAttempt, limit) {
+        function gameGeneration(currentAttempt, limit) { // Uses the provided limit and attempt count to randomize ALBW.
+            // variables
             scriptOutput+=`Attempt #${currentAttempt}\r\nNOTE: There are cuurently ${limit - (currentAttempt - 1)} ${
                 sForWord('attempt', limit - (currentAttempt - 1))
             } remaining until the randomizer stops entirely (unless you restart it).\r\nThis measure helps ensure that this website is still usable for everyone and that heavy loads are not being applied to the backend of this website.\r\n`;
@@ -520,7 +602,7 @@ app.get('/', (req, res) => {
             const liveOutput = spawn(`cd`, command, {
                 shell: true
             });
-        
+            // log output to the terminal
             liveOutput.stdout.setEncoding('utf8');
             liveOutput.stdout.on('data', function(data) {
                 console.log('stdout:', data);
@@ -537,7 +619,7 @@ app.get('/', (req, res) => {
         
             liveOutput.on('close', function(code) {
                 console.log('closing code:', code)
-                if (code != 0) {
+                if (code != 0) { // Errors out depending on the close code.
                     if (limit) {
                         scriptOutput += `The command closed unexpectedly with the ${code} code after ${currentAttempt} ${
                             sForWord('attempt', currentAttempt)
@@ -557,27 +639,27 @@ app.get('/', (req, res) => {
                         okay2spitscript = true;
                         if (code == 101) gameGeneration(currentAttempt + 1);
                     }
-                } else {
+                } else { // Randomization successful
                     scriptOutput += `Press Enter to continue...`;
                     okay2spitscript = true;
                 }
             });
         
-            liveOutput.on('error', function(code) {
+            liveOutput.on('error', function(code) { // An error occured
                 console.log('error:', code);
                 scriptOutput += `The command errored out with ${code} after ${currentAttempt} ${sForWord('attempt', currentAttempt)}.\r\nPress Enter to continue...`;
                 okay2spitscript = true;
             });
         }
-        if (writeALBWFile(req, versions, randoPath, req.query.writeNewPreset, command, res)) {
+        if (writeALBWFile(req, versions, randoPath, req.query.writeNewPreset, command, res)) { // preps ALBW stuff and then generates a game.
             scriptOutput += `Running Command: cd ${command.join(' ')}\r\n`;
             okay2spitscript = true;
             gameGeneration(1, 100);
-        } else {
+        } else { // whoops
             scriptOutput += `An unknown error occured while writting the required stuff to ${randoPath}.\r\n`;
             okay2spitscript = true;
         }
-    } catch (err) {
+    } catch (err) { // Something happened
         console.error(err)
         return res.status(500).json({
             error: {
@@ -586,17 +668,33 @@ app.get('/', (req, res) => {
             }
         });
     }
-}).get('/execVersions/:sourceVersion/:v', (req, res) => {
+})
+// Gets a version from the paramaters
+.get('/execVersions/:sourceVersion/:v', (req, res) => {
     const versionsPath = `./sourcecodes/${req.params.sourceVersion}${
         req.params.sourceVersion == "dev" ? `/${req.headers['x-forwarded-for'] || 'localhost'}` : ''
     }/${req.params.v}/versions.json`
     res.json(fs.existsSync(versionsPath) ? JSON.parse(fs.readFileSync(versionsPath)) : {})
-}).get('/randomizationStatus', (req, res) => {
+})
+// gets randomizer status (obviously)
+.get('/randomizationStatus', (req, res) => {
     const interval = setInterval(() => {
         if (okay2spitscript) okay2spitscript = false, clearInterval(interval), res.send(scriptOutput);
     }, 1)
-}).post('/genZipFromRandomizedGame', genGameZip);
-function deleteALBWStuff(req, randoPath) {
+})
+// Generates a zip for a randomized game
+.post('/genZipFromRandomizedGame', genGameZip);
+// functions
+function parseTOML(configToml) { // parses a toml config file
+    const config = {};
+    for (const line of configToml.split('\n')) {
+        if (!line) continue;
+        const [key, value] = line.split(" = '");
+        config[key] = value.split("'")[0]
+    }
+    return config;
+}
+function deleteALBWStuff(req, randoPath) { // deletes any existing albw stuff after game randomization
     let config;
     switch (req.query.v) {
         case "albw": config = "albw";
@@ -633,15 +731,15 @@ function deleteALBWStuff(req, randoPath) {
         `${randoPath}/${config.rom}`, `./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`
     );
 }
-async function genGameZip(req, res) {
-    function handleError(e) {
+async function genGameZip(req, res) { // Function to generate a randomized game zip file
+    function handleError(e) { // Error handler
         console.error(e);
         if (req.headers.connection != "upgrade") res.status(404);
         res.send(e.toString());
     }
     if (!userIsRandomizingGame) return handleError("Someone needs to randomize ALBW in order to generate a zip file.")
     userIsRandomizingGame = false;
-    try {
+    try { // Generate to see what happens
         const zip = new JSZip();
         const randoPath = `./sourcecodes/${req.query.sourceVersion}${
             req.query.sourceVersion == "dev" ? `/${req.headers['x-forwarded-for'] || 'localhost'}` : ''
@@ -669,13 +767,14 @@ async function genGameZip(req, res) {
         c(`${randoPath}/${config.output}`, zip);
         deleteALBWStuff(req, randoPath);
         res.send(await zip.generateAsync({type:"nodebuffer"}))
-    } catch (e) {
+    } catch (e) { // whoops
         handleError(e);
     }
 }
-function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = false, command = [], res = {}) {
+function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = false, command = [], res = {}) { 
+    // Writes down important stuff before albw randomization to prevent common problems that users face.
     try {
-        function string2boolean(s) {
+        function string2boolean(s) { // Converts a string to a boolean
             switch (s) {
                 case "true": return true;
                 case "false": return false;
@@ -685,7 +784,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 }
             }
         }
-        function writeOldToml(newToml = false) {
+        function writeOldToml(newToml = false) { // Pretty much converting json to toml which is slightly easier than doing this vice-versa thing.
             let toml = '';
             for (const i in req.query.settings) {
                 toml += `[${i}]\r\n`;
@@ -715,7 +814,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
         let config;
         if (req.query?.settings?.exclusions?.exclusions) req.query.settings.exclusions.exclusions = Object.keys(req.query.settings.exclusions.exclusions);
         if (req.query?.settings?.user_exclusions) req.query.settings.user_exclusions = Object.keys(req.query.settings.user_exclusions);
-        switch (req.query.v) {
+        switch (req.query.v) { // assigns stuff to the config variable based off of source versions.
             case "z17r":
             case "z17-rando": {
                 config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'));
@@ -787,7 +886,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
 
 const PORT = process.env.PORT || 80;
 
-server.listen(PORT, () => {
+server.listen(PORT, () => { // listens to the server
     console.log(`Server is running on port ${PORT}`);
     setInterval(() => {
         if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');

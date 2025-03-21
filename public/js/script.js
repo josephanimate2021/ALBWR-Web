@@ -1,5 +1,4 @@
 let fileChunks = [];
-let exclusionOptions;
 let fileName = ''; // Variable to store the name of the original file
 const totalChunks = 100; // Variable to store the number of chunks
 let presets; // variable to store all of the presets
@@ -424,6 +423,7 @@ function appendSettings(s) {
 // The file input event handler
 function handleFileSelect(event) {
     const file = event.target.files[0];
+    if (!file) return;
     const fileSize = file.size;
 
     fileChunks = [];
@@ -453,19 +453,29 @@ function isFileUploaded() {
 function uploadChunks() {
     console.log('Uploading chunks...');
     document.getElementById('logo').style.display = 'none';
-    const socket = new WebSocket(`${window.location.protocol.startsWith("https") ? 'wss' : 'ws'}://${window.location.host}/uploadFile`);
+    const fileInfo = {};
+    for (const i in fileInput) fileInfo[i] = fileInput[i]
+    const socket = new WebSocket(`${window.location.protocol.startsWith("https") ? 'wss' : 'ws'}://${window.location.host}/uploadFile?${new URLSearchParams(fileInfo).toString()}`);
     let start = 0;
     socket.addEventListener("message", result => {
-        if (result.data == "ok") {
-            if (start < totalChunks) {
-                console.log('Server response:', result.data);
-                socket.send(fileChunks[start]);
-                start++;
-                setBar(start);
-            } else {
-                console.log('All chunks uploaded successfully.');
-                console.log(`The final response from server: ${result.data}`);
+        switch (result.data) {
+            case "ok": {
+                if (start < totalChunks) {
+                    console.log('Server response:', result.data);
+                    socket.send(fileChunks[start]);
+                    start++;
+                    setBar(start);
+                } else {
+                    console.log('All chunks uploaded successfully.');
+                    console.log(`The final response from server: ${result.data}`);
+                    socket.send(JSON.stringify({
+                        onFileUploadAfter: "make3dsrom"
+                    }))
+                }
+                break;
+            } case "success": {
                 setBar(101);
+                break;
             }
         }
     })
@@ -498,3 +508,10 @@ document.getElementById('uploadButtonChunk').addEventListener('click', function(
 
 // When file is loaded then quickly save the changes
 fileInput.addEventListener('change', handleFileSelect);
+
+// closes a modal when a user clicks on the X button.
+for (const span of document.getElementsByClassName("modal-close")) {
+    span.onclick = function() {
+        this.parentElement.parentElement.parentElement.style.display = 'none';
+    }
+}

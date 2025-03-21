@@ -1,6 +1,8 @@
 document.getElementById('fileInput').addEventListener('change', function() {
-    document.getElementById('fileName').innerHTML = this.files?.length == 1 ? selectedFileHTML(this.files[0].name) : '';
-    document.getElementById('uploadButtonChunk').disabled = this.files?.length < 1;
+    const filename = this.files[0]?.name;
+    const ext = filename?.substring(filename?.lastIndexOf(".") + 1) || '';
+    document.getElementById('fileName').innerHTML = this.files?.length == 1 ? selectedFileHTML(this.files[0].name, ext) : 'Please select a file';
+    document.getElementById('uploadButtonChunk').disabled = this.files?.length < 1 || ext != "3ds";
 });
 
 const dropArea = document.getElementById('dropArea');
@@ -16,8 +18,9 @@ function handleDragOver(event) {
     dropArea.style.backgroundColor = '#f0f0f0';
 }
 
-function selectedFileHTML(fileName) {
-    return `<p>Selected file:</p>` + `<p style="font-weight: 500 !important;">${fileName}</p>`
+function selectedFileHTML(fileName, ext) {
+    if (ext == "3ds") return `<p>Selected file:</p>` + `<p style="font-weight: 500 !important;">${fileName}</p>`
+    if (fileName) return 'Invalid File Type! please upload a .3ds file instead.'
 }
 
 function handleDragLeave(event) {
@@ -29,12 +32,13 @@ function handleDrop(event) {
     event.preventDefault();
     dropArea.style.backgroundColor = '';
     const files = event.dataTransfer.files;
-    document.getElementById('fileName').innerHTML = files?.length == 1 ? selectedFileHTML(files[0].name) : '';
-    document.getElementById('uploadButtonChunk').disabled = files?.length < 1;
+    const ext = files[0]?.name.substring(files[0]?.name.lastIndexOf(".") + 1) || ""
+    document.getElementById('fileName').innerHTML = files?.length == 1 ? selectedFileHTML(files[0].name, ext) : 'Please select a file';
+    document.getElementById('uploadButtonChunk').disabled = files?.length < 1 || ext != "3ds";
     if (files.length == 1) {
         fileInput.files = files; // Set files for the input element
         
-        handleFileSelect({ target: { files: files } }); // Call handleFileSelect function with the files
+        handleFileSelect({ target: { files } }); // Call handleFileSelect function with the files
     } else if (fileInput.files) delete fileInput.files;
 }
 

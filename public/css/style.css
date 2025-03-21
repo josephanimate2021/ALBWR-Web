@@ -33,6 +33,10 @@ h1 {
 .blueBtn:hover {
     background-color: #0056b3;
 }
+.blueBtn:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
 .greenBtn {
     background-color: #28a745;
     color: #fff;
@@ -44,6 +48,10 @@ h1 {
 }
 .greenBtn:hover {
     background-color: #218838;
+}
+.greenBtn:disabled {
+    pointer-events: none;
+    opacity: 0.5;
 }
 #fileName {
     margin-top: 10px;
@@ -85,19 +93,61 @@ div.progressBarClass {
     outline: none;
     font-size: 15px;
 }
-  
 .collapsible:hover {
     background-color: #555;
 }
-
 .collapsible.active {
     background-color: #333;
 }
-  
 .collapsibleContent {
     padding: 0 18px;
     display: none;
     overflow: hidden;
     transition: max-height 0.2s ease-out;
     background-color: #f1f1f1;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+}
+.modal-close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.modal-close:hover,
+.modal-close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+.modal-header {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
+}
+.modal-body {padding: 2px 16px;}
+.modal-footer {
+    padding: 2px 16px;
+    background-color: #5cb85c;
+    color: white;
 }

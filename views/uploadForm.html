@@ -32,13 +32,29 @@
                     <div id="progressBarInner"></div>
                 </div>
             </div>
+            <div id="settingsPresetMaker" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="modal-close">&times;</span>
+                        <h2>Create A Setting Preset</h2>
+                    </div>
+                    <div class="modal-body">
+                        <p>Some text in the Modal Body</p>
+                        <p>Some other text...</p>
+                    </div>
+                    <div class="modal-footer">
+                        <h3>Modal Footer</h3>
+                    </div>
+                </div>
+            </div>
             <form id="step02" style="display: none;" action="javascript:;">
                 <input type="hidden" name="sourceVersion" value="stable"/>
                 <div id="presets" style="float: left; display: none;">
-                    <label for="presetsSelection" title="Click me to create your own preset with your current settings" onclick="settingsPresetMaker()">
+                    <label for="presetsSelection">
                         Setting Presets
                     </label><br>
-                    <select id="presetsSelection"></select>
+                    <select id="presetsSelection"></select><br>
+                    <input class="greenBtn" onclick="document.getElementById('settingsPresetMaker').style.display = 'block'" type="button" value="Create A New Preset"/>
                 </div>
                 <div style="float: right;" id="randoVer">
                     <label for="version">Randomizer Version</label><br>

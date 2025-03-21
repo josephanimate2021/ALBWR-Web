@@ -160,15 +160,17 @@
           <h2>Randomize Game Using The Cloned Source Code</h2>
           <p class="lead">Below is the form that you can use to configure your preset settings before your game gets randomized.</p>
         </div>
-        <div class="alert alert-warning" role="alert">
-          Randomizing ALBW With A Cloned Source Code (GUI Edition) is currently in beta right now. 
-          Things may not be stable, especially the older your cloned source code version gets. 
-          You are recommended to either use the GUI for stable versions like latest, v3 and below, or the 
-          <script>
-            const repoName = (new URLSearchParams(window.location.search)).get("repoName");
-            document.write(`<a href="/cli?sourceVersion=dev&v=${repoName}/target/debug&type=randomizer">CLI</a>`);
-          </script> 
-          for this repo version. Thank you for your patience. Things should be fully functional with the GUI soon.
+        <div id="alertBlock">
+          <div class="alert alert-warning" role="alert">
+            Randomizing ALBW With A Cloned Source Code (GUI Edition) is currently in beta right now. 
+            Things may not be stable, especially the older your cloned source code version gets. 
+            You are recommended to either use the GUI for stable versions like latest, v3 and below, or the 
+            <script>
+              const repoName = (new URLSearchParams(window.location.search)).get("repoName");
+              document.write(`<a href="/cli?sourceVersion=dev&v=${repoName}/target/debug&type=randomizer">CLI</a>`);
+            </script> 
+            for this repo version. Thank you for your patience. Things should be fully functional with the GUI soon.
+          </div>
         </div>
         <div id="terminal" style="display: none;"></div>
         <div class="row g-5">
