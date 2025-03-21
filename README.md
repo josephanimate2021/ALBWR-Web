@@ -31,10 +31,10 @@ The source code takes the info from the Web UI and hands it off to either the z1
 
 ## Features
 
-- Original settings are fetched from the z17 and albw randomizer source code presets (and user presets as well) so that it's easier for you to change them without having to modify their files localy.
-- Uploads your rom file into chunks for the server to process and then the server turns those chunks back into a single file to make for a fast and efficient file uploading process using [isaka's source code](https://github.com/isaka-james/chunks-to-file) to do most of the work.
+- Original settings are fetched from the z17 and albw randomizer source code presets (and user presets as well) so that it's easier for you to change them without having to modify their files locally.
+- Uploads your rom file into chunks for the server to process and then the server turns those chunks back into a single file to make for a fast and efficient file uploading process using some of the files from [isaka's source code](https://github.com/isaka-james/chunks-to-file) to do some of the work.
 - Allows you to select which source code version is used to randomize your game.
-- Allows you to share your own settings presets with anybody if you wanted to.
+- Allows you to share your own setting presets with anybody if you wanted to.
 - Simple and easy-to-use interface.
 
 
@@ -59,7 +59,7 @@ To use this application, follow these steps (Please Install [Node.JS](https://no
    npm install
 ```
 
-## Usage (YOU ONLY NEED TO DO STEPS 3, 4, 5, AND 6 ONCE BECAUSE AFTERWARDS THE APPLICATION WILL LOAD THE RANDOMIZER PAGE BY DEFAULT (Unless you restart your session))
+## Usage (YOU ONLY NEED TO DO STEPS 3, 4, 5, AND 6 ONCE BECAUSE AFTERWARDS THE APPLICATION WILL LOAD THE RANDOMIZER PAGE BY DEFAULT)
 
 1. Start the server:
 
@@ -72,7 +72,7 @@ To use this application, follow these steps (Please Install [Node.JS](https://no
 4. Click the "Upload" button to initiate the rom file upload process.
 5. The server will receive the file chunks and combine them into a single file inside the `uploads` folder.
 6. Once the file is uploaded, you will be shown a list of options you can change to randomize your game.
-7. Once all of the options are selected, you may click on the "Randomize Game" button. From there, the server will know that your game is ready to be randomized and will trigger either one of the randomizer executables to randomize your game.
+7. Once all of the options are selected, you may click on the "Randomize Game" button. From there, the server will know that your game is ready to be randomized and will trigger either one of the randomizer executables to randomize your game based off of the selected executable version.
 8. Once your game is randomized, you will get a download link of the randomized game where you can use the files to play the randomized copy of your game. You may refer [here](https://github.com/rickfay/z17-randomizer/tree/master?tab=readme-ov-file#installing-seeds) if you need help installing your randomized game seed.
 
 ## Contributing
