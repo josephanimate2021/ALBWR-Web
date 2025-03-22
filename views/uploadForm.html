@@ -103,13 +103,7 @@
                         <input type="checkbox" id="noVerbose" name="noVerbose">
                         <label for="noVerbose">Disable Verbose Mode</label><br><br>
                     </div>
-                    <div title="When enabled, developer mode will be used during game generation" id="devModeDiv" style="display: none;">
-                        <label for="devMode">Developer Mode</label><br>
-                        <select name="settings[dev_mode]" id="devMode">
-                            <option value="false">disabled</option>
-                            <option value="true">enabled</option>
-                        </select><br><br>
-                    </div>
+                    <div title="When enabled, developer mode will be used during game generation" id="devModeDiv" style="display: none;"></div>
                     <div title="If disabled, you won't have to worry about customizing your preset with the GUI until you reload this page. You will just instead select a preset option provided for game generation.">
                         <label for="presetCustomization">Preset Editor</label><br>
                         <select id="presetCustomization" onchange="loadSettings(document.getElementById('version').value, appendSettings)">

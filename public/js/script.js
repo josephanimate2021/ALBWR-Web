@@ -181,7 +181,9 @@ function loadSettings(id, callback) {
     cliLink.style.display = 'block';
     cliLink.setAttribute("data-v", id);
     document.getElementById('noVerboseDiv').style.display = 'none';
-    document.getElementById('devModeDiv').style.display = "none";
+    const devMode = document.getElementById('devModeDiv');
+    devMode.style.display = "none";
+    devMode.innerHTML = '';
     const settings = document.getElementById('randoSettings');
     settings.innerHTML = '';
     let typeInTitle = '', type;
@@ -209,7 +211,12 @@ function loadSettings(id, callback) {
     }
     fetch(`/settings/stable/${id}`).then(res => res.json()).then(d => {
         switch (id) { // loads executable versions for specific randomizer versions
-            case "z17v3": if (!typeInTitle) typeInTitle = 'Z17 Randomizer v3', document.getElementById('devModeDiv').style.display = "block"; 
+            case "z17v3": if (
+                !typeInTitle
+            ) typeInTitle = 'Z17 Randomizer v3', devMode.innerHTML = `<label for="devMode">Developer Mode</label><br><select name="settings[dev_mode]" id="devMode">
+                <option value="false">disabled</option>
+                <option value="true">enabled</option>
+            </select><br><br></br>`, devMode.style.display = 'block'; 
             case "z17r": if (!typeInTitle) typeInTitle = 'Z17 Randomizer Beta'; 
             case "z17-rando": if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Old)'; 
             case "z17-local": {

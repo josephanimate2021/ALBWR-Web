@@ -358,61 +358,6 @@ app.use((req, _, next) => {
         presets.unshift(info);
     }
     // functions
-    function decodeSettingsToml(info = {}, tomlFile) { // Decodes some preset settings in a toml format (Work in progress).
-        let tomlString = fs.readFileSync(tomlFile).toString('utf-8'), commentCount = 0, settingsCat, json;
-        const optionTypes = {
-            Skippable: ['Unchanged', 'Shuffled', 'Skip'],
-            Progression: ['Unchanged', 'Shuffled']
-        }, wordOptions = {
-            captains_sword: optionTypes.Skippable,
-            borrowed_sword: optionTypes.Progression,
-            lamp: optionTypes.Progression,
-            first_bracelet: optionTypes.Skippable,
-            barrier: ['Unchanged', 'Start'],
-            mode: ["Normal", "Hard", "GlitchBasic", "GlitchAdvanced", "GlitchHell", "NoLogic"]
-        }, comments = [];
-        info.settings = {};
-        info.notes = [];
-        for (const line of tomlString.split("\r").join('').split("\n")) {
-            if (!line) continue;
-            if (line.startsWith("## ")) comments.push(line.substring(3));
-            if (line.startsWith("[") && line.endsWith("]")) {
-                settingsCat = line.substring(1).slice(0, -1);
-                if (settingsCat.includes(".")) {
-
-                } else {
-                    info.settings[settingsCat] = {};
-                    if (comments[commentCount]) {
-                        info.settings[settingsCat].comment = comments[commentCount];
-                        commentCount++;
-                    }
-                }
-            } 
-            if (line.includes(" = ")) {
-                const [key, value] = line.split(" = ");
-                if (settingsCat) {
-                    if (!settingsCat.includes(".")) setInfo(info.settings[settingsCat]);
-                } else info[key] = tomlValue(value);
-                function tomlValue(value) {
-                    return (value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'")) ? value.substring(1).slice(0, -1) : value;
-                }
-                function setInfo(json) {
-                    json[key] = {
-                        defaultValue: tomlValue(value)
-                    };
-                    if (comments[commentCount]) {
-                        json[key].comment = comments[commentCount];
-                        commentCount++
-                    }
-                    if (wordOptions[key]) json[key][typeof wordOptions[key] == "number" ? 'rangeNumOptionsTo' : 'allOptions'] = wordOptions[key];
-                    else if (key == "exclude") {
-
-                    } else json[key].useBooleanOptions = true;
-                }
-            }
-        }
-        return info;
-    }
     function decodeSettingsJSON(json, info) { // Decodes some settings written in JSON with comments.
         const wordOptions = { // Used to provide options for some setting properties
             logic_mode: ["Normal", "Hard", "Glitched", "AdvGlitched", "Hell", "NoLogic"],
@@ -527,30 +472,30 @@ app.use((req, _, next) => {
 // Randomizes ALBW using the provided user input (The core of this whole web application)
 .post('/:type/:id', (req, res) => {
     try {
-        if (userIsRandomizingGame) return res.json({ 
+        if (userIsRandomizingGame) { 
             // Due to the potential overlap of files during game randomization, 
             // I will let one user randomize their gane at a time.
-            error: {
-                message: "Someone else is randomizing their game right now. Please wait for a few minutes."
-            }
-        })
+            scriptOutput += "Someone else is randomizing their game right now. Please wait for a few minutes.";
+            okay2spitscript = true; 
+            return;
+        }
         res.json({ // No user needs to wait for the randomizer to start. So just kick into the rando status.
             isRandomizing: true,
             data: Object.assign({}, req.params, req.query)
         })
         // variables and conditionals
         userIsRandomizingGame = true;
-        const randoPath = `./sourcecodes/${req.query.sourceVersion}${
-            req.query.sourceVersion == "dev" ? `/${req.headers['x-forwarded-for'] || 'localhost'}` : ''
-        }/${req.query.v}`;
-        const command = [path.join(__dirname, randoPath), "&&", `albw-${req.params.type}`];
+        let randoPath = path.join(__dirname, 'sourcecodes', req.query.sourceVersion);
+        if (req.query.sourceVersion == "dev") randoPath = path.join(randoPath, req.headers['x-forwarded-for'] || 'localhost');
+        randoPath = path.join(randoPath, req.query.v);
+        const command = [randoPath, "&&", `albw-${req.params.type}`];
         if (req.query.noSpoilers) command.push('--no-spoiler');
         if (req.query.noPatch) command.push('--no-patch');
         if (req.query.seed && req.params.type == "randomizer") command.push(`--seed ${req.query.seed}`);
         scriptOutput = `The randomizer is now up and running${req.query.execVersion ? ` on version ${req.query.execVersion}` : ''}.\r\n`;
         okay2spitscript = true;
         if (req.query.execVersion) command[2] += `-${req.query.execVersion}`;
-        const versionsFile = `${randoPath}/versions.json`;
+        const versionsFile = path.join(randoPath, 'versions.json');
         const versions = fs.existsSync(versionsFile) ? JSON.parse(fs.readFileSync(versionsFile)) : {};
         function sForWord(word = 'attempt', num = 0) { // adds an s to a word via a given number
             return num > 1 ? (word + 's') : word
@@ -647,25 +592,60 @@ app.use((req, _, next) => {
 // Generates a zip for a randomized game
 .post('/genZipFromRandomizedGame', genGameZip);
 // functions
-function parseTOML(configToml) { // parses a toml config file
-    const config = {};
-    let settingCat, info;
-    for (const line of configToml.split('\r').join('').split('\n')) {
+function decodeSettingsToml(info = {}, tomlFile) { // Decodes some preset settings in a toml format (Work in progress).
+    let tomlString = fs.readFileSync(tomlFile).toString('utf-8'), commentCount = 0, settingsCat;
+    const optionTypes = {
+        Skippable: ['Unchanged', 'Shuffled', 'Skip'],
+        Progression: ['Unchanged', 'Shuffled']
+    }, wordOptions = {
+        captains_sword: optionTypes.Skippable,
+        borrowed_sword: optionTypes.Progression,
+        lamp: optionTypes.Progression,
+        first_bracelet: optionTypes.Skippable,
+        barrier: ['Unchanged', 'Start'],
+        mode: ["Normal", "Hard", "GlitchBasic", "GlitchAdvanced", "GlitchHell", "NoLogic"]
+    }, comments = [];
+    info.settings = {};
+    info.notes = [];
+    for (const line of tomlString.split("\r").join('').split("\n")) {
         if (!line) continue;
+        if (line.startsWith("## ")) comments.push(line.substring(3));
         if (line.startsWith("[") && line.endsWith("]")) {
-            settingCat = line.substring(1).slice(0, -1);
-            info = config[settingCat.split(".")[0]] = (() => {
-                function c() {
-                    
+            settingsCat = line.substring(1).slice(0, -1);
+            if (settingsCat.includes(".")) {
+
+            } else {
+                info.settings[settingsCat] = {};
+                if (comments[commentCount]) {
+                    info.settings[settingsCat].comment = comments[commentCount];
+                    commentCount++;
                 }
-                return info
-            })();
-        } else {
+            }
+        } 
+        if (line.includes(" = ")) {
             const [key, value] = line.split(" = ");
-            config[key] = value.split("'")[0]
+            if (settingsCat) {
+                if (!settingsCat.includes(".")) setInfo(info.settings[settingsCat]);
+            } else info[key] = tomlValue(value);
+            function tomlValue(value) {
+                return (value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'")) ? value.substring(1).slice(0, -1) : value;
+            }
+            function setInfo(json) {
+                json[key] = {
+                    defaultValue: tomlValue(value)
+                };
+                if (comments[commentCount]) {
+                    json[key].comment = comments[commentCount];
+                    commentCount++
+                }
+                if (wordOptions[key]) json[key][typeof wordOptions[key] == "number" ? 'rangeNumOptionsTo' : 'allOptions'] = wordOptions[key];
+                else if (key == "exclude") {
+
+                } else json[key].useBooleanOptions = true;
+            }
         }
     }
-    return config;
+    return info;
 }
 function deleteALBWStuff(req, randoPath) { // deletes any existing albw stuff after game randomization
     let config;
@@ -673,10 +653,11 @@ function deleteALBWStuff(req, randoPath) { // deletes any existing albw stuff af
         case "albw": config = "albw";
         case "z17-local": {
             const t = config || 'z17';
+            const configFolder = path.join(randoPath, `${t}-randomizer/config`);
             if (
-                fs.existsSync(`${randoPath}/${t}-randomizer/config/presets/${req.query.id}.toml`) && req.query.deletePreset
-            ) fs.unlinkSync(`${randoPath}/${t}-randomizer/config/presets/${req.query.id}.toml`)
-            config = parseTOML(fs.readFileSync(`${randoPath}/${t}-randomizer/config/Rando.toml`).toString('utf-8'))
+                fs.existsSync(path.join(configFolder, `presets/${req.query.id}.toml`)) && req.query.deletePreset
+            ) fs.unlinkSync(path.join(configFolder, `presets/${req.query.id}.toml`))
+            config = decodeSettingsToml({}, path.join(configFolder, `Rando.toml`));
             fs.rmSync(path.join(process.env.APPDATA, `${t}-randomizer`), {
                 recursive: true, 
                 force: true 
@@ -685,24 +666,24 @@ function deleteALBWStuff(req, randoPath) { // deletes any existing albw stuff af
         } 
         case "z17r":
         case "z17-rando": {
-            config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'))
-            const presetFile = `${randoPath}/presets/${req.query.id}.toml`;
+            config = decodeSettingsToml({}, path.join(randoPath, 'config.toml'));
+            const presetFile = path.join(randoPath, `presets/${req.query.id}.toml`);
             if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
             break;
         } default: {
-            config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
-            const presetFile = `${randoPath}/presets/${req.query.id}.json`;
+            config = JSON.parse(fs.readFileSync(path.join(randoPath, 'config.json')));
+            const presetFile = path.join(randoPath, `presets/${req.query.id}.json`);
             if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
             break;
         } 
     }
-    if (fs.existsSync(`${randoPath}/${config.output}`)) fs.rmSync(`${randoPath}/${config.output}`, {
+    const outputFolder = path.join(randoPath, config.output);
+    const rom = path.join(randoPath, config.rom)
+    if (fs.existsSync(outputFolder)) fs.rmSync(outputFolder, {
         recursive: true, 
         force: true 
     });
-    if (fs.existsSync(`${randoPath}/${config.rom}`)) fs.renameSync(
-        `${randoPath}/${config.rom}`, `./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`
-    );
+    if (fs.existsSync(rom)) fs.renameSync(rom, `./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`);
 }
 async function genGameZip(req, res) { // Function to generate a randomized game zip file
     function handleError(e) { // Error handler
@@ -714,30 +695,31 @@ async function genGameZip(req, res) { // Function to generate a randomized game 
     userIsRandomizingGame = false;
     try { // Generate to see what happens
         const zip = new JSZip();
-        const randoPath = `./sourcecodes/${req.query.sourceVersion}${
-            req.query.sourceVersion == "dev" ? `/${req.headers['x-forwarded-for'] || 'localhost'}` : ''
-        }/${req.query.v}`;
+        let randoPath = path.join(__dirname, 'sourcecodes', req.query.sourceVersion);
+        if (req.query.sourceVersion == "dev") randoPath = path.join(randoPath, req.headers['x-forwarded-for'] || 'localhost');
+        randoPath = path.join(randoPath, req.query.v);
         function c(l, k) {
             for (const file of fs.readdirSync(l)) {
-                const fileStats = fs.lstatSync(`${l}/${file}`);
-                if (fileStats.isDirectory()) c(`${l}/${file}`, k.folder(file))
-                else k.file(file, fs.readFileSync(`${l}/${file}`))
+                const filepath = path.join(l, file);
+                const fileStats = fs.lstatSync(filepath);
+                if (fileStats.isDirectory()) c(filepath, k.folder(file))
+                else k.file(file, fs.readFileSync(filepath))
             }
         }
         let config;
         switch (req.query.v) {
             case "z17r":
             case "z17-rando": {
-                config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'))
+                config = decodeSettingsToml({}, path.join(randoPath, 'config.toml'))
                 break;
             } 
             case "albw": config = 'albw';
             case "z17-local": {
-                config = parseTOML(fs.readFileSync(`${randoPath}/${config || 'z17'}-randomizer/config/Rando.toml`).toString('utf-8'))
+                config = decodeSettingsToml({}, path.join(randoPath, `${config || 'z17'}-randomizer/config/Rando.toml`));
                 break;
-            } default: config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
+            } default: config = JSON.parse(fs.readFileSync(path.join(randoPath, 'config.json')));
         }
-        c(`${randoPath}/${config.output}`, zip);
+        c(path.join(randoPath, config.output), zip);
         deleteALBWStuff(req, randoPath);
         res.send(await zip.generateAsync({type:"nodebuffer"}))
     } catch (e) { // whoops
@@ -792,10 +774,10 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
         switch (req.query.v) { // assigns stuff to the config variable based off of source versions.
             case "z17r":
             case "z17-rando": {
-                config = parseTOML(fs.readFileSync(`${randoPath}/config.toml`).toString('utf-8'));
+                config = decodeSettingsToml({}, path.join(randoPath, 'config.toml'));
                 if (
                     req.query.settings && typeof req.query.settings == "object" && writeNewPreset
-                ) fs.writeFileSync(`${randoPath}/presets/${req.params.id}.toml`, writeOldToml(true));
+                ) fs.writeFileSync(path.join(randoPath, `presets/${req.params.id}.toml`), writeOldToml(true));
                 if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
                 break;
             } case "albw": {
@@ -803,16 +785,19 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 if (versions[req.query.execVersion]?.useVerbose && !req.query.noVerbose) command.push(`--verbose`);
             } case "z17-local": {
                 const t = config || "z17";
-                config = parseTOML(fs.readFileSync(`${randoPath}/${t}-randomizer/config/Rando.toml`).toString('utf-8'));
+                const builtRandoConfigFolder = path.join(randoPath, `${t}-randomizer/config`);
+                config = decodeSettingsToml({}, path.join(builtRandoConfigFolder, `Rando.toml`));
                 if (req.query.settings && typeof req.query.settings == "object" && writeNewPreset) {
-                    const presetFile = `${randoPath}/${t}-randomizer/config/presets/${req.params.id}.toml`
+                    const presetFile = path.join(builtRandoConfigFolder, `presets/${req.params.id}.toml`);
                     if (t == "z17" && req.query.settings.items) req.query.settings.items.first_bracelet = 'Skip';
                     if (!fs.existsSync(presetFile)) fs.writeFileSync(presetFile, writeOldToml());
                 }
                 if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
                 function c(k) {
-                    for (const j of fs.readdirSync(`${randoPath}/${k}`)) {
-                        const stats = fs.lstatSync(`${randoPath}/${k}/${j}`);
+                    const folderpath = path.join(randoPath, k);
+                    for (const j of fs.readdirSync(folderpath)) {
+                        const filepath = path.join(folderpath, j);
+                        const stats = fs.lstatSync(filepath);
                         if (stats.isDirectory()) {
                             const p = `${k}/${j}`;
                             const array = p.split("/");
@@ -823,8 +808,8 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                                 d(`${j}/${array[n + 1]}`, n + 1);
                             }
                             d(array[0], 0)
-                            c(`${k}/${j}`);
-                        } else fs.writeFileSync(path.join(process.env.APPDATA, `${k}/${j}`), fs.readFileSync(`${randoPath}/${k}/${j}`));
+                            c(p);
+                        } else fs.writeFileSync(path.join(process.env.APPDATA, k, j), fs.readFileSync(path.join(randoPath, k, j)));
                     }
                 }
                 c(`${t}-randomizer`)
@@ -832,7 +817,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
             } default: {
                 const info = req.query.v == "z17v3" ? req.query.settings : req.query;
                 if (info && typeof info == "object" && writeNewPreset) {
-                    const presetFile = `${randoPath}/presets/${req.params.id}`
+                    const presetFile = path.join(randoPath, 'presets', req.params.id);
                     function c(j) {
                         for (const i in j) {
                             if (typeof j[i] == "object") c(j[i])
@@ -844,12 +829,13 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                         req.params.id && !fs.existsSync(`${presetFile}.json`)
                     ) fs.writeFileSync(`${presetFile}.json`, JSON.stringify(info, null, "\t"));
                 }
-                config = JSON.parse(fs.readFileSync(`${randoPath}/config.json`));
+                config = JSON.parse(fs.readFileSync(path.join(randoPath, 'config.json')));
                 if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
             }
         }
-        if (!fs.existsSync(`${randoPath}/${config.output}`)) fs.mkdirSync(`${randoPath}/${config.output}`);
-        fs.renameSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`, `${randoPath}/${config.rom}`);
+        const outputPath = path.join(randoPath, config.output);
+        if (!fs.existsSync(outputPath)) fs.mkdirSync(outputPath);
+        fs.renameSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`, path.join(randoPath, config.rom));
         return true
     } catch (e) {
         console.log(e);
