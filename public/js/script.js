@@ -74,7 +74,7 @@ function randomizeGame(evt) {
                         document.getElementById('presets').style.display = 'block';
                         document.getElementById('randoVer').style.display = 'block';
                         document.getElementById('randoSettings').style.display = 'block';
-                        document.getElementById('randomizedGameDownload').remove();
+                        document.getElementById('randomizedGameDownload')?.remove();
                         document.getElementById('options').style.display = 'block';
                         document.getElementById('logo').style.display = 'none';
                     });
@@ -315,11 +315,11 @@ function toggleCollapsible(coll) {
 // loads randomizer settings based off of a user's selected preset.
 function randomizerSettings(d) {
     if (document.getElementById('presetCustomization').value == "disabled") return;
-    document.getElementById('randoSettings').innerHTML = document.getElementById('versionSelect')?.outerHTML || ''
+    document.getElementById('randoSettings').innerHTML = (document.getElementById('versionSelect')?.outerHTML || '') + `<input type="hidden" name="writeNewPreset" value="true"/><input type="hidden" name="deletePreset" value="true"/>`
     const booleans = [true, false];
     for (const setting in d.settings) {
         if (typeof d.settings[setting] != "object") continue;
-        let html = '<input type="hidden" name="writeNewPreset" value="true"/><input type="hidden" name="deletePreset" value="true"/>';
+        let html = '';
         switch (setting) {
             case "exclude": {
                 html += `<h3>${setting.split("_").map(captializeBegLetterInWord).join(" ")}</h3>`;
