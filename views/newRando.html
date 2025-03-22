@@ -608,8 +608,11 @@
               function capWord(d) {
                 return d.substring(0, 1).toUpperCase() + d.substring(1);
               }
-              function selectPreset(num) {
-                appendSetting(presets[num]);
+              function selectPreset(obj) {
+                appendSetting(presets[obj.getAttribute("data-presetNum")]);
+                document.getElementById('preset').innerText = $(obj).find("span").text();
+                for (const child of document.getElementById('presets').children) $(child).removeClass("bg-body-tertiary");
+                $(obj).addClass("bg-body-tertiary");
               }
               function updateAttribute(elem, attr, val) {
                 elem.removeAttribute(attr);
@@ -861,12 +864,12 @@
                   presets = d;
                   if (document.getElementById('presetCustomization').value != "disabled") appendSetting(d[0]);
                   for (var i = 0; i < d.length; i++) document.getElementById('presets').insertAdjacentHTML(
-                    "beforeend", `<li class="dropdown-item d-flex justify-content-between${i == 0 ? ' bg-body-tertiary' : ''}" onclick="selectPreset('${i}')">
+                    "beforeend", `<li class="dropdown-item d-flex justify-content-between${i == 0 ? ' bg-body-tertiary' : ''}" data-presetNum="${i}" onclick="selectPreset(this)">
                       <div>
                         <h6 class="my-0">${d[i].presetName}</h6>
                         <small class="text-body-secondary">
                           NOTES:
-                          <ul>${d[i].notes.map(v => `<li>${v}</li>`)}</ul>
+                          <ul>${d[i].notes.map(v => `<li>${v}</li>`).join('') || '<li>No notes were provided.</li>'}</ul>
                         </small>
                       </div>
                       <span class="text-info">${d[i].version}</span>

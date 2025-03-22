@@ -332,9 +332,7 @@ app.use((req, _, next) => {
     res.end();
 }) // Gets the settings using the provided version and source version.
 .get('/settings/:sourceVersion/:v', (req, res) => {
-    // Object variables
-    const info = {}
-    const presets = [];
+    const presets = []; // presets array
     // loop for pushing any uploaded presets into the presets array.
     for (const file of fs.readdirSync('./uploads').filter(i => i.startsWith(`settingsPreset-${req.params.v}-`) && i.endsWith(".json"))) {
         const info = decodeSettingsJSON(fs.readFileSync(`./uploads/${file}`).toString('utf-8'), {
@@ -459,10 +457,6 @@ app.use((req, _, next) => {
         }
         // exclusions are the same as user exclusions in v4, so who cares.
         wordOptions.exclusions = wordOptions.user_exclusions;
-        if (req.params.v == "z17v3") { // Add some extra stuff if the detected version is v3.
-            wordOptions.ped_requirement[1] = "Charmed";
-            wordOptions.ped_requirement[2] = "Standard";
-        }
         const comments = [];
         let commentCount = 1;
         let pos = json.indexOf("// ");
@@ -472,7 +466,15 @@ app.use((req, _, next) => {
             json = json.split(c).join("")
             pos = json.indexOf("// ", pos + 3);
         }
-        info.notes = info.notes || [comments[0]];
+        info.notes = info.notes || [];
+        if (comments[0]) info.notes.push(comments[0]);
+        if (req.params.v == "z17v3") { // Add some extra stuff if the detected version is v3.
+            info.settings = JSON.parse(json);
+            delete info.settings.presetName;
+            delete info.settings.notes;
+            wordOptions.ped_requirement[1] = "Charmed";
+            wordOptions.ped_requirement[2] = "Standard";
+        }
         Object.assign(info, JSON.parse(json));
         function c(k) { // The function that converts setting values into selectable values. The randomizer takes care of converting this back to the original.
             for (const settingName in k) {
@@ -501,7 +503,7 @@ app.use((req, _, next) => {
         c(info.settings)
         return info;
     }
-    let localPrefix, examplePreset = fs.existsSync(`${randoPath}/presets/Example.json`) ? fs.readFileSync(`${randoPath}/presets/Example.json`).toString('utf-8') : {};
+    let localPrefix
     if (req.params.sourceVersion == "stable") switch (req.params.v) { // Pushes a preset depending on the rando version.
         case "albw": localPrefix = "albw";
         case "z17-local": {
@@ -519,33 +521,23 @@ app.use((req, _, next) => {
                 settings: {}
             }, `${randoPath}/${localPrefix}-randomizer/config/presets/Open.toml`));
             break;
-        } case "z17-rando": {
-            Object.assign(info, {
+        } 
+        case "z17-rando": localPrefix = "Standard";
+        case "z17r": {
+            localPrefix ||= "Example";
+            presets.unshift(decodeSettingsToml({
                 presetName: "Default z17 ALBWR Template",
-                notes: [],
-                id: "Standard",
-                settings: {}
-            });
-            decodeSettingsToml(info, `${randoPath}/presets/Standard.toml`);
-            presets.unshift(info);
-            break;
-        } case "z17r": {
-            Object.assign(info, {
-                presetName: "Default z17 ALBWR Template",
-                id: "Example",
+                id: localPrefix,
                 notes: [],
                 settings: {}
-            });
-            decodeSettingsToml(info, `${randoPath}/presets/Example.toml`);
-            presets.unshift(info);
+            }, `${randoPath}/presets/${localPrefix}.toml`))
             break;
-        } case "z17v3": {
-            info.notes = ["Visit the <a href=\"https://github.com/rickfay/z17-randomizer/tree/v0.3.0?tab=readme-ov-file#game-options\">project GitHub</a> for details about each option."];
-            info.settings = JSON.parse(fs.readFileSync(`${randoPath}/presets/Example.json`));
-        } default: {
-            info.presetName = "Default z17 ALBWR Template";
-            info.id = "Example";
-            presets.unshift(decodeSettingsJSON(examplePreset, info));
+        } default: { // JSON is more universal with the ALBWR community, so I am allowing code modifiers to add as many example presets as they want.
+            fs.readdirSync(`${randoPath}/presets`).forEach(file => {
+                presets.unshift(decodeSettingsJSON(fs.readFileSync(`${randoPath}/presets/${file}`).toString('utf-8'), {
+                    id: file.substring(0, file.lastIndexOf("."))
+                }));
+            })
             break;
         }
     } else { // For cloned source codes, we need to take a different approach by pusing presets using trial and error.
@@ -553,16 +545,14 @@ app.use((req, _, next) => {
             // The given array is preset files to look for during the loop.
             const presetFile = path.join(randoPath, file);
             if (fs.existsSync(presetFile)) { // gives presets a name based off of the found preset file.
-                if (file.endsWith(".json")) {
-                    info.presetName = "Default z17 ALBWR Template";
-                    presets.unshift(decodeSettingsJSON(examplePreset, info));
-                } else if (file.endsWith(".toml")) {
-                    presets.unshift(decodeSettingsToml({
-                        presetName: `Default ALBWR Standard Template`,
-                        notes: [],
-                        settings: {}
-                    }, `${presetFile}`));
-                }
+                if (file.endsWith(".json")) presets.unshift(decodeSettingsJSON(fs.readFileSync(presetFile).toString('utf-8'), {
+                    presetName: "Default z17 ALBWR Template"
+                }));
+                else if (file.endsWith(".toml")) presets.unshift(decodeSettingsToml({
+                    presetName: `Default ALBWR Standard Template`,
+                    notes: [],
+                    settings: {}
+                }, `${presetFile}`));
             }
         }
     }

@@ -1,4 +1,6 @@
 {
+  "presetName": "ALBWR Default Preset",
+  "notes": [],
   "logic": {
     "logic_mode":                  "Normal",
     "randomize_dungeon_prizes":    true,

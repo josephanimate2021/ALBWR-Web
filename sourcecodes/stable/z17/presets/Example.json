@@ -2,6 +2,7 @@
   // Visit the <a href="https://github.com/rickfay/z17-randomizer/tree/dev#game-options" target="_blank">project GitHub</a> for details about each option.
   "seed": 0,
   "version": "v0.4.0 - SGL Tournament Build #1",
+  "presetName": "ALBWR Default Preset",
   "settings": {
     "dev_mode": false, // If enabled, developer mode will be used during game generation.
 

@@ -1,9 +1,10 @@
 {
-  // "Visit the project GitHub for details about each option: https://github.com/rickfay/z17-randomizer/tree/dev#game-options"
+  // Visit the <a href="https://github.com/rickfay/z17-randomizer/tree/dev#game-options" target="_blank">project GitHub</a> for details about each option.
   "seed": 0,
   "version": "SGL Tournament Build - 2024-09-10",
+  "presetName": "ALBWR Bingo Preset",
   "settings": {
-
+    "dev_mode": false, // If enabled, developer mode will be used during game generation.
 
     "logic_mode":                  "Normal",                  // "Normal", "Hard", "Glitched", "AdvGlitched", "Hell", "NoLogic"
     "lc_requirement":              7,                         // Sage Portraits needed to enter Lorule Castle's front door.

@@ -315,6 +315,7 @@ function toggleCollapsible(coll) {
 // loads randomizer settings based off of a user's selected preset.
 function randomizerSettings(d) {
     if (document.getElementById('presetCustomization').value == "disabled") return;
+    document.getElementById('randoSettings').innerHTML = document.getElementById('versionSelect')?.outerHTML || ''
     const booleans = [true, false];
     for (const setting in d.settings) {
         if (typeof d.settings[setting] != "object") continue;
