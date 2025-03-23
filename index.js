@@ -384,10 +384,10 @@ app.use((req, _, next) => {
         let commentCount = 1;
         let pos = json.indexOf("// ");
         while (pos > -1) { // Takes out all of the comments making it easier to parse the JSON output.
-            const c = json.substring(pos).split(newLine)[0];
+            const c = json.substring(pos).split('\r').join('').split('\n')[0];
             comments.push(c.substring(3));
             json = json.split(c).join("")
-            pos = json.indexOf("// ", pos + 3);
+            pos = json.indexOf("// ");
         }
         info.notes = info.notes || [];
         if (comments[0]) info.notes.push(comments[0]);
