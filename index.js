@@ -51,14 +51,14 @@ wss.on('connection', (ws, req) => {
                         if (!fs.existsSync(randoPath)) {
                             ws.send(`It seems that the build folder for your cloned source code does not exist. Creating the folder now...\r\n`);
                             const sourceFolder = path.join(sourceCodeRoot, parsedUrl.query.v.substring(0, parsedUrl.query.v.indexOf("/")));
-                            const command = [sourceFolder, '&& cargo build'];
+                            const command = [sourceFolder, '&& cargo update && cargo build'];
                             ws.send(`Running Command: cd ${command.join(' ')}\r\n`);
                             const shell = spawn('cd', command, {
                                 shell: true
                             });
                             shellInit(shell, () => {
                                 userIsRandomizingGame = false;
-                                deleteALBWStuff(req, randoPath);
+                                deleteALBWStuff(Object.assign(req, parsedUrl), randoPath);
                             });
                             shell.on("close", c => {
                                 if (c == 0) { // if successful, create the files needed to work the albw randomizer executable
@@ -83,7 +83,7 @@ wss.on('connection', (ws, req) => {
                                     }
                                     launchExe();
                                 }
-                                else ws.send(`The build command for rust has failed with code ${
+                                else userIsRandomizingGame = false, ws.send(`The build command for rust has failed with code ${
                                     c
                                 }.\r\nEither rust isn't installed or something else went wrong during the build process like not having an existant directory for the cloned source code or etc,\r\nstuff like that. Please resolve those issues before reloading this page.`)
                             })
@@ -119,6 +119,7 @@ wss.on('connection', (ws, req) => {
                             })
                             shell.on("error", e => ws.send(e))
                         } else {
+                            userIsRandomizingGame = false;
                             ws.send('\nPlease try reloading the page or contacting josephalt7000 on discord to get your issue resolved.')
                             ws.send('\nA screenshot of this error is highly encouraged in order for your error to be better resolved.');
                         }
@@ -701,7 +702,10 @@ function deleteALBWStuff(req, randoPath) { // deletes any existing albw stuff af
             if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
             break;
         } default: {
-            config = JSON.parse(fs.readFileSync(path.join(randoPath, 'config.json')));
+            config = fs.existsSync(path.join(randoPath, 'config.json')) ? JSON.parse(fs.readFileSync(path.join(randoPath, 'config.json'))) : {
+                rom: 'albw.3ds',
+                output: 'generated'
+            };
             const presetFile = path.join(randoPath, `presets/${req.query?.id}.json`);
             if ((req.query.deletePreset || fs.existsSync(`./uploads/${req.params?.id}.json`)) && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
             if (fs.existsSync(`./uploads/${req.params?.id}.json`)) {
