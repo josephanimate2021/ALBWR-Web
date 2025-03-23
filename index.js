@@ -158,7 +158,7 @@ wss.on('connection', (ws, req) => {
                                     ) ? fs.readFileSync(`./uploads/${name}`).toString("utf-8") : JSON.stringify(info.publishingPreset);
                                     info.publishingPreset.presetName ||= "Untitled Preset";
                                     info.publishingPreset.notes = info.publishingPreset.notes ? info.publishingPreset.notes.split("\r").join('').split("\n") : [];
-                                    info.publishingPreset.publisherIP = req.headers['x-forwarded-for'];
+                                    info.publishingPreset.publisherIP = req.headers['x-forwarded-for'] || 'localhost';
                                     function writePreset(preset) {
                                         fs.writeFileSync(
                                             `./uploads/settingsPreset-${info.expectedPresetV}-${(Math.random()).toString().substring(2)}.json`, 
@@ -355,8 +355,9 @@ app.use((req, _, next) => {
         const info = decodeSettingsJSON(fs.readFileSync(`./uploads/${file}`).toString('utf-8'), {
             id: file.substring(0, file.lastIndexOf("."))
         });
+        console.log(info);
         // Keep the loop going if a private preset is detected but does not match the ip address provided by the user's browser.
-        if (info.private && info.publisherIP != req.headers['x-forwarded-for']) continue;
+        if (info.private && info.publisherIP != (req.headers['x-forwarded-for'] || 'localhost')) continue;
         // Push the info if all checks cleared successfuly.
         info.presetName ||= "Untitled Preset";
         presets.unshift(info);
@@ -676,8 +677,18 @@ function deleteALBWStuff(req, randoPath) { // deletes any existing albw stuff af
             break;
         } default: {
             config = JSON.parse(fs.readFileSync(path.join(randoPath, 'config.json')));
-            const presetFile = path.join(randoPath, `presets/${req.query.id}.json`);
-            if ((req.query.deletePreset || fs.existsSync(`./uploads/${req.params.id}.json`)) && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
+            const presetFile = path.join(randoPath, `presets/${req.query?.id}.json`);
+            if ((req.query.deletePreset || fs.existsSync(`./uploads/${req.params?.id}.json`)) && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
+            if (fs.existsSync(`./uploads/${req.params?.id}.json`)) {
+                let presetInfo = fs.readFileSync(`./uploads/${req.params.id}.json`).toString('utf-8');
+                let p = presetInfo.indexOf("// ");
+                while (p > -1) {
+                    presetInfo = presetInfo.split(presetInfo.substring(p).split('\r').join('').split('\n')[0]).join('');
+                    p = presetInfo.indexOf("// ")
+                }
+                presetInfo = JSON.parse(presetInfo);
+                if (presetInfo.private) fs.unlinkSync(`./uploads/${req.params.id}.json`);
+            }
             break;
         } 
     }
@@ -734,6 +745,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
     send() {}
 }) { // Writes down important stuff before albw randomization to prevent common problems that users face.
     try {
+        if (req.query.execV?.includes("--")) return true;
         function string2boolean(s) { // Converts a string to a boolean
             switch (s) {
                 case "true": return true;
@@ -820,7 +832,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
             } default: {
                 const info = req.query.v == "z17v3" ? req.query.settings : req.query;
                 const presetFolder = path.join(randoPath, 'presets');
-                const presetFile = path.join(presetFolder, req.params.id);
+                const presetFile = path.join(presetFolder, req.params?.id || './');
                 if (info && typeof info == "object" && writeNewPreset) {
                     function c(j) {
                         for (const i in j) {
@@ -832,8 +844,14 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                     if (
                         req.params.id && !fs.existsSync(`${presetFile}.json`)
                     ) fs.writeFileSync(`${presetFile}.json`, JSON.stringify(info, null, "\t"));
-                } else if (
-                    !fs.existsSync(presetFile) && fs.existsSync(`./uploads/${req.params.id}.json`)
+                } else if ( 
+                    // with the preset editor disabled, I want to keep the same settings in tact so that the preset is truely playable for the user
+                    // Especially if it's an uploaded spoiler log preset that the creator shared that is meant to get the user playing the uploaded preset
+                    // with the same item checks, hint locations, and etc.
+                    // This means that we can't be changing the preset version from it's original to the one that's provided by the user.
+                    // I found that doing that will not leave the hash alone meaning that the user will be dissapointed once they find out that the seed isn't the
+                    // same like the one that is provided.
+                    !fs.existsSync(presetFile) && fs.existsSync(`./uploads/${req.params?.id}.json`)
                 ) fs.copyFileSync(`./uploads/${req.params.id}.json`, `${presetFile}.json`);
                 config = JSON.parse(fs.readFileSync(path.join(randoPath, 'config.json')));
                 if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
