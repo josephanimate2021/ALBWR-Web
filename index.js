@@ -140,8 +140,8 @@ wss.on('connection', (ws, req) => {
                     if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
                     const ipbse64 = Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64');
                     const name = parsedUrl.query.value?.substring(parsedUrl.query.value?.lastIndexOf("\\") + 1) || parsedUrl.query.name;
-                    const ext = name.substring(name.lastIndexOf(".") + 1);
-                    fs.writeFileSync(`./uploads/${name}`, '');
+                    const ext = name?.substring(name?.lastIndexOf(".") + 1) || "json";
+                    if (name) fs.writeFileSync(`./uploads/${name}`, '');
                     ws.on("message", e => {
                         try {
                             const info = JSON.parse(e);
@@ -153,10 +153,18 @@ wss.on('connection', (ws, req) => {
                                 } case "convert2preset": { 
                                     // when called, the uploaded file will be converted into a settings preset. 
                                     // If the file is not supported, then this won't work.
-                                    let preset = fs.readFileSync(`./uploads/${name}`).toString("utf-8");
+                                    let preset = fs.existsSync(
+                                        `./uploads/${name}`
+                                    ) ? fs.readFileSync(`./uploads/${name}`).toString("utf-8") : JSON.stringify(info.publishingPreset);
                                     info.publishingPreset.presetName ||= "Untitled Preset";
                                     info.publishingPreset.notes = info.publishingPreset.notes ? info.publishingPreset.notes.split("\r").join('').split("\n") : [];
-                                    if (info.publishingPreset.private) info.publishingPreset.publisherIP = req.headers['x-forwarded-for'];
+                                    info.publishingPreset.publisherIP = req.headers['x-forwarded-for'];
+                                    function writePreset(preset) {
+                                        fs.writeFileSync(
+                                            `./uploads/settingsPreset-${info.expectedPresetV}-${(Math.random()).toString().substring(2)}.json`, 
+                                            typeof preset == "object" ? JSON.stringify(preset, null, "\t") : preset
+                                        );
+                                    }
                                     switch (ext) {
                                         case "json": { 
                                             // JSON spoiler logs are quite universal to the ALBWR community nowadays so there shouldn't be too much
@@ -164,15 +172,14 @@ wss.on('connection', (ws, req) => {
                                             try { // most spoiler logs don't have comments so it should be fine.
                                                 preset = JSON.parse(preset)
                                                 Object.assign(preset, info.publishingPreset);
-                                                console.log(preset);
                                             } catch { 
                                                 // most preset files made with JSON have comments so the JSON won't be able to get parsed. 
                                                 // As a result of this, we will have to manually input data without parsing the JSON string.
                                                 for (const i in info.publishingPreset) preset = preset.replace("{", `{\n\t"${i}": ${
                                                     typeof info.publishingPreset[i] == "object" ? JSON.stringify(info.publishingPreset[i]) : `"${info.publishingPreset[i]}"`
                                                 },`);
-                                                fs.writeFileSync(`./uploads/settingsPreset-${info.expectedPresetV}-${preset.seed}.json`, preset);
                                             }
+                                            writePreset(preset);
                                             break;
                                         } case "yaml": { 
                                             /**
@@ -194,10 +201,7 @@ wss.on('connection', (ws, req) => {
                                                             for (const i in preset.settings) preset[i] = preset.settings[i];
                                                             delete preset.settings;
                                                             Object.assign(preset, info.publishingPreset)
-                                                            fs.writeFileSync(
-                                                                `./uploads/settingsPreset-${info.expectedPresetV}-${preset.seed}.json`, 
-                                                                JSON.stringify(preset, null, "\t")
-                                                            );
+                                                            writePreset(preset);
                                                         } else ws.send('noExpectedLayoutsError')
                                                     } else ws.send('inproperSpoilerLogError')
                                                 }
@@ -207,7 +211,7 @@ wss.on('connection', (ws, req) => {
                                             break;
                                         }
                                     }
-                                    fs.unlinkSync(`./uploads/${name}`);
+                                    if (fs.existsSync(`./uploads/${name}`)) fs.unlinkSync(`./uploads/${name}`);
                                     ws.send('success');
                                     break;
                                 }
@@ -349,7 +353,7 @@ app.use((req, _, next) => {
     // loop for pushing any uploaded presets into the presets array.
     for (const file of fs.readdirSync('./uploads').filter(i => i.startsWith(`settingsPreset-${req.params.v}-`) && i.endsWith(".json"))) {
         const info = decodeSettingsJSON(fs.readFileSync(`./uploads/${file}`).toString('utf-8'), {
-            id: file.split("-")[2]
+            id: file.substring(0, file.lastIndexOf("."))
         });
         // Keep the loop going if a private preset is detected but does not match the ip address provided by the user's browser.
         if (info.private && info.publisherIP != req.headers['x-forwarded-for']) continue;
@@ -673,7 +677,7 @@ function deleteALBWStuff(req, randoPath) { // deletes any existing albw stuff af
         } default: {
             config = JSON.parse(fs.readFileSync(path.join(randoPath, 'config.json')));
             const presetFile = path.join(randoPath, `presets/${req.query.id}.json`);
-            if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
+            if ((req.query.deletePreset || fs.existsSync(`./uploads/${req.params.id}.json`)) && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
             break;
         } 
     }
@@ -728,8 +732,7 @@ async function genGameZip(req, res) { // Function to generate a randomized game 
 }
 function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = false, command = [], res = {
     send() {}
-}) { 
-    // Writes down important stuff before albw randomization to prevent common problems that users face.
+}) { // Writes down important stuff before albw randomization to prevent common problems that users face.
     try {
         function string2boolean(s) { // Converts a string to a boolean
             switch (s) {
@@ -816,8 +819,9 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 break;
             } default: {
                 const info = req.query.v == "z17v3" ? req.query.settings : req.query;
+                const presetFolder = path.join(randoPath, 'presets');
+                const presetFile = path.join(presetFolder, req.params.id);
                 if (info && typeof info == "object" && writeNewPreset) {
-                    const presetFile = path.join(randoPath, 'presets', req.params.id);
                     function c(j) {
                         for (const i in j) {
                             if (typeof j[i] == "object") c(j[i])
@@ -828,7 +832,9 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                     if (
                         req.params.id && !fs.existsSync(`${presetFile}.json`)
                     ) fs.writeFileSync(`${presetFile}.json`, JSON.stringify(info, null, "\t"));
-                }
+                } else if (
+                    !fs.existsSync(presetFile) && fs.existsSync(`./uploads/${req.params.id}.json`)
+                ) fs.copyFileSync(`./uploads/${req.params.id}.json`, `${presetFile}.json`);
                 config = JSON.parse(fs.readFileSync(path.join(randoPath, 'config.json')));
                 if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
             }

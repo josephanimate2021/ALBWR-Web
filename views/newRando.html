@@ -211,7 +211,7 @@
             <h5 class="modal-title" id="presetUploadStatus"></h5>
           </div>
           <center>
-            <progress class="modal-body" id="presetFileUploadProgress" max="100"></progress>
+            <progress class="modal-body" id="presetFileUploadProgress"></progress>
           </center>
         </div>
       </div>
@@ -294,7 +294,7 @@
             <br>If you want, you may publish your preset with it's current settings shown below by going into <br><code>Setting Presets > Bring Your Own Preset > Publish Preset</code>.
           </p>
         </div>
-        <div id="alertBlock"></div>
+        <div id="alertBlock" class="hideDuringRandomization"></div>
         <script>
           class GameRandoSourceCode { 
             // Allows a user to randomize albw with the in-dev version of the source code without downloading rust + source code and figuring out the CLI 
@@ -444,14 +444,14 @@
               <input type="text" class="form-control" id="presetName" placeholder="My New Preset" name="presetName" required>
               <label for="floatingInput">Preset Name</label>
             </div>
-            <div class="form-floating" title="Any notes about your preset. As of right now, this feature only works in the v0.4 family of the albw randomizer.">
+            <div class="form-floating" title="Any notes about your preset. As of right now, this feature only works in the v0.4 family of the albw randomizer. PRO TIP: Pressing the enter key while typing in your notes will create bulletpoints which can help for if you want to make your notes a list essentially.">
               <textarea class="form-control" id="presetNotes" placeholder="You should play this preset for the best experience ever with the albw randomizer!" name="notes"></textarea>
               <label for="presetNotes">Notes (Optional)</label>
             </div>`
             else document.getElementById('publishingPresetDiv').innerHTML = '';
           }
           function setVersion(obj) {
-            document.getElementById('randoVer').innerText = obj.id;
+            document.getElementById('randoVer').innerText = obj.id
             for (const eI of document.getElementById('versions').children) eI.classList.remove("bg-body-tertiary");
             obj.classList.add("bg-body-tertiary");
             jQuery('input[name="version"]').val($(obj).find(".my-0").text())
@@ -609,8 +609,10 @@
                 return d.substring(0, 1).toUpperCase() + d.substring(1);
               }
               function selectPreset(obj) {
-                appendSetting(presets[obj.getAttribute("data-presetNum")]);
-                document.getElementById('preset').innerText = $(obj).find("span").text();
+                if (document.getElementById('presetCustomization').value != "disabled") appendSetting(presets[obj.getAttribute("data-presetNum")]);
+                const preset = document.getElementById('preset');
+                preset.innerText = $(obj).find("h6").text();
+                updateAttribute(preset, "data-presetNum", obj.getAttribute("data-presetNum"));
                 for (const child of document.getElementById('presets').children) $(child).removeClass("bg-body-tertiary");
                 $(obj).addClass("bg-body-tertiary");
               }
@@ -667,7 +669,7 @@
                   term
                 }
               }
-              function randomizeGame(obj) {
+              function randomizeGame() {
                 const {
                   randoGameBtn,
                   back2rando,
@@ -676,12 +678,17 @@
                   logo,
                   term
                 } = initTerminal(`Randomizing Game...`);
+                const obj = document.getElementById('randomizer');
                 term.write(`Running Randomizer...`);
                 const v = document.getElementById('randoVer').textContent;
+                const id = document.getElementById('presetCustomization').value != "disabled" ? (Math.random()).toString().substring(2) : (() => {
+                  const currentPresetNum = document.getElementById('preset').getAttribute("data-presetNum");
+                  for (const child of document.getElementById('presets').children) {
+                    if (child.getAttribute('data-presetNum') == currentPresetNum) return child.id;
+                  }
+                })()
                 jQuery.post(
-                  `/randomizer/${(
-                    Math.random()
-                  ).toString().substring(3)}?v=z17&execVersion=${v.startsWith("v") ? v.substring(1) : v}&${$(obj).serialize()}`, 
+                  `/randomizer/${id}?v=z17&execVersion=${v.startsWith("v") ? v.substring(1) : v}&${$(obj).serialize()}`, 
                   d => {
                     if (d.isRandomizing) {
                       function c() {
@@ -736,6 +743,8 @@
                 let html = `<div class="input-grpup" title="Allows you to manually type in your own seed if you want to.">
                   <label class="form-label" for="seed">Seed (Optional)</label>
                   <input type="number" class="form-control" id="seed" name="seed" value="${preset.seed}">
+                  <input type="hidden" name="writeNewPreset" value="true">
+                  <input type="hidden" name="deletePreset" value="true">
                 </div>`;
                 for (const settingName in preset.settings) {
                   const info = preset.settings[settingName];
@@ -762,6 +771,36 @@
                 }
                 document.getElementById('randoSettings').innerHTML = html;
               }
+              function string2boolean(s) { // Converts a string to a boolean
+                switch (s) {
+                  case "true": return true;
+                  case "false": return false;
+                  default: {
+                    if (isNaN(Number(s))) return s;
+                    return Number(s);
+                  }
+                }
+              }
+              function parseArrayJSON(json) {
+                for (const key in json) {
+                  if (key.includes("[") && key.includes("]")) {
+                    const beg = key.split("[")[0];
+                    json[beg] ||= {};
+                    let k = key.split("][").join(">").split("]").join(">").split("[").join(">").split(">");
+                    function c(e = 0) {
+                      if (e == k.length - 1) return json[key];
+                      const a = {};
+                      a[k[e]] = c(e + 1);
+                      return a;
+                    }
+                    const info = c();
+                    for (const k in info[beg]) info[beg][k] = string2boolean(info[beg][k]);
+                    Object.assign(json[beg], info[beg]);
+                    delete json[key];
+                  } else json[key] = string2boolean(json[key])
+                }
+                return json;
+              }
               function uploadPreset(obj) {
                 if (obj) {
                   const publishingPreset = Object.fromEntries(new URLSearchParams($(obj).serialize()));
@@ -771,9 +810,9 @@
                   obj.style.display = "none";
                   document.getElementById('presetPleaseWait').style.display = 'block';
                   function handleError(e) {
-                    console.error(e);
+                    if (e) console.error(e);
                     $("#presetUploader").modal('hide');
-                    displayAlert("danger", e.toString());
+                    if (e) displayAlert("danger", e.toString());
                     document.getElementById('presetPleaseWait').style.display = 'none';
                     obj.style.display = "block";
                   }
@@ -839,7 +878,36 @@
                         }
                       }
                     })
-                  }
+                  } else if (!publishingPreset.private) { 
+                    const socket = new WebSocket(`${grabURL4WebSocket()}/uploadFile`);
+                    socket.addEventListener("message", result => {
+                      switch (result.data) {
+                        case "ok": {
+                          Object.assign(publishingPreset, parseArrayJSON(Object.fromEntries(new URLSearchParams($("#randomizer").serialize()))));
+                          socket.send(JSON.stringify({
+                            onFileUploadAfter: "convert2preset",
+                            publishingPreset,
+                            expectedPresetV: "z17"
+                          }));
+                          break;
+                        } case "success": {
+                          loadSettings(() => {
+                            socket.close();
+                            handleError('')
+                            displayAlert("success", `Your successfuly brought in your own preset! If things were done correctly, 
+                            you or the other user should be able to use your preset at any time.`)
+                          });
+                          break;
+                        } case "fail": {
+                          socket.close();
+                          handleError('An unknown error occured while uploading your preset to the server.');
+                        } case "incompatiableVersionError": {
+                          socket.close();
+                          handleError('Your preset does not meet the version requirements needed in order to be loaded with the v0.4 family of the albw randomizer. Please upload a preset that is compatiable with the v0.4 family of albwr.');
+                        }
+                      }
+                    })
+                  } else handleError('You need to either upload a preset file or select the Publish Preset checkbox.');
                 } else $("#presetUploader").modal("show");
               }
               function loadSettings(callback) {
@@ -862,9 +930,10 @@
                 }
                 jQuery.getJSON(`/settings/stable/z17`, d => {
                   presets = d;
+                  const preset = document.getElementById('preset');
                   if (document.getElementById('presetCustomization').value != "disabled") appendSetting(d[0]);
                   for (var i = 0; i < d.length; i++) document.getElementById('presets').insertAdjacentHTML(
-                    "beforeend", `<li class="dropdown-item d-flex justify-content-between${i == 0 ? ' bg-body-tertiary' : ''}" data-presetNum="${i}" onclick="selectPreset(this)">
+                    "beforeend", `<li class="dropdown-item d-flex justify-content-between${i == 0 ? ' bg-body-tertiary' : ''}" data-presetNum="${i}" onclick="selectPreset(this)" id="${d[i].id}">
                       <div>
                         <h6 class="my-0">${d[i].presetName}</h6>
                         <small class="text-body-secondary">
@@ -875,7 +944,8 @@
                       <span class="text-info">${d[i].version}</span>
                     </li>`
                   );
-                  document.getElementById('preset').innerText = `${d[0].version}`;
+                  preset.innerText = `${d[0].presetName}`;
+                  preset.setAttribute("data-presetNum", 0);
                   const presetSettingsloading = $("#presetSettingsLoading");
                   if (presetSettingsloading.hasClass("d-flex")) {
                     presetSettingsloading.removeClass("d-flex");
@@ -903,7 +973,7 @@
               <span>Setting Presets</span>
               <span class="badge bg-primary rounded-pill" id="preset"></span>
             </button>
-            <div title="If disabled, you won't have to worry about customizing your preset with the GUI until you reload or leave this page. You will just instead select a preset option provided for game generation.">
+            <div title="If disabled, you won't have to worry about customizing your preset with the GUI until you reload or leave this page. You will just instead select a preset option provided for game generation." class="hideDuringRandomization">
               <label for="presetCustomization" class="form-label">Preset Editor</label><br>
               <select id="presetCustomization" onchange="loadSettings()" class="form-select">
                   <option>enabled</option>
@@ -912,7 +982,7 @@
             </div>
             <ul class="dropdown-menu mb-3" id="presets"></ul>
             <h4 class="mb-3 hideDuringRandomization">Randomizer Settings</h4>
-            <form action="javascript:;" onsubmit="randomizeGame(this)">
+            <form action="javascript:;" onsubmit="randomizeGame()" id="randomizer">
               <input type="hidden" name="version" value="v0.4.0"/>
               <div class="d-flex justify-content-center" id="presetSettingsLoading">
                 <div class="spinner-border m-5" role="status">
