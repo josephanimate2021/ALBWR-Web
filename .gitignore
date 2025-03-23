@@ -2,3 +2,4 @@ package-lock.json
 node_modules
 *.3ds
 generated
+uploads
