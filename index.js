@@ -241,7 +241,7 @@ wss.on('connection', (ws, req) => {
                             (info.repo.html_url || info.repo.web_url) + ".git",
                             '-v',
                             '--progress',
-                            '--origin',
+                            `--${branchInfo.name ? 'branch' : 'origin'}`,
                             branchInfo.sha || branchInfo.name || branchInfo.id
                         ];
                         ws.send(`\r\nRunning command:\r\ncd ${command.join(' ')}`)
