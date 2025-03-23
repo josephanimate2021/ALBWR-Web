@@ -240,20 +240,45 @@ wss.on('connection', (ws, req) => {
                             '&& git clone',
                             (info.repo.html_url || info.repo.web_url) + ".git",
                             '-v',
-                            '--progress',
-                            `--${branchInfo.name ? 'branch' : 'origin'}`,
-                            branchInfo.sha || branchInfo.name || branchInfo.id
+                            '--progress'
                         ];
+                        if (branchInfo.name) {
+                            command.push('--branch');
+                            command.push(branchInfo.name);
+                        }
                         ws.send(`\r\nRunning command:\r\ncd ${command.join(' ')}`)
                         const shell = spawn(`cd`, command, {
                             shell: true
                         });
                         shellInit(shell);
                         shell.on("close", c => {
-                            if (c == 0) ws.send('success');
-                            else {
-                                ws.send(`\r\nThe command closed unexpectedly with code ${c}.`);
-                                ws.send('fail');
+                            if (!branchInfo.sha && !branchInfo.short_id && !branchInfo.id) {
+                                if (c == 0) ws.send('success');
+                                else {
+                                    ws.send(`\r\nThe command closed unexpectedly with code ${c}.\r\n`);
+                                    ws.send('fail');
+                                }
+                            } else {
+                                ws.send(`Because you chose to use commits, a command will now be ran where it will checkout commit ${
+                                    branchInfo.sha?.slice(0, -33) || branchInfo.short_id
+                                }.`)
+                                const command = [
+                                    repoFolder,
+                                    '&& git checkout',
+                                    branchInfo.sha || branchInfo.id,
+                                ];
+                                ws.send(`\r\nRunning command:\r\ncd ${command.join(' ')}`)
+                                const shell = spawn(`cd`, command, {
+                                    shell: true
+                                });
+                                shellInit(shell);
+                                shell.on("close", c => {
+                                    if (c == 0) ws.send('success');
+                                    else {
+                                        ws.send(`\r\nThe command closed unexpectedly with code ${c}.\r\n`);
+                                        ws.send('fail');
+                                    }
+                                });
                             }
                         });
                     })
