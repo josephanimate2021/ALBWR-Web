@@ -26,7 +26,7 @@ class TerminalEmulator {
         term.loadAddon(webLinksAddon);
         term.open(document.getElementById('terminal'));
         fitAddon.fit();
-        window.addEventListener("resize", e => fitAddon.fit())
+        window.addEventListener("resize", () => fitAddon.fit())
         // sets up a websocket so that the terminal is usable.
         socket.addEventListener("message", e => {
             if (typeof e.data == "string") { // writes string data to the terminal.
@@ -43,7 +43,7 @@ class TerminalEmulator {
             input = [];
             for (var i = 0; i < h.length; i++) input.push(h.substring(i, i + 1));
         }
-        term.onKey(k => { // peforms terminal events when a key is pressed.
+        term.onKey(k => { // preforms terminal events when a key is pressed.
             // switch function that allows javascript code to be executed depending on the key the user presses.
             switch (k.domEvent.code) {
                 case "ArrowUp": {
@@ -65,9 +65,9 @@ class TerminalEmulator {
                 } case "Enter": { // sends the input to the server after a user presses the enter key.
                     const text = input.join('');
                     cursorX = '';
-                    term.write(k.key);
                     socket.send(text)
                     if (text.toLowerCase() == "cls" || text.toLowerCase() == "clear") term.clear();
+                    else term.write(k.key);
                     commandHistory.push(text);
                     historyIndex = commandHistory.length;
                     input = [];

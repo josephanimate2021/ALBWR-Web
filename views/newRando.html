@@ -173,6 +173,28 @@
         </ul>
       </header>
     </div>
+    <div class="modal" tabindex="-1" id="myPresetsModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Your Presets</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="myPresets"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+        <div class="modal-content presetPleaseWait" style="display: none;">
+          <div class="modal-header">
+            <h5 class="modal-title presetUploadStatus"></h5>
+          </div>
+          <center>
+            <progress class="modal-body presetFileUploadProgress"></progress>
+          </center>
+        </div>
+      </div>
+    </div>
     <div class="modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" id="presetUploader">
       <div class="modal-dialog modal-xl">
         <form class="modal-content" action="javascript:;" onsubmit="uploadPreset(this)">
@@ -188,11 +210,9 @@
                 <li>Publish your preset using it's current settings so that everyone can see and use your preset if they wanted to.</li>
               </ol>
             </p>
-            <div class="tabedDiv" id="presetFileUploaderSection">
-              <div title="The preset file that will be uploaded to the server. Don't worry, if you choose not to publish your preset, your file will either get deleted after game randomization or when you leave/reload the page.">
-                <label class="form-label" for="presetFile">Preset File (Must be a JSON, YAML, or TOML file)</label>
-                <input type="file" id="presetFile" accept=".json,.yaml,.toml" class="form-control"/>
-              </div>
+            <div title="The preset file that will be uploaded to the server. Don't worry, if you choose not to publish your preset, your file will either get deleted after game randomization or when you leave/reload the page.">
+              <label class="form-label" for="presetFile">Preset File (Must be a JSON, YAML, or TOML file)</label>
+              <input type="file" id="presetFile" accept=".json,.yaml,.toml" class="form-control"/>
             </div>
             <div title="When checked, a section will appear where you can begin typing in your preset infomation">
               <br>
@@ -206,12 +226,12 @@
             <button type="submit" class="btn btn-primary">Upload Preset</button>
           </div>
         </form>
-        <div class="modal-content" style="display: none;" id="presetPleaseWait">
+        <div class="modal-content presetPleaseWait" style="display: none;">
           <div class="modal-header">
-            <h5 class="modal-title" id="presetUploadStatus"></h5>
+            <h5 class="modal-title presetUploadStatus"></h5>
           </div>
           <center>
-            <progress class="modal-body" id="presetFileUploadProgress"></progress>
+            <progress class="modal-body presetFileUploadProgress"></progress>
           </center>
         </div>
       </div>
@@ -732,8 +752,8 @@
                                   zipfiledownload.classList.remove('d-none');
                                   zipfiledownload.classList.add('d-flex');
                                 } else handleError("Your ZIP file for the randomized version of albw could not be retrieved due to an unknown error")
-                              } else handleError(`Could not get your randomized game due to an error: ${await res.text()}. Please try randomizing your game again.`)
-                            })
+                              } else handleError(`Could not get your randomized game due to the following: ${await res.text()}. Please try randomizing your game again.`)
+                            }).catch(e => handleError(e.toString()))
                           } catch (e) {
                             handleError(e);
                           }
@@ -814,15 +834,16 @@
                 if (obj) {
                   const publishingPreset = Object.fromEntries(new URLSearchParams($(obj).serialize()));
                   publishingPreset.private = !gameRandoSourceCode.publishingPreset;
-                  $("#presetUploadStatus").text('Uploading Preset...');
+                  $(".presetUploadStatus").text('Uploading Preset...');
                   const presetFile = document.getElementById('presetFile').files[0]
                   obj.style.display = "none";
-                  document.getElementById('presetPleaseWait').style.display = 'block';
+                  $(".presetPleaseWait").show();
                   function handleError(e) {
                     if (e) console.error(e);
                     $("#presetUploader").modal('hide');
+                    $("#myPresetsModal").modal('hide');
                     if (e) displayAlert("danger", e.toString());
-                    document.getElementById('presetPleaseWait').style.display = 'none';
+                    $(".presetPleaseWait").hide()
                     obj.style.display = "block";
                   }
                   if (presetFile) {
@@ -838,31 +859,31 @@
                       default: return handleError("You have selected an unsupported file type for your preset. Please upload a file with the supported file type.");
                     }
                     const totalChunks = 100; // Variable to store the number of chunks
-                    $("#presetUploadStatus").text('Preparing Your Preset File for upload...');
-                    const progress = document.getElementById('presetFileUploadProgress');
-                    progress.max = fileInfo.size;
-                    const chunkSize = Math.ceil(progress.max / totalChunks);
-                    progress.value = 0;
+                    $(".presetUploadStatus").text('Preparing Your Preset File for upload...');
+                    const progress = $(".presetFileUploadProgress")
+                    progress.attr("max", fileInfo.size);
+                    const chunkSize = Math.ceil(progress.attr("max") / totalChunks);
+                    progress.val(0);
                     for (let i = 0; i < totalChunks; i++) {
-                      const chunk = presetFile.slice(progress.value, progress.value + chunkSize);
+                      const chunk = presetFile.slice(progress.val(), progress.val() + chunkSize);
                       fileChunks.push(chunk);
-                      progress.value += chunkSize;
+                      progress.val(progress.val() + chunkSize);
                     }
-                    $("#presetUploadStatus").text('Uploading Your Preset File to the server...');
-                    progress.value = 0;
-                    progress.max = totalChunks;
+                    $(".presetUploadStatus").text('Uploading Your Preset File to the server...');
+                    progress.val(0)
+                    progress.attr("max", totalChunks);
                     socket.addEventListener("message", result => {
                       switch (result.data) {
                         case "ok": {
-                          if (progress.value < progress.max) {
+                          if (progress.val() < progress.attr("max")) {
                             console.log('Server response:', result.data);
-                            socket.send(fileChunks[progress.value]);
-                            progress.value++;
+                            socket.send(fileChunks[progress.val()]);
+                            progress.val(progress.val() + 1)
                           } else {
                             console.log('All chunks uploaded successfully.');
                             console.log(`The final response from server: ${result.data}`);
-                            $("#presetUploadStatus").text('Attempting to make your preset usable...');
-                            progress.removeAttribute("value");
+                            $(".presetUploadStatus").text('Attempting to make your preset usable...');
+                            progress.removeAttr("value")
                             socket.send(JSON.stringify({
                               onFileUploadAfter: "convert2preset",
                               publishingPreset,
@@ -876,6 +897,9 @@
                             handleError('')
                             displayAlert("success", `Your successfuly brought in your own preset! If things were done correctly, 
                             you or the other user should be able to use your preset at any time.`)
+                            obj.reset();
+                            $('#publishingPresetDiv').hide();
+                            delete gameRandoSourceCode.publishingPreset;
                           });
                           break;
                         } case "fail": {
@@ -905,6 +929,9 @@
                             handleError('')
                             displayAlert("success", `Your successfuly brought in your own preset! If things were done correctly, 
                             you or the other user should be able to use your preset at any time.`)
+                            obj.reset();
+                            $('#publishingPresetDiv').hide();
+                            delete gameRandoSourceCode.publishingPreset;
                           });
                           break;
                         } case "fail": {
@@ -919,8 +946,9 @@
                   } else handleError('You need to either upload a preset file or select the Publish Preset checkbox.');
                 } else $("#presetUploader").modal("show");
               }
-              function loadSettings(callback) {
+              async function loadSettings(callback) {
                 $("#randoSettings").html('');
+                gameRandoSourceCode.myip ||= await gameRandoSourceCode.jQueryURL('get', '/whatismyip');
                 document.getElementById('presets').innerHTML = `<li class="dropdown-item d-flex justify-content-between" onclick="uploadPreset()">
                   <div>
                     <h6 class="my-0">Bring Your Own Preset</h6>
@@ -928,6 +956,14 @@
                       With this feature, you may upload a preset file that will be used during game randomization!<br> 
                       You may choose to publish your preset before it gets uploaded if you want to. 
                       <br>otherwise, the preset will be deleted after game randomization or when you reload/leave this page.
+                    </small>
+                  </div>
+                  <span class="text-warning">BETA FEATURE</span>
+                </li><li class="dropdown-item d-flex justify-content-between" data-bs-toggle="modal" data-bs-target="#myPresetsModal">
+                  <div>
+                    <h6 class="my-0">Your Presets</h6>
+                    <small class="text-body-secondary">
+                      You may view the presets that you uploaded when this option is clicked. You may choose to delete or modify your preset with this option.
                     </small>
                   </div>
                   <span class="text-warning">BETA FEATURE</span>
@@ -939,6 +975,24 @@
                 }
                 jQuery.getJSON(`/settings/stable/z17`, d => {
                   presets = d;
+                  const myPresets = presets.filter(i => i.publisherIP == gameRandoSourceCode.myip);
+                  $("#myPresets").html(`<div class="container text-center">
+                    <div class="row">
+                      ${myPresets.map(v => `<div class="col">
+                        <div class="card">
+                          <div class="card-body">
+                            <h5 class="card-title">${v.presetName}</h5>
+                            <p class="card-text">
+                              NOTES:
+                              <ul>${v.notes.map(v => `<li>${v}</li>`).join('\r\n') || '<li>No notes were provided</li>'}</ul>
+                            </p>
+                            <a data-bs-toggle="collapse" href="#collapsableEditable" class="btn btn-primary">Modify Preset</a>
+                            <a href="javascript:;" class="btn btn-danger">Delete Preset</a>
+                          </div>
+                        </div>
+                      </div>`).join('\r\n')}
+                    </div>
+                  </div>`)
                   const preset = document.getElementById('preset');
                   if (document.getElementById('presetCustomization').value != "disabled") appendSetting(d[0]);
                   for (var i = 0; i < d.length; i++) document.getElementById('presets').insertAdjacentHTML(
@@ -982,6 +1036,7 @@
               <span>Setting Presets</span>
               <span class="badge bg-primary rounded-pill" id="preset"></span>
             </button>
+            <ul class="dropdown-menu mb-3" id="presets"></ul>
             <div title="If disabled, you won't have to worry about customizing your preset with the GUI until you reload or leave this page. You will just instead select a preset option provided for game generation. However, if this option is set to disabled, you will be required to match your randomizer version with the preset that's selected. It's version should be shown on the top right corner of the preset option button. This is usually good for those that want to play the seed with nothing changing like it's hash and etc. If you want to change some settings, leave this setting alone." class="hideDuringRandomization">
               <label for="presetCustomization" class="form-label">Preset Editor</label><br>
               <select id="presetCustomization" onchange="loadSettings()" class="form-select">
@@ -989,7 +1044,6 @@
                   <option>disabled</option>
               </select>
             </div>
-            <ul class="dropdown-menu mb-3" id="presets"></ul>
             <h4 class="mb-3 hideDuringRandomization">Randomizer Settings</h4>
             <form action="javascript:;" onsubmit="randomizeGame()" id="randomizer">
               <input type="hidden" name="version" value="v0.4.0"/>

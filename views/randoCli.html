@@ -20,6 +20,15 @@
         <div id="terminal"></div>
         <script src="/js/terminal.js"></script>
         <script>
+            window.addEventListener("load", e => {
+                window.addEventListener("beforeunload", function (e) {
+                    var confirmationMessage = 'It looks like you have been editing something. If you leave before saving, your changes will be lost.';
+                    const stuff = (e || window.event);
+                    stuff.preventDefault();
+                    stuff.returnValue = confirmationMessage;
+                    return confirmationMessage;
+                });
+            })
             const params = new URLSearchParams(window.location.search);
             const execV = params.get("execV");
             const t = new TerminalEmulator(

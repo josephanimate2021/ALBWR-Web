@@ -98,7 +98,7 @@ wss.on('connection', (ws, req) => {
                             });
                             shellInit(shell, () => {
                                 userIsRandomizingGame = false;
-                                deleteALBWStuff(req, randoPath);
+                                deleteALBWStuff(Object.assign(req, parsedUrl), randoPath);
                             });
                             shell.on("close", async c => {
                                 if (!parsedUrl.query.execV?.includes("--")) {
@@ -329,7 +329,8 @@ app.use((req, _, next) => {
         }
     }
     res.sendFile(path.join(__dirname, 'views', 'uploadForm.html'));
-}) // shell page
+}) 
+// shell page
 .get('/shell', (req, res) => {
     if (!req.headers.host.startsWith("localhost") && !req.headers.host.startsWith("127.0.0.1")) {
         res.writeHead(302, '', {
@@ -337,7 +338,8 @@ app.use((req, _, next) => {
         });
         res.end();
     } else res.sendFile(path.join(__dirname, `views/interactiveShell.html`))
-}) // Page for the v0.4 family of the albw randomizer which as of right now is currently the latest family of versions that are currently out.
+}) 
+// Page for the v0.4 family of the albw randomizer which as of right now is currently the latest family of versions that are currently out.
 .get('/v4', (req, res) => {
     if (!fs.existsSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`)) {
         res.writeHead(302, '', {
@@ -345,7 +347,8 @@ app.use((req, _, next) => {
         });
         res.end();
     } else res.sendFile(path.join(__dirname, 'views', 'newRando.html'));
-}) // RandoCLI page for users who prefer the style.
+}) 
+// RandoCLI page for users who prefer the style.
 .get('/cli', (req, res) => {
     if (!fs.existsSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`)) {
         res.writeHead(302, '', {
@@ -353,18 +356,20 @@ app.use((req, _, next) => {
         });
         res.end();
     } else res.sendFile(path.join(__dirname, 'views', 'randoCli.html'));
-}) // Deletes a user's 3ds rom apon request.
+}) 
+// Deletes a user's 3ds rom apon request.
 .get('/deleteFile', (req, res) => {
     fs.unlinkSync(`./uploads/rom-${Buffer.from(req.headers['x-forwarded-for'] || 'localhost').toString('base64')}.3ds`)
     res.writeHead(302, '', {
         location: "/"
     });
     res.end();
-}) // Gets the settings using the provided version and source version.
+}) 
+// Sends the user's IP Address (Server side) to the browser
+.get('/whatismyip', (req, res) => res.end(req.headers['x-forwarded-for'] || 'localhost'))
+// Gets the settings using the provided version and source version.
 .get('/settings/:sourceVersion/:v', (req, res) => {
     // variables
-    const newLineCommon = "\n";
-    const newLine = process.platform == "win32" ? "\r" : "" + newLineCommon;
     const presets = [];
     const randoPath = `./sourcecodes/${req.params.sourceVersion}${
         req.params.sourceVersion == "dev" ? `/${req.headers['x-forwarded-for'] || 'localhost'}` : ''
@@ -372,16 +377,14 @@ app.use((req, _, next) => {
     const excludableChecksJSON = fs.existsSync(`${randoPath}/excludableChecksList.json`) ? JSON.parse(
         fs.readFileSync(`${randoPath}/excludableChecksList.json`)
     ) : {};
-    const excludableChecksYAML = fs.existsSync(`${randoPath}/excludableChecksList.yaml`) ? yaml.parse(
-        fs.readFileSync(`${randoPath}/excludableChecksList.yaml`).toString('utf-8')
-    ).layout : {}
     let localPrefix;
     // loop for pushing any uploaded presets into the presets array.
-    for (const file of fs.readdirSync('./uploads').filter(i => i.startsWith(`settingsPreset-${req.params.v}-`) && i.endsWith(".json"))) {
-        const info = decodeSettingsJSON(fs.readFileSync(`./uploads/${file}`).toString('utf-8'), {
+    for (const file of fs.readdirSync('./uploads').filter(i => i.startsWith(`settingsPreset-${req.params.v}-`) && (i.endsWith(".json") || i.endsWith(".toml")))) {
+        const f = file.endsWith(".json") ? decodeSettingsJSON : decodeSettingsToml;
+        const info = f({
             id: file.substring(0, file.lastIndexOf("."))
-        });
-        console.log(info);
+        }, `./uploads/${file}`);
+        if (fs.existsSync(`${randoPath}/presets/${file}`)) fs.unlinkSync(`${randoPath}/presets/${file}`);
         // Keep the loop going if a private preset is detected but does not match the ip address provided by the user's browser.
         if (info.private && info.publisherIP != (req.headers['x-forwarded-for'] || 'localhost')) continue;
         // Push the info if all checks cleared successfuly.
@@ -389,7 +392,8 @@ app.use((req, _, next) => {
         presets.unshift(info);
     }
     // functions
-    function decodeSettingsJSON(json, info) { // Decodes some settings written in JSON with comments.
+    function decodeSettingsJSON(info, jsonFile) { // Decodes some settings written in JSON with comments.
+        let json = fs.readFileSync(jsonFile).toString('utf-8');
         const wordOptions = { // Used to provide options for some setting properties
             logic_mode: ["Normal", "Hard", "Glitched", "AdvGlitched", "Hell", "NoLogic"],
             lc_requirement: 7,
@@ -417,14 +421,17 @@ app.use((req, _, next) => {
         }
         info.notes = info.notes || [];
         if (comments[0]) info.notes.push(comments[0]);
+        Object.assign(info, JSON.parse(json));
         if (req.params.v == "z17v3") { // Add some extra stuff if the detected version is v3.
-            info.settings = JSON.parse(json);
+            info.settings ||= JSON.parse(json);
             delete info.settings.presetName;
             delete info.settings.notes;
             wordOptions.ped_requirement[1] = "Charmed";
             wordOptions.ped_requirement[2] = "Standard";
         }
-        Object.assign(info, JSON.parse(json));
+        for (const i in info.settings) {
+            if (info[i]) delete info[i];
+        }
         function c(k) { // The function that converts setting values into selectable values. The randomizer takes care of converting this back to the original.
             for (const settingName in k) {
                 if (typeof k[settingName] == "object" && !Array.isArray(k[settingName])) c(k[settingName]);
@@ -476,9 +483,9 @@ app.use((req, _, next) => {
             break;
         } default: { // JSON is more universal with the ALBWR community, so I am allowing code modifiers to add as many example presets as they want.
             fs.readdirSync(`${randoPath}/presets`).forEach(file => {
-                presets.unshift(decodeSettingsJSON(fs.readFileSync(`${randoPath}/presets/${file}`).toString('utf-8'), {
+                presets.unshift(decodeSettingsJSON({
                     id: file.substring(0, file.lastIndexOf("."))
-                }));
+                }, `${randoPath}/presets/${file}`));
             })
             break;
         }
@@ -487,14 +494,14 @@ app.use((req, _, next) => {
             // The given array is preset files to look for during the loop.
             const presetFile = path.join(randoPath, file);
             if (fs.existsSync(presetFile)) { // gives presets a name based off of the found preset file.
-                if (file.endsWith(".json")) presets.unshift(decodeSettingsJSON(fs.readFileSync(presetFile).toString('utf-8'), {
+                if (file.endsWith(".json")) presets.unshift(decodeSettingsJSON({
                     presetName: "Default z17 ALBWR Template"
-                }));
+                }, presetFile));
                 else if (file.endsWith(".toml")) presets.unshift(decodeSettingsToml({
                     presetName: `Default ALBWR Standard Template`,
                     notes: [],
                     settings: {}
-                }, `${presetFile}`));
+                }, presetFile));
             }
         }
     }
@@ -707,16 +714,16 @@ function deleteALBWStuff(req, randoPath) { // deletes any existing albw stuff af
                 output: 'generated'
             };
             const presetFile = path.join(randoPath, `presets/${req.query?.id}.json`);
-            if ((req.query.deletePreset || fs.existsSync(`./uploads/${req.params?.id}.json`)) && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
-            if (fs.existsSync(`./uploads/${req.params?.id}.json`)) {
-                let presetInfo = fs.readFileSync(`./uploads/${req.params.id}.json`).toString('utf-8');
+            if ((req.query.deletePreset || fs.existsSync(`./uploads/${req.query?.id}.json`)) && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
+            if (fs.existsSync(`./uploads/${req.query?.id}.json`)) {
+                let presetInfo = fs.readFileSync(`./uploads/${req.query.id}.json`).toString('utf-8');
                 let p = presetInfo.indexOf("// ");
                 while (p > -1) {
                     presetInfo = presetInfo.split(presetInfo.substring(p).split('\r').join('').split('\n')[0]).join('');
                     p = presetInfo.indexOf("// ")
                 }
                 presetInfo = JSON.parse(presetInfo);
-                if (presetInfo.private) fs.unlinkSync(`./uploads/${req.params.id}.json`);
+                if (presetInfo.private) fs.unlinkSync(`./uploads/${req.query.id}.json`);
             }
             break;
         } 
