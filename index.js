@@ -407,6 +407,7 @@ app.use((req, _, next) => {
             logic_mode: ["Normal", "Hard", "Glitched", "AdvGlitched", "Hell", "NoLogic"],
             lc_requirement: 7,
             ped_requirement: ["Vanilla", "Standard"],
+            door_shuffle: ["Off", "DungeonEntrances"],
             cracks: ["Closed", "Open"],
             cracksanity: ["Off", "CrossWorldPairs", "AnyWorldPairs", "MirroredCrossWorldPairs", "MirroredAnyWorldPairs"],
             keysy: ["Off", "SmallKeysy", "BigKeysy", "AllKeysy"],

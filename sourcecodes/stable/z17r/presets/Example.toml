@@ -28,8 +28,4 @@ night_mode = false
 
 ## Excludes a specific check from having progression items. A random junk item will be placed there instead.
 [exclusions]
-"exclusions" = [
-#   "Great Rupee Fairy",
-#   "Thief Girl Cave"
-#   "Master Sword Pedestal"
-]
+"exclusions" = ["Great Rupee Fairy","Thief Girl Cave","Master Sword Pedestal"]

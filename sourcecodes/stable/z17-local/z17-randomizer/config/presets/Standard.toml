@@ -32,5 +32,3 @@ barrier = 'Unchanged'
 
 ## Excludes certain locations from having progression items.
 [exclude]
-## Use the names from the spoiler log.
-# [exclude.Hyrule]
