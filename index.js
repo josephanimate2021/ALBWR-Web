@@ -147,7 +147,14 @@ wss.on('connection', (ws, req) => {
                         try {
                             const info = JSON.parse(e);
                             switch (info.onFileUploadAfter) { // functions for after a file is done uploading on websockets
-                                case "make3dsrom": { // creates a 3ds rom when told to
+                                case "deletePreset": {
+                                    const fileMatch = fs.readdirSync('./uploads').filter(i => i.startsWith(info.fileId));
+                                    if (fileMatch.length == 1) {
+                                        fs.unlinkSync(`./uploads/${fileMatch[0]}`);
+                                        ws.send('success');
+                                    } else ws.send('fail');
+                                    break;
+                                } case "make3dsrom": { // creates a 3ds rom when told to
                                     fs.renameSync(`./uploads/${name}`, `./uploads/rom-${ipbse64}.3ds`)
                                     ws.send('success');
                                     break;
@@ -155,14 +162,17 @@ wss.on('connection', (ws, req) => {
                                     // when called, the uploaded file will be converted into a settings preset. 
                                     // If the file is not supported, then this won't work.
                                     let preset = fs.existsSync(
-                                        `./uploads/${name}`
-                                    ) ? fs.readFileSync(`./uploads/${name}`).toString("utf-8") : JSON.stringify(info.publishingPreset);
+                                        `./uploads/${name || info.publishingPreset.filename}`
+                                    ) ? fs.readFileSync(
+                                        `./uploads/${name || info.publishingPreset.filename}`
+                                    ).toString("utf-8") : JSON.stringify(info.publishingPreset);
                                     info.publishingPreset.presetName ||= "Untitled Preset";
                                     info.publishingPreset.notes = info.publishingPreset.notes ? info.publishingPreset.notes.split("\r").join('').split("\n") : [];
                                     info.publishingPreset.publisherIP = req.headers['x-forwarded-for'] || 'localhost';
                                     function writePreset(preset) {
+                                        console.log(preset);
                                         fs.writeFileSync(
-                                            `./uploads/settingsPreset-${info.expectedPresetV}-${(Math.random()).toString().substring(2)}.json`, 
+                                            `./uploads/${info.publishingPreset.filename}`, 
                                             typeof preset == "object" ? JSON.stringify(preset, null, "\t") : preset
                                         );
                                     }
@@ -380,11 +390,10 @@ app.use((req, _, next) => {
     let localPrefix;
     // loop for pushing any uploaded presets into the presets array.
     for (const file of fs.readdirSync('./uploads').filter(i => i.startsWith(`settingsPreset-${req.params.v}-`) && (i.endsWith(".json") || i.endsWith(".toml")))) {
-        const f = file.endsWith(".json") ? decodeSettingsJSON : decodeSettingsToml;
+        const f = file.endsWith(".toml") ? decodeSettingsToml : decodeSettingsJSON;
         const info = f({
             id: file.substring(0, file.lastIndexOf("."))
         }, `./uploads/${file}`);
-        if (fs.existsSync(`${randoPath}/presets/${file}`)) fs.unlinkSync(`${randoPath}/presets/${file}`);
         // Keep the loop going if a private preset is detected but does not match the ip address provided by the user's browser.
         if (info.private && info.publisherIP != (req.headers['x-forwarded-for'] || 'localhost')) continue;
         // Push the info if all checks cleared successfuly.

@@ -104,6 +104,17 @@
       .randoOutput {
         display: none;
       }
+      .collapsing {
+        height: 0;
+        overflow: hidden;
+        transition: height .35s ease;
+
+        &.collapse-horizontal {
+          width: 0;
+          height: auto;
+          transition: width .35s ease;
+        }
+      }
     </style>
 
     
@@ -174,30 +185,32 @@
       </header>
     </div>
     <div class="modal" tabindex="-1" id="myPresetsModal">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-fullscreen" id="myPresetsModalDialog">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Your Presets</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body" id="myPresets"></div>
-          <div class="modal-footer">
+          <div class="modal-footer justify-content-center">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
-        <div class="modal-content presetPleaseWait" style="display: none;">
+      </div>
+      <div class="modal-dialog" style="display: none;" id="presetModificationPleaseWait">
+        <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title presetUploadStatus"></h5>
+            <h5 class="modal-title" id="presetModificationStatus"></h5>
           </div>
           <center>
-            <progress class="modal-body presetFileUploadProgress"></progress>
+            <progress class="modal-body" id="presetModificationProgress"></progress>
           </center>
         </div>
       </div>
     </div>
     <div class="modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" id="presetUploader">
-      <div class="modal-dialog modal-xl">
-        <form class="modal-content" action="javascript:;" onsubmit="uploadPreset(this)">
+      <form class="modal-dialog modal-xl" action="javascript:;" onsubmit="uploadPreset(this)">
+        <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Bring Your Own Preset</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -211,27 +224,29 @@
               </ol>
             </p>
             <div title="The preset file that will be uploaded to the server. Don't worry, if you choose not to publish your preset, your file will either get deleted after game randomization or when you leave/reload the page.">
-              <label class="form-label" for="presetFile">Preset File (Must be a JSON, YAML, or TOML file)</label>
-              <input type="file" id="presetFile" accept=".json,.yaml,.toml" class="form-control"/>
+              <label class="form-label" for="presetFile">Preset File (Must be a JSON file)</label>
+              <input type="file" id="presetFile" accept=".json" class="form-control"/>
             </div>
             <div title="When checked, a section will appear where you can begin typing in your preset infomation">
               <br>
-              <input type="checkbox" onclick="$('#publishingPresetDiv').toggle(); setupPresetPublisher()" class="form-check-input" id="publishPresetCheckmark"/>
+              <input type="checkbox" onclick="setupPresetPublisher()" class="form-check-input" id="publishPresetCheckmark"/>
               <label class="form-check-label" for="publishPresetCheckmark">Publish Preset</label>
             </div>
-            <div id="publishingPresetDiv" style="display: none;"></div>
+            <div id="publishingPresetDiv"></div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-primary">Upload Preset</button>
           </div>
-        </form>
-        <div class="modal-content presetPleaseWait" style="display: none;">
+        </div>
+      </form>
+      <div class="modal-dialog" style="display: none;" id="presetUploadPleaseWait">
+        <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title presetUploadStatus"></h5>
+            <h5 class="modal-title" id="presetUploadStatus"></h5>
           </div>
           <center>
-            <progress class="modal-body presetFileUploadProgress"></progress>
+            <progress class="modal-body" id="presetUploadProgress"></progress>
           </center>
         </div>
       </div>
@@ -458,22 +473,27 @@
             }
           }
           let gameRandoSourceCode = new GameRandoSourceCode(`https://api.github.com/repos/rickfay/z17-randomizer`);
-          function setupPresetPublisher() {
-            gameRandoSourceCode.publishingPreset = !gameRandoSourceCode.publishingPreset;
-            if (gameRandoSourceCode.publishingPreset) document.getElementById('publishingPresetDiv').innerHTML = `<div class="form-floating" title="A name for your preset. Make sure to title it in a way where it's easy to find.">
-              <input type="text" class="form-control" id="presetName" placeholder="My New Preset" name="presetName" required>
-              <label for="floatingInput">Preset Name</label>
-            </div>
-            <div class="form-floating" title="Any notes about your preset. As of right now, this feature only works in the v0.4 family of the albw randomizer. PRO TIP: Pressing the enter key while typing in your notes will create bulletpoints which can help for if you want to make your notes a list essentially.">
-              <textarea class="form-control" id="presetNotes" placeholder="You should play this preset for the best experience ever with the albw randomizer!" name="notes"></textarea>
-              <label for="presetNotes">Notes (Optional)</label>
-            </div>`
-            else document.getElementById('publishingPresetDiv').innerHTML = '';
+          function setupPresetPublisher(elemId = 'publishingPresetDiv', appendExistingContent = false) {
+            gameRandoSourceCode.publishingPreset ||= {};
+            gameRandoSourceCode.publishingPreset[elemId] = !gameRandoSourceCode.publishingPreset[elemId];
+            if (gameRandoSourceCode.publishingPreset[elemId]) {
+              const fallbackContent = `<div class="form-floating" title="A name for your preset. Make sure to title it in a way where it's easy to find.">
+                <input type="text" class="form-control" id="presetName" placeholder="My New Preset" name="presetName" required>
+                <label for="presetName">Preset Name</label>
+              </div>
+              <div class="form-floating" title="Any notes about your preset. As of right now, this feature only works in the v0.4 family of the albw randomizer. PRO TIP: Pressing the enter key while typing in your notes will create bulletpoints which can help for if you want to make your notes a list essentially.">
+                <textarea class="form-control" id="presetNotes" placeholder="You should play this preset for the best experience ever with the albw randomizer!" name="notes"></textarea>
+                <label for="presetNotes">Notes (Optional)</label>
+              </div>`;
+              if (!appendExistingContent) document.getElementById(elemId).innerHTML = fallbackContent;
+              else document.getElementById(elemId).innerHTML = document.getElementById(elemId + 'Content')?.innerHTML || fallbackContent;
+            }
+            else document.getElementById(elemId).innerHTML = '';
           }
           function setVersion(obj) {
             document.getElementById('randoVer').innerText = obj.id
-            for (const eI of document.getElementById('versions').children) eI.classList.remove("bg-body-tertiary");
-            obj.classList.add("bg-body-tertiary");
+            for (const eI of document.getElementById('versions').children) eI.classList.remove("active");
+            obj.classList.add("active");
             jQuery('input[name="version"]').val($(obj).find(".my-0").text())
           }
           function grabURL4WebSocket() {
@@ -497,7 +517,17 @@
               <span class="badge bg-primary rounded-pill" id="randoVer">v0.4.0-release</span>
             </button>
             <ul class="dropdown-menu mb-3" id="versions">
-              <li id="v0.4.0-release" class="dropdown-item d-flex justify-content-between bg-body-tertiary" onclick="setVersion(this)">
+              <li id="v0.4.1-beta-2025-03-25" class="dropdown-item d-flex justify-content-between" onclick="setVersion(this)">
+                <div>
+                  <h6 class="my-0">v0.4.1 - Beta Build 2025-03-25</h6>
+                  <small class="text-body-secondary">
+                    <strong>Full Changelog</strong>: 
+                    <a href="https://github.com/rickfay/z17-randomizer/compare/v0.4.0-release...v0.4.1-beta-2025-03-25" target="_blank">v0.4.0-release...v0.4.1-beta-2025-03-25</a>
+                  </small>
+                </div>
+                <span class="text-warning">Pre Release</span>
+              </li>
+              <li id="v0.4.0-release" class="dropdown-item d-flex justify-content-between active" onclick="setVersion(this)">
                 <div>
                   <h6 class="my-0">v0.4.0</h6>
                   <small class="text-body-secondary">
@@ -642,8 +672,8 @@
                 const preset = document.getElementById('preset');
                 preset.innerText = $(obj).find("h6").text();
                 updateAttribute(preset, "data-presetNum", obj.getAttribute("data-presetNum"));
-                for (const child of document.getElementById('presets').children) $(child).removeClass("bg-body-tertiary");
-                $(obj).addClass("bg-body-tertiary");
+                for (const child of document.getElementById('presets').children) $(child).removeClass("active");
+                $(obj).addClass("active");
               }
               function updateAttribute(elem, attr, val) {
                 elem.removeAttribute(attr);
@@ -830,60 +860,107 @@
                 }
                 return json;
               }
+              function deletePreset(fileId) {
+                let hasConsent = confirm('Are you sure that you want to delete this preset?');
+                function handleError(e) {
+                  console.error(e);
+                  displayAlert("danger", e.toString());
+                  $("#myPresetsModal").modal('hide');
+                  $("#myPresetsModalDialog").show();
+                  $("#presetModificationPleaseWait").hide();
+                  $("#presetModificationStatus").text('');
+                }
+                if (hasConsent) {
+                  $("#myPresetsModalDialog").hide();
+                  $("#presetModificationPleaseWait").show();
+                  $("#presetModificationStatus").text('Deleting Preset...');
+                  const socket = new WebSocket(`${grabURL4WebSocket()}/uploadFile`);
+                  socket.addEventListener("message", e => {
+                    switch (e.data) {
+                      case "ok": {
+                        socket.send(JSON.stringify({
+                          onFileUploadAfter: "deletePreset",
+                          fileId
+                        }));
+                        break;
+                      } case "success": {
+                        loadSettings(() => {
+                          socket.close();
+                          handleError('')
+                          displayAlert("success", `Your preset was successfuly deleted!`)
+                          delete gameRandoSourceCode.publishingPreset[`publishingPresetDiv${fileId || ''}`];
+                        });
+                        break;
+                      } case "fail": {
+                        socket.close();
+                        handleError('An unknown error occured while deleting your preset from the server.');
+                      }
+                    }
+                  })
+                }
+              }
               function uploadPreset(obj) {
                 if (obj) {
+                  displayAlert()
+                  const id = obj.id || '';
                   const publishingPreset = Object.fromEntries(new URLSearchParams($(obj).serialize()));
-                  publishingPreset.private = !gameRandoSourceCode.publishingPreset;
-                  $(".presetUploadStatus").text('Uploading Preset...');
-                  const presetFile = document.getElementById('presetFile').files[0]
+                  gameRandoSourceCode.publishingPreset ||= {};
+                  publishingPreset.private = !gameRandoSourceCode.publishingPreset[`publishingPresetDiv${id || ''}`] 
+                  publishingPreset.notEditing = obj.getAttribute("data-editingpreset") != "1";
+                  const elem = 'preset' + (publishingPreset.notEditing ? 'Upload' : 'Modification');
+                  $('#' + elem + "Status").text('Uploading Preset...');
+                  const presetFile = document.getElementById('presetFile' + id).files[0];
+                  const ext = presetFile ? presetFile.name.substring(presetFile.name.lastIndexOf(".")) : ".json";
+                  publishingPreset.filename = id ? (id + ext) : `settingsPreset-z17-${(Math.random()).toString().substring(2)}${ext}`;
+                  document.getElementById('myPresetsModalDialog').style.display = "none"
                   obj.style.display = "none";
-                  $(".presetPleaseWait").show();
+                  $('#' + elem + "PleaseWait").show();
                   function handleError(e) {
                     if (e) console.error(e);
                     $("#presetUploader").modal('hide');
                     $("#myPresetsModal").modal('hide');
                     if (e) displayAlert("danger", e.toString());
-                    $(".presetPleaseWait").hide()
+                    $('#' + elem + "PleaseWait").hide()
+                    document.getElementById('myPresetsModalDialog').style.display = "block"
                     obj.style.display = "block";
                   }
                   if (presetFile) {
                     const fileInfo = {};
-                    for (const i in presetFile) fileInfo[i] = presetFile[i]
+                    for (const i in presetFile) fileInfo[i] = presetFile[i];
                     const socket = new WebSocket(`${grabURL4WebSocket()}/uploadFile?${new URLSearchParams(fileInfo).toString()}`);
                     const fileChunks = [];
                     const fileName = fileInfo.name; // Variable to store the name of the original file
-                    switch (fileName.substring(fileName.lastIndexOf(".") + 1)) {
-                      case "json":
-                      case "yaml":
-                      case "toml": break;
+                    switch (fileName.substring(fileName.lastIndexOf(".") + 1)) { // supported file types
+                      case "json": break; // supported
+                      // goes to default for unsupported files
                       default: return handleError("You have selected an unsupported file type for your preset. Please upload a file with the supported file type.");
                     }
                     const totalChunks = 100; // Variable to store the number of chunks
-                    $(".presetUploadStatus").text('Preparing Your Preset File for upload...');
-                    const progress = $(".presetFileUploadProgress")
-                    progress.attr("max", fileInfo.size);
-                    const chunkSize = Math.ceil(progress.attr("max") / totalChunks);
-                    progress.val(0);
+                    $('#' + elem + "Status").text('Preparing Your Preset File for upload...');
+                    const progress = document.getElementById(elem + "Progress");
+                    progress.setAttribute("max", presetFile.size);
+                    const chunkSize = Math.ceil(progress.getAttribute("max") / totalChunks);
+                    progress.value = 0;
                     for (let i = 0; i < totalChunks; i++) {
-                      const chunk = presetFile.slice(progress.val(), progress.val() + chunkSize);
+                      const chunk = presetFile.slice(progress.value, progress.value + chunkSize);
                       fileChunks.push(chunk);
-                      progress.val(progress.val() + chunkSize);
+                      progress.value += chunkSize;
                     }
-                    $(".presetUploadStatus").text('Uploading Your Preset File to the server...');
-                    progress.val(0)
-                    progress.attr("max", totalChunks);
+                    $('#' + elem + "Status").text('Uploading Your Preset File to the server...');
+                    progress.value = 0;
+                    progress.setAttribute("max", totalChunks);
                     socket.addEventListener("message", result => {
                       switch (result.data) {
                         case "ok": {
-                          if (progress.val() < progress.attr("max")) {
+                          if (progress.value < progress.getAttribute("max")) {
                             console.log('Server response:', result.data);
-                            socket.send(fileChunks[progress.val()]);
-                            progress.val(progress.val() + 1)
+                            socket.send(fileChunks[progress.value]);
+                            progress.value++
                           } else {
                             console.log('All chunks uploaded successfully.');
                             console.log(`The final response from server: ${result.data}`);
-                            $(".presetUploadStatus").text('Attempting to make your preset usable...');
-                            progress.removeAttr("value")
+                            $('#' + elem + "Status").text('Attempting to make your preset usable...');
+                            progress.removeAttribute("value");
                             socket.send(JSON.stringify({
                               onFileUploadAfter: "convert2preset",
                               publishingPreset,
@@ -898,8 +975,7 @@
                             displayAlert("success", `Your successfuly brought in your own preset! If things were done correctly, 
                             you or the other user should be able to use your preset at any time.`)
                             obj.reset();
-                            $('#publishingPresetDiv').hide();
-                            delete gameRandoSourceCode.publishingPreset;
+                            delete gameRandoSourceCode.publishingPreset[`publishingPresetDiv${id || ''}`];
                           });
                           break;
                         } case "fail": {
@@ -916,7 +992,9 @@
                     socket.addEventListener("message", result => {
                       switch (result.data) {
                         case "ok": {
-                          Object.assign(publishingPreset, parseArrayJSON(Object.fromEntries(new URLSearchParams($("#randomizer").serialize()))));
+                          if (
+                            publishingPreset.notEditing || publishingPreset.publishCurrentSettings
+                          ) Object.assign(publishingPreset, parseArrayJSON(Object.fromEntries(new URLSearchParams($("#randomizer").serialize()))));
                           socket.send(JSON.stringify({
                             onFileUploadAfter: "convert2preset",
                             publishingPreset,
@@ -930,8 +1008,7 @@
                             displayAlert("success", `Your successfuly brought in your own preset! If things were done correctly, 
                             you or the other user should be able to use your preset at any time.`)
                             obj.reset();
-                            $('#publishingPresetDiv').hide();
-                            delete gameRandoSourceCode.publishingPreset;
+                            delete gameRandoSourceCode.publishingPreset[`publishingPresetDiv${id || ''}`] 
                           });
                           break;
                         } case "fail": {
@@ -954,8 +1031,7 @@
                     <h6 class="my-0">Bring Your Own Preset</h6>
                     <small class="text-body-secondary">
                       With this feature, you may upload a preset file that will be used during game randomization!<br> 
-                      You may choose to publish your preset before it gets uploaded if you want to. 
-                      <br>otherwise, the preset will be deleted after game randomization or when you reload/leave this page.
+                      You may choose to publish your preset before it gets uploaded if you want to.
                     </small>
                   </div>
                   <span class="text-warning">BETA FEATURE</span>
@@ -977,8 +1053,8 @@
                   presets = d;
                   const myPresets = presets.filter(i => i.publisherIP == gameRandoSourceCode.myip);
                   $("#myPresets").html(`<div class="container text-center">
-                    <div class="row">
-                      ${myPresets.map(v => `<div class="col">
+                    <div class="row row-cols-auto">
+                      ${myPresets.map(v => `<div class="col-md-auto">
                         <div class="card">
                           <div class="card-body">
                             <h5 class="card-title">${v.presetName}</h5>
@@ -986,17 +1062,78 @@
                               NOTES:
                               <ul>${v.notes.map(v => `<li>${v}</li>`).join('\r\n') || '<li>No notes were provided</li>'}</ul>
                             </p>
-                            <a data-bs-toggle="collapse" href="#collapsableEditable" class="btn btn-primary">Modify Preset</a>
-                            <a href="javascript:;" class="btn btn-danger">Delete Preset</a>
+                            <a data-bs-toggle="collapse" href="#${v.id}" class="btn btn-primary">Modify Preset</a>
+                            <a href="javascript:deletePreset('${v.id}')" class="btn btn-danger">Delete Preset</a>
+                            <form class="collapse" id="${v.id}" data-editingpreset="1" action="javascript:;">
+                              <div class="card card-body">
+                                <div title="If you want, you may replace your current preset settings with the updated ones that you provided yourself in a JSON format. This allows users to upload their preset file as many times as they like without messing up server storage.">
+                                  <label class="form-label" for="presetFile${v.id}">Preset File (Must be a JSON file)</label>
+                                  <input type="file" id="presetFile${v.id}" accept=".json" class="form-control"/>
+                                </div>
+                                <div title="When checked, a section will appear where you can begin typing in your preset infomation">
+                                  <br>
+                                  <input${!v.private ? ' checked=""' : ''} type="checkbox" onclick="setupPresetPublisher('publishingPresetDiv${v.id}', true)" class="form-check-input" id="publishPresetCheckmark${v.id}"/>
+                                  <label class="form-check-label" for="publishPresetCheckmark${v.id}">Publish Preset</label>
+                                </div>
+                                <div id="publishingPresetDiv${v.id}"></div>
+                                ${!v.private ? `<script>
+                                  $("#publishingPresetDiv${v.id}").html($("#publishingPresetDiv${v.id}Content").html());
+                                  gameRandoSourceCode.publishingPreset ||= {};
+                                  gameRandoSourceCode.publishingPreset['publishingPresetDiv${v.id}'] = true;
+                                <\/script>` : ''}
+                                <div title="When checked, this will publish your current settings during preset modification. Otherwise, your current settings will not be published by default.">
+                                  <br>
+                                  <input type="checkbox" name="publishCurrentSettings" class="form-check-input" id="publishCurrentSettings${v.id}"/>
+                                  <label class="form-check-label" for="publishCurrentSettings${v.id}">Publish Current Preset Settings</label>
+                                </div>
+                              </div>
+                              <button onclick="uploadPreset(document.getElementById('${v.id}'))" class="btn btn-primary">Confirm Preset Modification</button>
+                            </form>
+                            <div id="publishingPresetDiv${v.id}Content" style="display: none;">
+                              <div class="form-floating" title="A name for your preset. Make sure to title it in a way where it's easy to find.">
+                                <input type="text" class="form-control" id="presetName${v.id}" placeholder="My New Preset" name="presetName" value="${v.presetName}">
+                                <label for="presetName${v.id}">Preset Name</label>
+                              </div>
+                              <div class="form-floating" title="Any notes about your preset. As of right now, this feature only works in the v0.4 family of the albw randomizer. PRO TIP: Pressing the enter key while typing in your notes will create bulletpoints which can help for if you want to make your notes a list essentially.">
+                                <textarea class="form-control" id="presetNotes${v.id}" placeholder="You should play this preset for the best experience with the albw randomizer!" name="notes" style="height: ${v.notes.join('').length}px;">${v.notes.join('\r\n')}</textarea>
+                                <label for="presetNotes${v.id}">Notes (Optional)</label>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>`).join('\r\n')}
+                      </div>`).join('\r\n') || `<div class="container">
+                        <div class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary">
+                          <div class="col-lg-6 px-0">
+                            <h1 class="display-4 fst-italic">Looks like you have not created any presets yet.</h1>
+                            <p class="lead my-3">There is so much benefit if you create your own preset. You may click on the "Show Benefits" link to learn more.</p>
+                            <p class="lead mb-0">
+                              <a href="javascript:;" data-bs-target="#presetBenefits" data-bs-toggle="collapse" class="text-body-emphasis fw-bold">
+                                Show Benefits
+                              </a>
+                            </p>
+                          </div>
+                        </div>
+                        <div class="row g-5 collapse bg-body-tertiary" id="presetBenefits">
+                          <div class="col-md-8">
+                            <h3 class="pb-4 mb-4 fst-italic border-bottom">
+                              The Benefits Of Creating A Preset
+                            </h3>
+                            <article class="blog-post">
+                              <p>
+                                While that's optional, creating a preset will help users in the ALBWR community randomize their game with it if they wanted to.
+                                You also won't have to worry about recreating user settings from the images manually if the publisher
+                                decides to upload their preset using <a href="javascript:uploadPreset()">this tool</a>.
+                              </p>
+                            </article>
+                          </div>
+                        </div>
+                      </div>`}
                     </div>
                   </div>`)
                   const preset = document.getElementById('preset');
                   if (document.getElementById('presetCustomization').value != "disabled") appendSetting(d[0]);
                   for (var i = 0; i < d.length; i++) document.getElementById('presets').insertAdjacentHTML(
-                    "beforeend", `<li class="dropdown-item d-flex justify-content-between${i == 0 ? ' bg-body-tertiary' : ''}" data-presetNum="${i}" onclick="selectPreset(this)" id="${d[i].id}">
+                    "beforeend", `<li class="dropdown-item d-flex justify-content-between${i == 0 ? ' active' : ''}" data-presetNum="${i}" onclick="selectPreset(this)" id="${d[i].id}">
                       <div>
                         <h6 class="my-0">${d[i].presetName}</h6>
                         <small class="text-body-secondary">
