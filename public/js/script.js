@@ -384,11 +384,13 @@ function randomizerSettings(d) {
                         } else {
                             const [_, cat1, cat2] = p.split(".")
                             const defaultValueProp = info.defaultValue[cat1];
-                            const defaultValue = defaultValueProp ? defaultValueProp[cat2]?.find(i => i == l) : '';
                             const keys = Object.keys(info.allOptions[cat1][cat2]);
-                            for (let i = 0; i < keys.length; i++) html += `<input${defaultValue ? ' checked=""' : ''} id="${keys[i].split(' ').join('').split("'").join('')}${i}" type="checkbox" name="settings[${setting}]${
-                                !noSetting2 ? `[${setting2}]` : ''
-                            }[${setting}.${cat1}][${cat2}][${i}][${keys[i]}]"/><label for="${keys[i].split(' ').join('').split("'").join('')}${i}">${keys[i]}</label><br><br>`;
+                            for (let i = 0; i < keys.length; i++) {
+                                const defaultValue = defaultValueProp ? defaultValueProp[cat2]?.find(l => l == keys[i]) : '';
+                                html += `<input${defaultValue ? ' checked=""' : ''} id="${keys[i].split(' ').join('').split("'").join('')}${i}" type="checkbox" name="settings[${setting}]${
+                                    !noSetting2 ? `[${setting2}]` : ''
+                                }[${setting}.${cat1}][${cat2}][${i}][${keys[i]}]"/><label for="${keys[i].split(' ').join('').split("'").join('')}${i}">${keys[i]}</label><br><br>`;
+                            }
                             break;
                         }
                     }

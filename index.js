@@ -393,7 +393,7 @@ app.use((req, _, next) => {
         const f = file.endsWith(".toml") ? decodeSettingsToml : decodeSettingsJSON;
         const info = f({
             id: file.substring(0, file.lastIndexOf("."))
-        }, `./uploads/${file}`);
+        }, `./uploads/${file}`, randoPath);
         // Keep the loop going if a private preset is detected but does not match the ip address provided by the user's browser.
         if (info.private && info.publisherIP != (req.headers['x-forwarded-for'] || 'localhost')) continue;
         // Push the info if all checks cleared successfuly.
@@ -477,7 +477,7 @@ app.use((req, _, next) => {
             fs.readdirSync(`${randoPath}/${localPrefix}-randomizer/config/presets`).forEach(file => {
                 presets.unshift(decodeSettingsToml({
                     id: file.substring(0, file.lastIndexOf("."))
-                }, `${randoPath}/${localPrefix}-randomizer/config/presets/${file}`));
+                }, `${randoPath}/${localPrefix}-randomizer/config/presets/${file}`, randoPath));
             })
             break;
         } 
@@ -489,7 +489,7 @@ app.use((req, _, next) => {
                 id: localPrefix,
                 notes: [],
                 settings: {}
-            }, `${randoPath}/presets/${localPrefix}.toml`))
+            }, `${randoPath}/presets/${localPrefix}.toml`, randoPath))
             break;
         } default: { // JSON is more universal with the ALBWR community, so I am allowing code modifiers to add as many example presets as they want.
             fs.readdirSync(`${randoPath}/presets`).forEach(file => {
@@ -511,7 +511,7 @@ app.use((req, _, next) => {
                     presetName: `Default ALBWR Standard Template`,
                     notes: [],
                     settings: {}
-                }, presetFile));
+                }, presetFile, randoPath));
             }
         }
     }
@@ -640,8 +640,11 @@ app.use((req, _, next) => {
 // Generates a zip for a randomized game
 .post('/genZipFromRandomizedGame', genGameZip);
 // functions
-function decodeSettingsToml(info = {}, tomlFile) { // Decodes some preset settings in a toml format (Work in progress).
+function decodeSettingsToml(info = {}, tomlFile, randoPath) { // Decodes some preset settings in a toml format (Work in progress).
     let tomlString = fs.readFileSync(tomlFile).toString('utf-8'), commentCount = 0, settingsCat;
+    const exclude = fs.existsSync(path.join(randoPath, 'excludableChecksList.yaml')) ? yaml.parse(
+        fs.readFileSync(path.join(randoPath, 'excludableChecksList.yaml')).toString('utf8')
+    ) : {}
     const optionTypes = {
         Skippable: ['Unchanged', 'Shuffled', 'Skip'],
         Progression: ['Unchanged', 'Shuffled']
@@ -660,13 +663,34 @@ function decodeSettingsToml(info = {}, tomlFile) { // Decodes some preset settin
         if (line.startsWith("## ")) comments.push(line.substring(3));
         if (line.startsWith("[") && line.endsWith("]")) {
             settingsCat = line.substring(1).slice(0, -1);
-            if (settingsCat.includes(".")) {
-
-            } else {
-                info.settings[settingsCat] = {};
+            if (!settingsCat.includes(".")) {
+                const json = info.settings[settingsCat] = {};
                 if (comments[commentCount]) {
-                    info.settings[settingsCat].comment = comments[commentCount];
+                    json.comment = comments[commentCount];
                     commentCount++;
+                }
+                if (settingsCat == "exclude") {
+                    info.settings.exclude.useCheckmarks = true;
+                    info.settings.exclude.defaultValue = {};
+                    info.settings.exclude.allOptions = exclude.layout
+                    let exclusiveCat;
+                    for (
+                        const line2 of tomlString.substring(tomlString.indexOf(`[exclude]`)).split("\r").join('').split("\n")
+                    ) {
+                        if (!line2) continue;
+                        if (line2.startsWith("[") && line2.endsWith("]")) {
+                            exclusiveCat = line2.substring(9).slice(0, -1);
+                            info.settings.exclude.defaultValue[exclusiveCat] = {}
+                        }
+                        if (line2.includes("' = ")) {
+                            const [key, value] = line2.split("' = ");
+                            if (
+                                exclusiveCat
+                            ) info.settings.exclude.defaultValue[exclusiveCat][
+                                key.substring(1)
+                            ] = value.substring(1).slice(0, -1).split('"').join('').split("'").join('').split(",");
+                        }
+                    }
                 }
             }
         } 
@@ -687,9 +711,7 @@ function decodeSettingsToml(info = {}, tomlFile) { // Decodes some preset settin
                     commentCount++
                 }
                 if (wordOptions[key]) json[key][typeof wordOptions[key] == "number" ? 'rangeNumOptionsTo' : 'allOptions'] = wordOptions[key];
-                else if (key == "exclude") {
-
-                } else json[key].useBooleanOptions = true;
+                else json[key].useBooleanOptions = true;
             }
         }
     }
@@ -705,7 +727,7 @@ function deleteALBWStuff(req, randoPath) { // deletes any existing albw stuff af
             if (
                 fs.existsSync(path.join(configFolder, `presets/${req.query.id}.toml`)) && req.query.deletePreset
             ) fs.unlinkSync(path.join(configFolder, `presets/${req.query.id}.toml`))
-            config = decodeSettingsToml({}, path.join(configFolder, `Rando.toml`));
+            config = decodeSettingsToml({}, path.join(configFolder, `Rando.toml`), randoPath);
             fs.rmSync(path.join(process.env.APPDATA, `${t}-randomizer`), {
                 recursive: true, 
                 force: true 
@@ -714,7 +736,7 @@ function deleteALBWStuff(req, randoPath) { // deletes any existing albw stuff af
         } 
         case "z17r":
         case "z17-rando": {
-            config = decodeSettingsToml({}, path.join(randoPath, 'config.toml'));
+            config = decodeSettingsToml({}, path.join(randoPath, 'config.toml'), randoPath);
             const presetFile = path.join(randoPath, `presets/${req.query.id}.toml`);
             if (req.query.deletePreset && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
             break;
@@ -771,12 +793,16 @@ async function genGameZip(req, res) { // Function to generate a randomized game 
         switch (req.query.v) {
             case "z17r":
             case "z17-rando": {
-                config = decodeSettingsToml({}, path.join(randoPath, 'config.toml'))
+                config = decodeSettingsToml({}, path.join(randoPath, 'config.toml'), randoPath)
                 break;
             } 
             case "albw": config = 'albw';
             case "z17-local": {
-                config = decodeSettingsToml({}, path.join(randoPath, `${config || 'z17'}-randomizer/config/Rando.toml`));
+                config = decodeSettingsToml(
+                    {}, 
+                    path.join(randoPath, `${config || 'z17'}-randomizer/config/Rando.toml`),
+                    randoPath
+                );
                 break;
             } default: config = JSON.parse(fs.readFileSync(path.join(randoPath, 'config.json')));
         }
@@ -802,28 +828,24 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 }
             }
         }
-        function writeOldToml(newToml = false) { // Pretty much converting json to toml which is slightly easier than doing this vice-versa thing.
+        function writeOldToml() { // Pretty much converting json to toml which is slightly easier than doing this vice-versa thing.
             let toml = '';
             for (const i in req.query.settings) {
                 toml += `[${i}]\r\n`;
-                if (i == "exclude") {
-                    if (!newToml) {
-                        for (const i in req.query.settings.exclude) {
-                            toml += `[${i}]\r\n`;
-                            const keys = Object.keys(req.query.settings.exclude[i])
-                            for (let b = 0; b < keys.length; b++) {
-                                const array = req.query.settings.exclude[i][keys[b]];
-                                const array2 = [];
-                                for (const info of array) array2.unshift(Object.keys(info)[0]);
-                                toml += `'${keys[b]}' = [\r\n`;
-                                for (var h = 0; h < array.length; h++) toml += `    '${array2[h]}'${h < array2.length - 1 ? ',\r\n' : ''}`;
-                                toml += `\r\n]\r\n`;
-                            }
-                        }
+                if (i == "exclude") for (const i in req.query.settings.exclude) {
+                    toml += `[${i}]\r\n`;
+                    const keys = Object.keys(req.query.settings.exclude[i])
+                    for (let b = 0; b < keys.length; b++) {
+                        const array = req.query.settings.exclude[i][keys[b]];
+                        const array2 = [];
+                        for (const info of array) array2.unshift(Object.keys(info)[0]);
+                        toml += `'${keys[b]}' = [\r\n`;
+                        for (var h = 0; h < array.length; h++) toml += `    '${array2[h]}'${h < array2.length - 1 ? ',\r\n' : ''}`;
+                        toml += `\r\n]\r\n`;
                     }
-                } else if (i == "exclusions") {
-                    if (newToml) toml += `"exclusions" = ${JSON.stringify(req.query.settings.exclusions.exclusions, null, "\t")}\r\n`
-                } else for (const c in req.query.settings[i]) toml += `${c} = ${
+                }
+                else if (i == "exclusions") toml += `"exclusions" = ${JSON.stringify(req.query.settings.exclusions?.exclusions || [], null, "\t")}\r\n`
+                else for (const c in req.query.settings[i]) toml += `${c} = ${
                     typeof string2boolean(req.query.settings[i][c]) == "string" ? `'${req.query.settings[i][c]}'` : req.query.settings[i][c]
                 }\r\n`;
             }
@@ -835,7 +857,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
         switch (req.query.v) { // assigns stuff to the config variable based off of source versions.
             case "z17r":
             case "z17-rando": {
-                config = decodeSettingsToml({}, path.join(randoPath, 'config.toml'));
+                config = decodeSettingsToml({}, path.join(randoPath, 'config.toml'), randoPath);
                 if (
                     req.query.settings && typeof req.query.settings == "object" && writeNewPreset
                 ) fs.writeFileSync(path.join(randoPath, `presets/${req.params.id}.toml`), writeOldToml(true));
@@ -847,7 +869,7 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
             } case "z17-local": {
                 const t = config || "z17";
                 const builtRandoConfigFolder = path.join(randoPath, `${t}-randomizer/config`);
-                config = decodeSettingsToml({}, path.join(builtRandoConfigFolder, `Rando.toml`));
+                config = decodeSettingsToml({}, path.join(builtRandoConfigFolder, `Rando.toml`), randoPath);
                 if (req.query.settings && typeof req.query.settings == "object" && writeNewPreset) {
                     const presetFile = path.join(builtRandoConfigFolder, `presets/${req.params.id}.toml`);
                     if (t == "z17" && req.query.settings.items) req.query.settings.items.first_bracelet = 'Skip';

@@ -15,12 +15,12 @@ unsafe_key_placement = false
 ## Excludes certain locations from having progression items.
 [exclude]
 ## Use the names from the spoiler log.
-[exclude.Hyrule]
-'Lost Woods' = [
-    'Pedestal'
-]
-[exclude.Lorule]
-'Lorule Field' = [
-    'Great Rupee Fairy',
-    'Thief Girl'
-]
+##[exclude.Hyrule]
+##'Lost Woods' = [
+##    'Pedestal'
+##]
+##[exclude.Lorule]
+##'Lorule Field' = [
+##    'Great Rupee Fairy',
+##    'Thief Girl'
+##]
