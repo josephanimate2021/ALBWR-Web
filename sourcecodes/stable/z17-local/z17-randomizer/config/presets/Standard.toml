@@ -1,34 +1,34 @@
 ## Modifications to the game's core mechanics.
 [modifications]
-## Enables the Y button from the start.
-y_button_enabled = false
+## Enabled the Y button from the start.
+y_button_enabled = true
 
-## Modifications to the game's logic.
+## Modifications to logic.
 [logic]
-## Disables the requirement for the lamp in dark areas.
-dont_require_lamp_for_darkness = false
-## Requires the seller's golden bee for the Bee Badge check.
-require_golden_bee_for_sale = false
-## Allows all of the keys to be placed in an order where one or more softlocks can occur.
-unsafe_key_placement = false
-## Place items using logic that potentially requires glitches to complete
-glitched_logic = false
+## Disables lamp requirement for dark areas.
+dont_require_lamp_for_darkness = true
+## Requires seller's golden bee for Bee Badge check.
+require_golden_bee_for_sale = true
+## Allows keys to be placed in an order that can lead to softlocks.
+unsafe_key_placement = true
 
-## Modifications to certain items in the game.
+## Modifications to certain items.
 [items]
-## The action that should be done to the Captain's Sword<br><br>WARNING: Changing this to Shuffled will cause the console to freak out in some versions. Please change this setting at your own risk.
-captains_sword = 'Unchanged'
-## The action that should be done to the Borrowed Sword.
-borrowed_sword = 'Unchanged'
-## The action that should be done to the Lamp.
-lamp = 'Unchanged'
+## Skips the Captain's Sword.
+captains_sword = 'Skip'
+## Shuffles the Borrowed Sword.
+borrowed_sword = 'Shuffled'
+## Shuffles the Lamp.
+lamp = 'Shuffled'
+## Skips Ravio's first bracelet.
+first_bracelet = 'Skip'
 
-## Modifications to the game's behavior.
+## Modifications to game behavior.
 [behavior]
 ## Starts the game in a pseudo-post-Sanctuary state.
-open = false
+open = true
 ## Enables the barrier around Hyrule Castle from the start.
-barrier = 'Unchanged'
+barrier = 'Start'
 
 ## Excludes certain locations from having progression items.
 [exclude]

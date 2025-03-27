@@ -1,0 +1,20 @@
+[modifications]
+y_button_enabled = true
+
+[logic]
+dont_require_lamp_for_darkness = false
+require_golden_bee_for_sale = false
+unsafe_key_placement = false
+glitched_logic = false
+
+[items]
+captains_sword = 'Skip'
+borrowed_sword = 'Shuffled'
+lamp = 'Shuffled'
+first_bracelet = 'Skip'
+
+[behavior]
+open = true
+barrier = 'Start'
+
+[exclude]

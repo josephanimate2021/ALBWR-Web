@@ -416,8 +416,11 @@ app.use((req, _, next) => {
             maiamai_limit: 100,
             nice_items: ["Vanilla", "Shuffled", "Off"],
             treacherous_tower_floors: 66,
+            hint_ghost_price: 9999,
             user_exclusions: excludableChecksJSON
         }
+        wordOptions.portal_shuffle = wordOptions.cracksanity;
+        wordOptions.ravios_shop = wordOptions.cracks;
         // exclusions are the same as user exclusions in v4, so who cares.
         wordOptions.exclusions = wordOptions.user_exclusions;
         const comments = [];
@@ -474,11 +477,18 @@ app.use((req, _, next) => {
         case "albw": localPrefix = "albw";
         case "z17-local": {
             localPrefix ||= "z17";
-            fs.readdirSync(`${randoPath}/${localPrefix}-randomizer/config/presets`).forEach(file => {
-                presets.unshift(decodeSettingsToml({
-                    id: file.substring(0, file.lastIndexOf("."))
-                }, `${randoPath}/${localPrefix}-randomizer/config/presets/${file}`, randoPath));
-            })
+            presets.unshift(decodeSettingsToml({
+                presetName: "Default ALBWR Open World Template",
+                id: "Open",
+                notes: [],
+                settings: {}
+            }, `${randoPath}/${localPrefix}-randomizer/config/presets/Open.toml`, randoPath));
+            presets.unshift(decodeSettingsToml({
+                presetName: "Default ALBWR Standard Template",
+                id: "Standard",
+                notes: [],
+                settings: {}
+            }, `${randoPath}/${localPrefix}-randomizer/config/presets/Standard.toml`, randoPath));
             break;
         } 
         case "z17-rando": localPrefix = "Standard";
@@ -645,6 +655,9 @@ function decodeSettingsToml(info = {}, tomlFile, randoPath) { // Decodes some pr
     const exclude = fs.existsSync(path.join(randoPath, 'excludableChecksList.yaml')) ? yaml.parse(
         fs.readFileSync(path.join(randoPath, 'excludableChecksList.yaml')).toString('utf8')
     ) : {}
+    const exclusions = fs.existsSync(path.join(randoPath, 'excludableChecksList.json')) ? JSON.parse(
+        fs.readFileSync(path.join(randoPath, 'excludableChecksList.json'))
+    ) : {}
     const optionTypes = {
         Skippable: ['Unchanged', 'Shuffled', 'Skip'],
         Progression: ['Unchanged', 'Shuffled']
@@ -669,32 +682,45 @@ function decodeSettingsToml(info = {}, tomlFile, randoPath) { // Decodes some pr
                     json.comment = comments[commentCount];
                     commentCount++;
                 }
-                if (settingsCat == "exclude") {
-                    info.settings.exclude.useCheckmarks = true;
-                    info.settings.exclude.defaultValue = {};
-                    info.settings.exclude.allOptions = exclude.layout
-                    let exclusiveCat;
-                    for (
-                        const line2 of tomlString.substring(tomlString.indexOf(`[exclude]`)).split("\r").join('').split("\n")
-                    ) {
-                        if (!line2) continue;
-                        if (line2.startsWith("[") && line2.endsWith("]")) {
-                            exclusiveCat = line2.substring(9).slice(0, -1);
-                            info.settings.exclude.defaultValue[exclusiveCat] = {}
+                switch (settingsCat) {
+                    case "exclude": {
+                        info.settings.exclude.useCheckmarks = true;
+                        info.settings.exclude.defaultValue = {};
+                        info.settings.exclude.allOptions = exclude.layout
+                        let exclusiveCat;
+                        for (
+                            const line2 of tomlString.substring(tomlString.indexOf(`[exclude]`)).split("\r").join('').split("\n")
+                        ) {
+                            if (!line2) continue;
+                            if (line2.startsWith("[") && line2.endsWith("]")) {
+                                exclusiveCat = line2.substring(9).slice(0, -1);
+                                info.settings.exclude.defaultValue[exclusiveCat] = {}
+                            }
+                            if (line2.includes("' = ")) {
+                                const [key, value] = line2.split("' = ");
+                                if (
+                                    exclusiveCat
+                                ) info.settings.exclude.defaultValue[exclusiveCat][
+                                    key.substring(1)
+                                ] = value.substring(1).slice(0, -1).split('"').join('').split("'").join('').split(",");
+                            }
                         }
-                        if (line2.includes("' = ")) {
-                            const [key, value] = line2.split("' = ");
-                            if (
-                                exclusiveCat
-                            ) info.settings.exclude.defaultValue[exclusiveCat][
-                                key.substring(1)
-                            ] = value.substring(1).slice(0, -1).split('"').join('').split("'").join('').split(",");
-                        }
+                        break;
+                    } case "exclusions": {
+                        const line = tomlString.substring(tomlString.indexOf(`[exclusions]`)).split("\r").join('').split("\n")[1]
+                        Object.assign(info.settings.exclusions, {
+                            exclusions: {
+                                useCheckmarks: true,
+                                defaultValue: JSON.parse(line.substring(15)),
+                                allOptions: exclusions
+                            }
+                        });
+                        break;
                     }
                 }
             }
         } 
-        if (line.includes(" = ")) {
+        if (line.includes(" = ") && !line.startsWith('"exclusions" = [')) {
             const [key, value] = line.split(" = ");
             if (settingsCat) {
                 if (!settingsCat.includes(".")) setInfo(info.settings[settingsCat]);
@@ -747,16 +773,6 @@ function deleteALBWStuff(req, randoPath) { // deletes any existing albw stuff af
             };
             const presetFile = path.join(randoPath, `presets/${req.query?.id}.json`);
             if ((req.query.deletePreset || fs.existsSync(`./uploads/${req.query?.id}.json`)) && fs.existsSync(presetFile)) fs.unlinkSync(presetFile);
-            if (fs.existsSync(`./uploads/${req.query?.id}.json`)) {
-                let presetInfo = fs.readFileSync(`./uploads/${req.query.id}.json`).toString('utf-8');
-                let p = presetInfo.indexOf("// ");
-                while (p > -1) {
-                    presetInfo = presetInfo.split(presetInfo.substring(p).split('\r').join('').split('\n')[0]).join('');
-                    p = presetInfo.indexOf("// ")
-                }
-                presetInfo = JSON.parse(presetInfo);
-                if (presetInfo.private) fs.unlinkSync(`./uploads/${req.query.id}.json`);
-            }
             break;
         } 
     }

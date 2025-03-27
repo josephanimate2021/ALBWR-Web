@@ -137,12 +137,14 @@ function versionsChecker(obj) {
         for (let i = 0; i < presets.length; i++) {
             const preset = presets[i];
             const infoPlaceholder = {
+                id: preset.id,
                 presetName: preset.presetName + ` Version ${e.value}`,
                 notes: preset.notes || [],
                 settings: {}
             }
             if (e.getAttribute('data-versionoptions')) {
                 array[i] = infoPlaceholder;
+                array[i].id += `-${obj.value}`;
                 const info = JSON.parse(e.getAttribute('data-versionoptions'));
                 for (const settingCat in preset.settings) array[i].settings[settingCat] = Object.assign({}, preset.settings[settingCat]);
                 for (const settingCat in info) {
@@ -428,6 +430,14 @@ function appendSettings(s) {
     }
     // shows user presets after they have been appended
     document.getElementById('presets').style.display = 'block';
+}
+
+// shows an alert banner
+function displayAlert(color, headerText, bodyText) {
+    document.getElementById('alertBlock').innerHTML = `<div class="w3-panel${color ? ` w3-${color}` : ''}">
+        <h3>${headerText}</h3>
+        <p>${bodyText}</p>
+    </div>`;
 }
 
 // The file input event handler

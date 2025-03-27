@@ -1,10 +1,10 @@
 {
-  // "Visit the <a href="https://github.com/rickfay/z17-randomizer/tree/dev#game-options">project GitHub</a> for details about each option."
+  // Visit the <a href="https://github.com/rickfay/z17-randomizer/tree/v0.4.1#game-options" target="_blank">project GitHub</a> for details about each option.
   "seed": 0,
   "presetName": "ALBWR Default Preset Version 0.4.1",
   "version": "v0.4.1 - Beta Build 2025-03-25",
   "settings": {
-
+    "dev_mode": false, // When this is enabled, developer mode will be used during game generation.
 
     "logic_mode":                  "Normal",                  // "Normal", "Hard", "Glitched", "AdvGlitched", "Hell", "NoLogic"
     "lc_requirement":              7,                         // Sage Portraits needed to enter Lorule Castle's front door.

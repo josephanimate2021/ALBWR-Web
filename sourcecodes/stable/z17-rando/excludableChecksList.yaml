@@ -1,283 +1,283 @@
 ---
 layout:
   Hyrule:
-    Hyrule Field:
-      Behind Blacksmith: Monster Horn
-      Blacksmith: Monster Tail
-      Blacksmith Cave: Boomerang
-      Castle (Indoors): Bottle
-      Castle Balcony: Heart Container
-      Castle Rocks: Progressive Mail
-      Clean Rocks: Gold Rupee
-      Dampe: Gold Rupee
-      Irene: Blue Rupee
-      Ravio (1): Heart Container
-      Ravio (2): Red Rupee
-      Ravio (3): Tornado Rod
-      Ravio (4): Piece of Heart
-      Ravio (5): Bracelet
-      Ravio (6): Master Ore
-      Ravio (7): Piece of Heart
-      Ravio (8): Hylian Shield
-      Ravio (9): Progressive Sword
-      Rosso: Progressive Sword
-      Rosso Cave: Bombs
-      Rupee Rush: Gold Rupee
-      Sanctuary Cave: Purple Rupee
-      Sanctuary Pegs: Bell
-      Treasure Room: Monster Guts
-      Woods: Silver Rupee
     Lake Hylia:
-      Bird Lover: Progressive Glove
-      Hyrule Hotfoot: Blue Rupee
+      Bird Lover: Monster Tail
+      Hyrule Hotfoot: Silver Rupee
       Ledge Chest: Purple Rupee
-      Secret Cave: Master Ore
+      Secret Cave: Bottle
       Shore: Message in a Bottle
       Torch Cave: Piece of Heart
     Sanctuary:
       Entrance: Monster Guts
-      Ledge: Small Key
-      Lower Chest: Red Rupee
-      Upper Chest: Blue Rupee
+      Ledge: Heart Container
+      Lower Chest: Hylian Shield
+      Upper Chest: Small Key
+    Hyrule Field:
+      Behind Blacksmith: Silver Rupee
+      Blacksmith: Bombs
+      Blacksmith Cave: Purple Rupee
+      Castle (Indoors): Pegasus Boots
+      Castle Balcony: Purple Rupee
+      Castle Rocks: Bracelet
+      Clean Rocks: Purple Rupee
+      Dampe: Piece of Heart
+      Irene: Fire Rod
+      Ravio (1): Red Rupee
+      Ravio (2): Monster Horn
+      Ravio (3): Tornado Rod
+      Ravio (4): Monster Horn
+      Ravio (5): Silver Rupee
+      Ravio (6): Piece of Heart
+      Ravio (7): Red Rupee
+      Ravio (8): Progressive Mail
+      Ravio (9): Boomerang
+      Rosso: Piece of Heart
+      Rosso Cave: Monster Guts
+      Rupee Rush: Gold Rupee
+      Sanctuary Cave: Purple Rupee
+      Sanctuary Pegs: Ice Rod
+      Treasure Room: Silver Rupee
+      Woods: Bottle
     Kakariko Village:
-      Bee Guy: Monster Horn
-      Bee Guy (Golden Bee): Progressive Sword
-      Cucco Ranch: Sand Rod
-      Fortune Teller: Heart Container
-      Jail: Bottle
-      Merchant (Left): Silver Rupee
-      Merchant (Right): Piece of Heart
-      Milk Bar Owner: Ice Rod
-      Shady Guy: Hammer
-      Stylish Woman: Piece of Heart
-      Well (Chest): Silver Rupee
-      Well (Upper): Gold Rupee
-    Zoras Domain:
-      Behind Waterfall: Blue Rupee
-      Chest: Blue Rupee
-      Zora Queen: Hookshot
-    Eastern Ruins:
-      Armos Chest: Purple Rupee
-      Cave: Monster Guts
-      Hookshot Chest: Flippers
-      Merge Chest: Monster Guts
-      Pegs (South): Silver Rupee
-      Treasure Room: Gold Rupee
+      Bee Guy: Green Rupee
+      Bee Guy (Golden Bee): Piece of Heart
+      Cucco Ranch: Progressive Mail
+      Fortune Teller: Progressive Sword
+      Jail: Silver Rupee
+      Merchant (Left): Purple Rupee
+      Merchant (Right): Progressive Sword
+      Milk Bar Owner: Progressive Glove
+      Shady Guy: Piece of Heart
+      Stylish Woman: Master Ore
+      Well (Chest): Red Rupee
+      Well (Upper): Purple Rupee
     Death Mountain:
-      Blocked Cave: Piece of Heart
-      Bouldering Guy: Purple Rupee
+      Blocked Cave: Red Rupee
+      Bouldering Guy: Pouch
       Distant Pillar: Red Rupee
-      Fairy Cave: Red Rupee
-      First Cave: Progressive Sword
-      Hidden Area: Premium Milk
-      Ledge Chest: Monster Tail
+      Fairy Cave: Hookshot
+      First Cave: Purple Rupee
+      Hidden Area: Monster Guts
+      Ledge Chest: Red Rupee
       Ore Mine Column: Piece of Heart
-      Rock Cave (Pegs): Purple Rupee
-      Rock Cave (Top): Net
-      Treasure Room: Pegasus Boots
+      Rock Cave (Pegs): Bottle
+      Rock Cave (Top): Purple Rupee
+      Treasure Room: Red Rupee
     Southern Ruins:
-      Behind Pillars: Piece of Heart
-      Ledge: Piece of Heart
-      Runaway Item Seller: Monster Guts
-      Treasure Room: Fire Rod
+      Behind Pillars: Progressive Glove
+      Ledge: Silver Rupee
+      Runaway Item Seller: Bell
+      Treasure Room: Blue Rupee
     Lost Woods:
-      Alcove: Silver Rupee
-      Chest: Green Rupee
-      Pedestal: Red Rupee
+      Alcove: Red Rupee
+      Chest: Blue Rupee
+      Pedestal: Bottle
+    Zoras Domain:
+      Behind Waterfall: Purple Rupee
+      Chest: Purple Rupee
+      Zora Queen: Monster Horn
+    Eastern Ruins:
+      Armos Chest: Monster Tail
+      Cave: Silver Rupee
+      Hookshot Chest: Silver Rupee
+      Merge Chest: Blue Rupee
+      Pegs (South): Monster Guts
+      Treasure Room: Blue Rupee
   Lorule:
+    Dark Ruins:
+      Hinox (1): Red Rupee
+      Hinox (2): Blue Rupee
+      Hinox (3): Monster Tail
+      Hinox (4): Smooth Gem
+      Hinox (5): Sand Rod
+      Hinox (6): Piece of Heart
+      Lake Chest: Master Ore
+      Maze Chest: Piece of Heart
+      Maze Ledge: Piece of Heart
+    Death Mountain:
+      Behind Ice Gimos: Silver Rupee
+      Ice Gimos (West): Master Ore
+      Ledge (East): Piece of Heart
+      Ledge (West): Silver Rupee
+      Treacherous Tower (Intermediate): Purple Rupee
+    Skull Woods:
+      Alcove: Piece of Heart
+      Balcony: Master Ore
+      Chest: Monster Guts
     Lorule Field:
-      Big Bomb Cave: Red Rupee
-      Blacksmith: Silver Rupee
-      Great Rupee Fairy: Purple Rupee
-      Hookshot Ledge: Bottle
-      Octoball Derby: Lamp
+      Big Bomb Cave: Piece of Heart
+      Blacksmith: Hammer
+      Great Rupee Fairy: Red Rupee
+      Hookshot Ledge: Premium Milk
+      Octoball Derby: Monster Tail
       Rupee Rush: Piece of Heart
       Swamp Cave (Left): Gold Rupee
       Swamp Cave (Middle): Piece of Heart
-      Swamp Cave (Right): Red Rupee
-      Thief Girl: Pouch
-      Treasure Room: Master Ore
-      Vacant House: Smooth Gem
-    Death Mountain:
-      Behind Ice Gimos: Stamina Scroll
-      Ice Gimos (West): Monster Horn
-      Ledge (East): Piece of Heart
-      Ledge (West): Silver Rupee
-      Treacherous Tower (Intermediate): Progressive Glove
-    Skull Woods:
-      Alcove: Purple Rupee
-      Balcony: Silver Rupee
-      Chest: Silver Rupee
-    Dark Ruins:
-      Hinox (1): Monster Guts
-      Hinox (2): Blue Rupee
-      Hinox (3): Silver Rupee
-      Hinox (4): Purple Rupee
-      Hinox (5): Heart Container
-      Hinox (6): Bow
-      Lake Chest: Red Rupee
-      Maze Chest: Silver Rupee
-      Maze Ledge: Red Rupee
-    Lorule Lake:
-      Balcony: Monster Guts
-      Chest: Gold Rupee
+      Swamp Cave (Right): Silver Rupee
+      Thief Girl: Gold Rupee
+      Treasure Room: Silver Rupee
+      Vacant House: Flippers
     Misery Mire:
-      Ledge: Red Rupee
-      Treasure Room: Blue Rupee
+      Ledge: Lamp
+      Treasure Room: Silver Rupee
     Graveyard:
-      Big Chest: Piece of Heart
-      Field Chest: Red Rupee
+      Big Chest: Purple Rupee
+      Field Chest: Silver Rupee
+    Lorule Lake:
+      Balcony: Silver Rupee
+      Chest: Heart Container
   Dungeons:
     Eastern Palace:
-      (1F) Defeat Popos: Piece of Heart
-      (1F) Hidden Door: Silver Rupee
-      (1F) Near Entrance: Piece of Heart
-      (1F) Outside (East): Heart Container
-      (1F) Outside (West): Monster Guts
-      (1F) Switch Puzzle: Small Key
-      (2F) Ball Room: Bottle
-      (2F) Big Chest: Compass
-      (2F) Defeat Popos: Big Key
-      (2F) Switch Room: Small Key
-      (3F) After Cutscene: Heart Container
-      (3F) Outside (North): Purple Rupee
-      Yuga: Red Rupee
+      (1F) Defeat Popos: Purple Rupee
+      (1F) Hidden Door: Small Key
+      (1F) Near Entrance: Silver Rupee
+      (1F) Outside (East): Red Rupee
+      (1F) Outside (West): Compass
+      (1F) Switch Puzzle: Hint Glasses
+      (2F) Ball Room: Big Key
+      (2F) Big Chest: Monster Guts
+      (2F) Defeat Popos: Gold Rupee
+      (2F) Switch Room: Blue Rupee
+      (3F) After Cutscene: Small Key
+      (3F) Outside (North): Silver Rupee
+      Yuga: Purple Rupee
     House of Gales:
-      (1F) Blue Bari Room: Silver Rupee
-      (1F) Blue Bari Room (Bottom Left): Small Key
+      (1F) Blue Bari Room: Purple Rupee
+      (1F) Blue Bari Room (Bottom Left): Big Key
       (1F) Fire Bubbles: Small Key
-      (1F) Switch Room: Small Key
+      (1F) Switch Room: Piece of Heart
       (1F) Torches: Small Key
-      (2F) Big Chest: Silver Rupee
-      (2F) Fire Ring: Big Key
-      (2F) Narrow Ledge: Compass
-      (3F) Fire Bubbles: Bottle
-      (3F) Rat Room: Piece of Heart
-      Margomill: Silver Rupee
+      (2F) Big Chest: Purple Rupee
+      (2F) Fire Ring: Small Key
+      (2F) Narrow Ledge: Small Key
+      (3F) Fire Bubbles: Red Rupee
+      (3F) Rat Room: Compass
+      Margomill: Gold Rupee
     Tower of Hera:
-      (11F) Big Chest: Red Rupee
-      (1F) Center: Silver Rupee
-      (1F) Outside: Big Key
+      (11F) Big Chest: Monster Guts
+      (1F) Center: Small Key
+      (1F) Outside: Silver Rupee
       (3F) Platform: Small Key
-      (5F) Red/Blue Switches: Silver Rupee
-      (6F) Left Mole: Small Key
-      (6F) Right Mole: Compass
-      (7F) Outside (Ledge): Silver Rupee
-      (8F) Fairy Room: Monster Guts
-      Moldorm: Piece of Heart
+      (5F) Red/Blue Switches: Heart Container
+      (6F) Left Mole: Compass
+      (6F) Right Mole: Monster Guts
+      (7F) Outside (Ledge): Monster Guts
+      (8F) Fairy Room: Big Key
+      Moldorm: Blue Rupee
     Graveyard:
-      Entrance: Purple Rupee
-      Ledge: Red Rupee
-      Lower Chest: Piece of Heart
-      Upper Chest: Small Key
+      Entrance: Progressive Sword
+      Ledge: Heart Container
+      Lower Chest: Small Key
+      Upper Chest: Silver Rupee
     Dark Palace:
-      (1F) Fall From 2F: Heart Container
-      (1F) Hidden Room (Lower): Silver Rupee
-      (1F) Hidden Room (Upper): Small Key
-      (1F) Narrow Ledge: Big Key
-      (1F) Near Entrance: Small Key
-      (1F) Switch Puzzle: Silver Rupee
-      (2F) Alcove: Purple Rupee
-      (2F) Big Chest (Hidden): Master Ore
-      (B1) Big Chest (Switches): Silver Rupee
-      (B1) Fall From 1F: Piece of Heart
-      (B1) Helmasaur Room: Bee Badge
-      (B1) Helmasaur Room (Fall): Small Key
-      (B1) Maze: Small Key
-      Gemesaur King: Compass
+      (1F) Fall From 2F: Compass
+      (1F) Hidden Room (Lower): Small Key
+      (1F) Hidden Room (Upper): Silver Rupee
+      (1F) Narrow Ledge: Small Key
+      (1F) Near Entrance: Heart Container
+      (1F) Switch Puzzle: Small Key
+      (2F) Alcove: Piece of Heart
+      (2F) Big Chest (Hidden): Gold Rupee
+      (B1) Big Chest (Switches): Red Rupee
+      (B1) Fall From 1F: Small Key
+      (B1) Helmasaur Room: Monster Guts
+      (B1) Helmasaur Room (Fall): Red Rupee
+      (B1) Maze: Big Key
+      Gemesaur King: Bow of Light
     Swamp Palace:
-      (1F) Big Chest (Fire): Red Rupee
+      (1F) Big Chest (Fire): Big Key
       (1F) East Room: Small Key
-      (1F) Water Puzzle: Small Key
-      (1F) West Room: Blue Rupee
+      (1F) Water Puzzle: Silver Rupee
+      (1F) West Room: Small Key
       (B1) Big Chest (Secret): Silver Rupee
-      (B1) Center: Heart Container
-      (B1) Gyorm: Small Key
-      (B1) Raft Room (Left): Silver Rupee
-      (B1) Raft Room (Pillar): Purple Rupee
-      (B1) Raft Room (Right): Small Key
-      (B1) Waterfall Room: Big Key
-      Arrghus: Compass
+      (B1) Center: Gold Rupee
+      (B1) Gyorm: Monster Guts
+      (B1) Raft Room (Left): Small Key
+      (B1) Raft Room (Pillar): Small Key
+      (B1) Raft Room (Right): Compass
+      (B1) Waterfall Room: Piece of Heart
+      Arrghus: Heart Container
     Skull Palace:
       (B1) Big Chest (Eyes): Silver Rupee
-      (B1) Big Chest (Upper): Big Key
-      (B1) Gibdo Room (Hole): Progressive Mail
+      (B1) Big Chest (Upper): Silver Rupee
+      (B1) Gibdo Room (Hole): Small Key
       (B1) Gibdo Room (Lower): Small Key
       (B1) Grate Room: Small Key
-      (B1) South Chest: Small Key
-      (B2) Moving Platform Room: Purple Rupee
+      (B1) South Chest: Big Key
+      (B2) Moving Platform Room: Bee Badge
       Knucklemaster: Compass
     Thieves Hideout:
       (B1) Behind Wall: Silver Rupee
       (B1) Big Chest (Entrance): Compass
-      (B1) Grate Chest: Big Key
-      (B1) Jail Cell: Small Key
-      (B2) Eyegores: Silver Rupee
-      (B2) Grate Chest (Fall): Purple Rupee
+      (B1) Grate Chest: Stamina Scroll
+      (B1) Jail Cell: Heart Container
+      (B2) Eyegores: Red Rupee
+      (B2) Grate Chest (Fall): Big Key
       (B2) Jail Cell: Silver Rupee
-      (B2) Switch Puzzle Room: Red Rupee
+      (B2) Switch Puzzle Room: Small Key
       (B3) Big Chest (Hidden): Piece of Heart
-      (B3) Underwater: Silver Rupee
-      Stalblind: Piece of Heart
+      (B3) Underwater: Piece of Heart
+      Stalblind: Silver Rupee
     Ice Ruins:
-      (1F) Hidden Chest: Purple Rupee
-      (B1) East Chest: Gold Rupee
-      (B1) Narrow Ledge: Heart Container
+      (1F) Hidden Chest: Red Rupee
+      (B1) East Chest: Progressive Sword
+      (B1) Narrow Ledge: Silver Rupee
       (B1) Upper Chest: Silver Rupee
-      (B2) Far North: Red Rupee
-      (B3) Big Chest (Puzzle): Small Key
-      (B3) Grate Chest (Left): Small Key
-      (B3) Grate Chest (Right): Heart Container
-      (B4) Ice Pillar: Small Key
-      (B4) Narrow Platform: Big Key
-      (B4) Southeast Chest (Fall): Silver Rupee
-      (B4) Southwest Chest (Fall): Purple Rupee
-      (B4) Switches: Monster Tail
-      (B5) Big Chest: Piece of Heart
+      (B2) Far North: Small Key
+      (B3) Big Chest (Puzzle): Silver Rupee
+      (B3) Grate Chest (Left): Silver Rupee
+      (B3) Grate Chest (Right): Small Key
+      (B4) Ice Pillar: Purple Rupee
+      (B4) Narrow Platform: Purple Rupee
+      (B4) Southeast Chest (Fall): Big Key
+      (B4) Southwest Chest (Fall): Silver Rupee
+      (B4) Switches: Piece of Heart
+      (B5) Big Chest: Small Key
       Dharkstare: Compass
     Desert Palace:
-      (1F) Behind Rocks: Silver Rupee
-      (1F) Big Chest (Behind Wall): Small Key
+      (1F) Behind Rocks: Heart Container
+      (1F) Big Chest (Behind Wall): Silver Rupee
       (1F) Entrance: Big Key
-      (1F) Sand Room (North): Monster Guts
-      (1F) Sand Room (South): Piece of Heart
-      (1F) Sand Switch Room: Small Key
-      (2F) Beamos Room: Red Rupee
+      (1F) Sand Room (North): Small Key
+      (1F) Sand Room (South): Compass
+      (1F) Sand Switch Room: Red Rupee
+      (2F) Beamos Room: Purple Rupee
       (2F) Big Chest (Puzzle): Small Key
-      (2F) Leever Room: Compass
+      (2F) Leever Room: Piece of Heart
       (2F) Red/Blue Switches: Piece of Heart
       (2F) Under Rock (Ball Room): Small Key
       (2F) Under Rock (Left): Monster Guts
-      (2F) Under Rock (Right): Piece of Heart
+      (2F) Under Rock (Right): Small Key
       (3F) Armos Room: Small Key
-      (3F) Silver Rupee: Monster Tail
-      Zaganaga: Purple Rupee
+      (3F) Silver Rupee: Bottle
+      Zaganaga: Green Rupee
     Turtle Rock:
-      (1F) Center: Purple Rupee
-      (1F) Defeat Flamolas: Small Key
+      (1F) Center: Heart Container
+      (1F) Defeat Flamolas: Piece of Heart
       (1F) Grate Chest: Silver Rupee
-      (1F) Northeast Ledge: Silver Rupee
-      (1F) Portal Room (Northwest): Silver Rupee
+      (1F) Northeast Ledge: Net
+      (1F) Portal Room (Northwest): Piece of Heart
       (1F) Southeast Chest: Big Key
       (B1) Big Chest (Center): Small Key
-      (B1) Big Chest (Top): Silver Rupee
-      (B1) Grate Chest (Small): Compass
-      (B1) Northeast Room: Red Rupee
+      (B1) Big Chest (Top): Piece of Heart
+      (B1) Grate Chest (Small): Red Rupee
+      (B1) Northeast Room: Small Key
       (B1) Platform: Small Key
-      Grinexx: Purple Rupee
+      Grinexx: Compass
     Lorule Castle:
       (1F) Center: Small Key
-      (1F) Ledge: Green Rupee
+      (1F) Ledge: Piece of Heart
       (2F) Hidden Path: Silver Rupee
       (2F) Ledge: Small Key
-      (2F) Near Torches: Purple Rupee
-      (3F) Ball Trial (Chest): Hint Glasses
-      (3F) Ball Trial (Puzzle): Piece of Heart
+      (2F) Near Torches: Silver Rupee
+      (3F) Ball Trial (Chest): Silver Rupee
+      (3F) Ball Trial (Puzzle): Small Key
       (3F) Bomb Trial (Behind Rock): Small Key
-      (3F) Bomb Trial (Chest): Small Key
-      (4F) Center: Monster Guts
-      (4F) Hidden Path: Compass
-      (4F) Hookshot Trial (Chest): Small Key
-      (4F) Hookshot Trial (Eyes): Piece of Heart
-      (4F) Lamp Trial: Silver Rupee
-      Zelda: Bow of Light
+      (3F) Bomb Trial (Chest): Heart Container
+      (4F) Center: Bow
+      (4F) Hidden Path: Small Key
+      (4F) Hookshot Trial (Chest): Compass
+      (4F) Hookshot Trial (Eyes): Gold Rupee
+      (4F) Lamp Trial: Red Rupee
+      Zelda: Blue Rupee

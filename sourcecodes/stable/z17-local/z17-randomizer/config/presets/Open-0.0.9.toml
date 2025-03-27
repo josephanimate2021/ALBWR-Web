@@ -1,0 +1,10 @@
+[logic]
+dont_require_lamp_for_darkness = false
+unsafe_key_placement = false
+glitched_logic = false
+shuffle_bracelet = false
+
+[options]
+night_mode = false
+
+[exclude]

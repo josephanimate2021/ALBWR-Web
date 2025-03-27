@@ -2,7 +2,8 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
         <title>The Legend Of Zelda: A Link Between Worlds Randomizer - Web UI</title>
         <link rel="stylesheet" href="/css/style.css">
         <link rel="stylesheet" href="/css/xterm.css"/>
@@ -14,6 +15,12 @@
             <h1 id="logo">
                 <img src="https://github.com/user-attachments/assets/a1185a97-2e5f-4bde-901b-23836b2ca64e" alt="The Legend Of Zelda: A Link Between Worlds Randomizer">
             </h1>
+            <div id="alertBlock">
+                <div class="w3-panel">
+                    <h3></h3>
+                    <p></p>
+                </div>
+            </div>
             <div id="step01" style="display: none;">
                 <h2>Decrypted North America ALBW Rom File</h2>
                 <p>
@@ -28,8 +35,8 @@
                 </div>
                 <div id="fileName" style="margin: 10%;"></div>
                 <button type="button" disabled id="uploadButtonChunk" class="greenBtn">Upload</button>
-                <div id="progressBar" class="progressBarClass" style="display: none;">
-                    <div id="progressBarInner"></div>
+                <div class="w3-light-grey w3-round-xlarge" id="progressBar" style="display: none;">
+                    <div class="w3-container w3-green w3-round-xlarge" style="width:0%" id="progressBarInner">0%</div>
                 </div>
             </div>
             <div id="settingsPresetMaker" class="modal">
@@ -39,11 +46,29 @@
                         <h2>Create A Setting Preset</h2>
                     </div>
                     <div class="modal-body">
-                        <p>Some text in the Modal Body</p>
-                        <p>Some other text...</p>
+                        <p>
+                            By either uploading your preset file or publishing your current preset settings, 
+                            you are giving users more ideas on how they can randomize their game making their gameplay experience look like 
+                            a new game that just came out of the box.
+                        </p>
+                        <form id="presetFileUploader" action="javascript:;" onsubmit="uploadPresetFile(this)">
+                            <label for="presetFile">Preset File</label>
+                            <input type="file" id="presetFile" name="file" accept=".json,.yaml,.toml"><br>
+                            <input type="checkbox" id="publishingPresetCheckbox" onclick="setupPresetPublisher()"/>
+                            <label for="publishingPresetCheckbox">Publish Preset</label><br>
+                            <div id="publishingPresetDiv"></div>
+                            <br><br>
+                            <button type="submit" class="greenBtn">Confirm Preset Creation</button>
+                        </form>
+                        <div class="w3-light-grey w3-round-xlarge" style="display: none;">
+                            <div class="w3-container w3-green w3-round-xlarge" style="width:0%">0%</div>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <h3>Modal Footer</h3>
+                        <h3>
+                            This feature is currently in beta and is right now exclusive for json file uploads. 
+                            toml and yaml file support is coming pretty soon. I hope that you're ready for the action to take place!
+                        </h3>
                     </div>
                 </div>
             </div>
@@ -65,7 +90,7 @@
                         <option value="z17-local">z17 (Older)</option>
                         <option value="albw">albw</option>
                     </select><br>
-                    <input id="link2cli" type="button" value="Randomize Game With The CLI" class="greenBtn" onclick="location.href = `/cli?v=${this.getAttribute('data-v')}&execV=${this.getAttribute('data-execv')}&sourceVersion=stable&type=randomizer`"/>
+                    <input id="link2cli" type="button" value="Randomize Game With The CLI" class="greenBtn" onclick="window.open(`/cli?v=${this.getAttribute('data-v')}&execV=${this.getAttribute('data-execv')}&sourceVersion=stable&type=randomizer`, '_blank')"/>
                 </div>
                 <h2>Randomizer Settings</h2>
                 <h6>
@@ -84,12 +109,12 @@
                 <hr>
                 <div id="options">
                     <h3 title="Allows you to apply options that change the behavior of the albw randomizer executable.">Generation Options</h3>
-                    <div title="Adds a flag/arguement to the albw randomizer executable where it is told to not patch your game at all.">
+                    <div title="Adds an arguement to the albw randomizer executable where it is told to not patch your game at all.">
                         <input type="checkbox" id="noPatch" name="noPatch">
                         <label for="noPatch">Disable Game Patching</label>
                         <br><br>
                     </div>
-                    <div title="Adds a flag/arguement to the albw randomizer executable where it is told to not generate your spoiler log.">
+                    <div title="Adds an arguement to the albw randomizer executable where it is told to not generate your spoiler log.">
                         <input type="checkbox" id="noSpoilers" name="noSpoilers">
                         <label for="noSpoilers">Disable Spoiler Log</label>
                         <br><br>
@@ -98,13 +123,13 @@
                         <label for="seed">Seed (Optional)</label><br>
                         <input type="number" id="seed" name="seed"><br><br>
                     </div>
-                    <div id="noVerboseDiv" style="display: none;" title="Removes a flag/arguement from the albw randomizer executable where it is told to not use verbose mode for game generation.
+                    <div id="noVerboseDiv" style="display: none;" title="Removes an arguement from the albw randomizer executable where it is told to not use verbose mode for game generation.
                     removal only works on versions a0.0.2 and below">
                         <input type="checkbox" id="noVerbose" name="noVerbose">
                         <label for="noVerbose">Disable Verbose Mode</label><br><br>
                     </div>
-                    <div title="When enabled, developer mode will be used during game generation" id="devModeDiv" style="display: none;"></div>
-                    <div title="If disabled, you won't have to worry about customizing your preset with the GUI until you reload this page. You will just instead select a preset option provided for game generation.">
+                    <div title="When this setting is enabled, developer mode will be used during game generation" id="devModeDiv" style="display: none;"></div>
+                    <div title="When this setting is disabled, you won't have to worry about customizing your preset with the GUI until you reload this page. You will just instead select a preset option provided for game generation.">
                         <label for="presetCustomization">Preset Editor</label><br>
                         <select id="presetCustomization" onchange="loadSettings(document.getElementById('version').value, appendSettings)">
                             <option>enabled</option>

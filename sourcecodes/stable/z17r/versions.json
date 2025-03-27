@@ -20,6 +20,52 @@
             }
         }
     },
+    "0.1.3": {
+        "versionName": "v0.1.3",
+        "desc": "",
+        "addOptions": {
+            "logic": {
+                "maiamai_madness": {
+                    "comment": "Maiamai Madness. Shuffles Maiamai into the pool, adding 100 more locations",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "vanes_activated": {
+                    "comment": "Pre-activates all Weather Vanes (EXPERIMENTAL). May cause Bracelet(s) to be located in any region of Lorule.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "lampless": {
+                    "comment": "Dont require Lamp. If true, the player may have to cross dark rooms without a light source. If youre not sure, select false.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            }
+        }
+    },
+    "0.2.0": {
+        "versionName": "v0.2.0",
+        "desc": "",
+        "addOptions": {
+            "logic": {
+                "maiamai_madness": {
+                    "comment": "Maiamai Madness. Shuffles Maiamai into the pool, adding 100 more locations",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "vanes_activated": {
+                    "comment": "Pre-activates all Weather Vanes (EXPERIMENTAL). May cause Bracelet(s) to be located in any region of Lorule.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "lampless": {
+                    "comment": "Dont require Lamp. If true, the player may have to cross dark rooms without a light source. If youre not sure, select false.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            }
+        }
+    },
     "0.3.0-dev-build-1": {
         "versionName": "v0.3.0 - Dev Build 1",
         "desc": "v0.3.0-dev-build-1\r\n\r\nadd back map toggle, fix lorule music, fix HC 4F cutscene, add big special something",

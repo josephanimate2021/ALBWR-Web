@@ -2,111 +2,111 @@
 layout:
   Hyrule:
     Hyrule Field:
-      Blacksmith: Monster Guts
-      Castle (Indoors): Silver Rupee
-      Castle Balcony: Red Rupee
+      Blacksmith: Red Rupee
+      Castle (Indoors): Red Rupee
+      Castle Balcony: Progressive Mail
       Dampe: Progressive Sword
-      Irene: Bell
-      "Ravio's Shop (1)": Red Rupee
-      "Ravio's Shop (2)": Boomerang
-      "Ravio's Shop (3)": Progressive Sword
-      "Ravio's Shop (4)": Red Rupee
-      "Ravio's Shop (5)": Progressive Glove
-      "Ravio's Shop (6)": Monster Horn
-      "Ravio's Shop (7)": Progressive Glove
-      "Ravio's Shop (8)": Lamp
-      "Ravio's Shop (9)": Hammer
-      Rosso: Fire Rod
-      Rosso Cave: Gold Rupee
+      Irene: Red Rupee
+      "Ravio's Shop (1)": Progressive Sword
+      "Ravio's Shop (2)": Hookshot
+      "Ravio's Shop (3)": Monster Tail
+      "Ravio's Shop (4)": Monster Horn
+      "Ravio's Shop (5)": Silver Rupee
+      "Ravio's Shop (6)": Ice Rod
+      "Ravio's Shop (7)": Monster Guts
+      "Ravio's Shop (8)": Silver Rupee
+      "Ravio's Shop (9)": Monster Guts
+      Rosso: Red Rupee
+      Rosso Cave: Silver Rupee
       "Rosso's Rocks": Silver Rupee
-      Rupee Rush: Silver Rupee
-      Sanctuary Pegs: Silver Rupee
+      Rupee Rush: Blue Rupee
+      Sanctuary Pegs: "Ravio's Bracelet"
       Treasure Hunter Room: Red Rupee
-      Woods: Sand Rod
+      Woods: Progressive Sword
     Kakariko Village:
       Bar: Premium Milk
-      Bee Guy: Bombs
-      Closed House: Monster Guts
-      Cucco Ranch: Flippers
-      Fortune Teller: Silver Rupee
-      Jail: Red Rupee
+      Bee Guy: Purple Rupee
+      Closed House: Silver Rupee
+      Cucco Ranch: Bottle
+      Fortune Teller: Red Rupee
+      Jail: Blue Rupee
       Merchant (Left): Bottle
       Merchant (Right): Smooth Gem
-      Shady Guy: Blue Rupee
-      Well: Purple Rupee
+      Shady Guy: Purple Rupee
+      Well: Silver Rupee
     Lake Hylia:
-      Hyrule Hotfoot: Gold Rupee
-      Ledge Chest: Blue Rupee
-      Secret Cave: Piece of Heart
+      Hyrule Hotfoot: Red Rupee
+      Ledge Chest: Purple Rupee
+      Secret Cave: Silver Rupee
       Shore: Message in a Bottle
-      Torch Cave: Silver Rupee
-      Under Bridge: Blue Rupee
+      Torch Cave: Flippers
+      Under Bridge: Bow of Light
     Sanctuary:
-      Entrance: Small Key
-      Lower Chest: Red Rupee
-      Upper Chest: Red Rupee
-    Southern Ruins:
-      Ledge: Gold Rupee
-      Runaway Item Seller: Hookshot
-      Treasure Hunter Cave: "Ravio's Bracelet"
-    Death Mountain:
-      Blocked Cave: Master Ore
-      Cave (Lower): Purple Rupee
-      Climber: Monster Guts
-      Fairy Cave: Bug Net
-      Ledge Chest: Red Rupee
-      Peg Chest: Red Rupee
-      Rock Cave (Top): Red Rupee
-      Treasure Hunter Room: Purple Rupee
+      Entrance: Lamp
+      Lower Chest: Purple Rupee
+      Upper Chest: Small Key
     Eastern Ruins:
-      Armos Chest: Bottle
-      Hookshot Chest: Purple Rupee
-      Merge Chest: Gold Rupee
-      Treasure Hunter Room: Ice Rod
-    "Zora's Domain":
-      Chest: Purple Rupee
-      Zora Queen: Silver Rupee
-    Lost Woods:
-      Chest: Purple Rupee
-      Pedestal: Gold Rupee
-  Lorule:
-    Dark Ruins:
-      Hinox (1): Silver Rupee
-      Hinox (2): Monster Guts
-      Hinox (3): Silver Rupee
-      Hinox (4): Pegasus Boots
-      Hinox (5): Hint Glasses
-      Hinox (6): Silver Rupee
-      Lake Chest: Master Ore
-      Maze Chest: Red Rupee
-    Cemetary:
-      Big Chest: Silver Rupee
-      Entrance: Blue Rupee
-      Field Chest: Bottle
-      Lower Chest: Master Ore
-      Upper Chest: Silver Rupee
-    Lorule Field:
-      Big Bomb Cave: Bottle
-      Big Fairy: Silver Rupee
-      Blacksmith: Blue Rupee
-      Ledge: Master Ore
-      Octoball Derby: Red Rupee
-      Rupee Rush: Silver Rupee
-      Swamp Cave (Left): Monster Guts
-      Swamp Cave (Right): Piece of Heart
-      Thief Girl: Gold Rupee
-      Treasure Hunter Room: Progressive Sword
-      Vacant House: Monster Tail
+      Armos Chest: Progressive Glove
+      Hookshot Chest: Silver Rupee
+      Merge Chest: Monster Horn
+      Treasure Hunter Room: Piece of Heart
     Death Mountain:
-      Ice Statues: Stamina Scroll
-      Ledge (East): Progressive Mail
-      Ledge (West): Silver Rupee
-      Top: Monster Guts
+      Blocked Cave: Blue Rupee
+      Cave (Lower): Hammer
+      Climber: Silver Rupee
+      Fairy Cave: Silver Rupee
+      Ledge Chest: Bombs
+      Peg Chest: Tornado Rod
+      Rock Cave (Top): Silver Rupee
+      Treasure Hunter Room: Progressive Mail
+    Lost Woods:
+      Chest: Sand Rod
+      Pedestal: Purple Rupee
+    "Zora's Domain":
+      Chest: Silver Rupee
+      Zora Queen: Monster Guts
+    Southern Ruins:
+      Ledge: Silver Rupee
+      Runaway Item Seller: Piece of Heart
+      Treasure Hunter Cave: Bottle
+  Lorule:
+    Lorule Field:
+      Big Bomb Cave: Red Rupee
+      Big Fairy: Master Ore
+      Blacksmith: Monster Tail
+      Ledge: Blue Rupee
+      Octoball Derby: Silver Rupee
+      Rupee Rush: Silver Rupee
+      Swamp Cave (Left): Piece of Heart
+      Swamp Cave (Right): Green Rupee
+      Thief Girl: Pegasus Boots
+      Treasure Hunter Room: Monster Guts
+      Vacant House: Master Ore
+    Cemetary:
+      Big Chest: Stamina Scroll
+      Entrance: Blue Rupee
+      Field Chest: Master Ore
+      Lower Chest: Hylian Shield
+      Upper Chest: Bug Net
     Skull Woods:
-      Chest: Red Rupee
-    Misery Mire:
-      Treasure Hunter Room: Silver Rupee
+      Chest: Boomerang
     Lorule Lake:
-      Chest: Bottle
+      Chest: Red Rupee
+    Dark Ruins:
+      Hinox (1): Monster Guts
+      Hinox (2): Progressive Sword
+      Hinox (3): Silver Rupee
+      Hinox (4): Monster Guts
+      Hinox (5): Monster Horn
+      Hinox (6): Purple Rupee
+      Lake Chest: Red Rupee
+      Maze Chest: Gold Rupee
+    Death Mountain:
+      Ice Statues: Hint Glasses
+      Ledge (East): Gold Rupee
+      Ledge (West): Monster Guts
+      Top: Monster Guts
     Lorule Castle:
-      Zelda: Purple Rupee
+      Zelda: Silver Rupee
+    Misery Mire:
+      Treasure Hunter Room: Bottle

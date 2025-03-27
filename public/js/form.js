@@ -49,11 +49,11 @@ function setBar(percent) {
     progressBar.style.display = 'block';
 
     if (percent === 101) {
-        progressBar.classList.remove('progressBarClass');
         progressBar.innerHTML = `<p> Upload complete! Refreshing the page... </p>`;
         window.location.reload();
         return;
     }
 
     progressBarInner.style.width = `${percent}%`;
+    progressBarInner.innerHTML = `${percent}%`;
 }
