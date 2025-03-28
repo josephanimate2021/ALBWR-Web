@@ -686,24 +686,23 @@ function decodeSettingsToml(info = {}, tomlFile, randoPath) { // Decodes some pr
                     case "exclude": {
                         info.settings.exclude.useCheckmarks = true;
                         info.settings.exclude.defaultValue = {};
-                        info.settings.exclude.allOptions = exclude.layout
+                        info.settings.exclude.allOptions = exclude.layout;
                         let exclusiveCat;
-                        for (
-                            const line2 of tomlString.substring(tomlString.indexOf(`[exclude]`)).split("\r").join('').split("\n")
-                        ) {
-                            if (!line2) continue;
-                            if (line2.startsWith("[") && line2.endsWith("]")) {
-                                exclusiveCat = line2.substring(9).slice(0, -1);
-                                info.settings.exclude.defaultValue[exclusiveCat] = {}
+                        const exclusiveSubstring = tomlString.substring(tomlString.indexOf(`[exclude]`));
+                        let p = exclusiveSubstring.indexOf("##");
+                        while (p > -1) {
+                            const n = p + 2;
+                            const string = exclusiveSubstring.substring(n);
+                            const line = string.split('\r').join('').split('\n')[0]
+                            if (line.startsWith("[") && line.endsWith("]") && line.includes(".")) {
+                                exclusiveCat = line.substring(1).slice(0, -1).split(".")[1];
+                                info.settings.exclude.defaultValue[exclusiveCat] = {};
+                            } else if (line.includes("' = ")) {
+                                const [key, value] = line.split("'").join("").split(" = ");
+                                const stringArray = string.substring(string.indexOf(`'${key}' = ${value}`) + (key.length + 5)).split("##").join('').split("]")[0] + ']';
+                                info.settings.exclude.defaultValue[exclusiveCat][key] = stringArray.substring(1).slice(0, -1).split('\r').join('').split('\n').join('').split(",").map(v => v.split("'").join('').substring(4));
                             }
-                            if (line2.includes("' = ")) {
-                                const [key, value] = line2.split("' = ");
-                                if (
-                                    exclusiveCat
-                                ) info.settings.exclude.defaultValue[exclusiveCat][
-                                    key.substring(1)
-                                ] = value.substring(1).slice(0, -1).split('"').join('').split("'").join('').split(",");
-                            }
+                            p = exclusiveSubstring.indexOf("##", n);
                         }
                         break;
                     } case "exclusions": {
@@ -868,15 +867,13 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
             return toml;
         }
         let config;
-        if (req.query?.settings?.exclusions?.exclusions) req.query.settings.exclusions.exclusions = Object.keys(req.query.settings.exclusions.exclusions);
-        if (req.query?.settings?.user_exclusions) req.query.settings.user_exclusions = Object.keys(req.query.settings.user_exclusions);
         switch (req.query.v) { // assigns stuff to the config variable based off of source versions.
             case "z17r":
             case "z17-rando": {
                 config = decodeSettingsToml({}, path.join(randoPath, 'config.toml'), randoPath);
                 if (
                     req.query.settings && typeof req.query.settings == "object" && writeNewPreset
-                ) fs.writeFileSync(path.join(randoPath, `presets/${req.params.id}.toml`), writeOldToml(true));
+                ) fs.writeFileSync(path.join(randoPath, `presets/${req.params.id}.toml`), writeOldToml());
                 if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
                 break;
             } case "albw": {
@@ -888,7 +885,6 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 config = decodeSettingsToml({}, path.join(builtRandoConfigFolder, `Rando.toml`), randoPath);
                 if (req.query.settings && typeof req.query.settings == "object" && writeNewPreset) {
                     const presetFile = path.join(builtRandoConfigFolder, `presets/${req.params.id}.toml`);
-                    if (t == "z17" && req.query.settings.items) req.query.settings.items.first_bracelet = 'Skip';
                     if (!fs.existsSync(presetFile)) fs.writeFileSync(presetFile, writeOldToml());
                 }
                 if (req.params?.id && req.params.type == "randomizer") command.push(`--preset ${req.params.id}`);
@@ -914,7 +910,14 @@ function writeALBWFile(req = {}, versions = {}, randoPath, writeNewPreset = fals
                 c(`${t}-randomizer`)
                 break;
             } default: {
-                const info = req.query.v == "z17v3" ? req.query.settings : req.query;
+                const info = req.query.v == "z17v3" ? (() => {
+                    if (req.query?.settings?.exclusions?.exclusions) req.query.settings.exclusions.exclusions = Object.keys(req.query.settings.exclusions.exclusions);
+                    return req.query.settings
+                })() : (() => {
+                    if (req.query?.settings?.user_exclusions) req.query.settings.user_exclusions = Object.keys(req.query.settings.user_exclusions);
+                    if (req.query?.settings?.exclusions) req.query.settings.exclusions = Object.keys(req.query.settings.exclusions);
+                    return req.query;
+                })()
                 const presetFolder = path.join(randoPath, 'presets');
                 const presetFile = path.join(presetFolder, req.params?.id || './');
                 if (info && typeof info == "object" && writeNewPreset) {

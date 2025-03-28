@@ -4,7 +4,7 @@
   "version": "SGL Tournament Build - 2024-09-10",
   "presetName": "ALBWR Bingo Preset",
   "settings": {
-    "dev_mode": false, // When this is enabled, developer mode will be used during game generation.
+    "dev_mode": false, // When this setting is enabled, developer mode will be used during game generation.
 
     "logic_mode":                  "Normal",                  // "Normal", "Hard", "Glitched", "AdvGlitched", "Hell", "NoLogic"
     "lc_requirement":              7,                         // Sage Portraits needed to enter Lorule Castle's front door.

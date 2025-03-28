@@ -4,7 +4,7 @@
   "seed": 0,
   "version": "v0.4.0 - SNAPSHOT",
   "settings": {
-    "dev_mode": false, // When this is enabled, developer mode will be used during game generation.
+    "dev_mode": false, // When this setting is enabled, developer mode will be used during game generation.
 
     "lc_requirement":              7,                         // Sage Portraits needed to enter Lorule Castle's front door,
     "ped_requirement":             "Standard",                // MS Pedestal Pendant requirement: (2) "Vanilla", (3) "Charmed", or (4) "Standard"
