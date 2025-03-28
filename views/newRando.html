@@ -871,8 +871,8 @@
                                 </div>
                               </div>`;
                               else html += `<div class="form-check">
-                                <input class="form-check-input" id="${n}@${k}" name="settings[${settingName}][${k}]" type="checkbox">
-                                <label for="${n}@${k}" class="form-check-label">${k.split("_").map(capWord).join(' ')}</label>
+                                <input class="form-check-input" id="${n}@${k.split(" ").join("")}" name="settings[${settingName}][${k}]" type="checkbox">
+                                <label for="${n}@${k.split(" ").join("")}" class="form-check-label">${k.split("_").map(capWord).join(' ')}</label>
                               </div>`;
                             }
                             return html;
