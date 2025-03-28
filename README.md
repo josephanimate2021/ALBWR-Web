@@ -1,6 +1,8 @@
 <div align="center">
   <h1>
-    The Legend Of Zelda: A Link Between Worlds Randomizer 
+    The Legend Of Zelda
+    <br>
+    A Link Between Worlds Randomizer 
     <br>
     (Web Interface)
   </h1>
