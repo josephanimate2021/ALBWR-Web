@@ -1,7 +1,7 @@
 {
   "name": "albwr-web",
   "version": "1.0.0",
-  "description": "A Node.JS App that executes the albw-randomizer file using the input provided by the user",
+  "description": "A Node.JS app that runs the albw randomizer cli executables to randomize albw with user input from the GUI",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js"
@@ -10,10 +10,9 @@
   "author": "Joseph",
   "license": "MIT",
   "dependencies": {
-    "archipelago.js": "^2.0.4",
     "express": "^4.19.2",
     "jszip": "^3.10.1",
-    "multer": "^1.4.5-lts.1",
-    "ws": "^8.18.1"
+    "ws": "^8.18.1",
+    "yaml": "^2.7.0"
   }
 }

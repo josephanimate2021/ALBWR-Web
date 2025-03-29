@@ -1,0 +1,416 @@
+{
+    "0.3.0-dev-build-3": {
+        "versionName": "v0.3.0 Dev Build 3",
+        "desc": "EmoTracker Pack for this release: https://github.com/rickfay/ALBW-Randomizer-Tracker/releases/tag/dev-build-3"
+    },
+    "0.3.0-dev-build-4": {
+        "versionName": "v0.3.0 Dev Build 4",
+        "desc": "Full Changelog: https://github.com/rickfay/z17-randomizer/compare/e0af7ea...7565a58\r\n\r\nEmoTracker Pack for this release: https://github.com/rickfay/ALBW-Randomizer-Tracker/releases/tag/dev-build-4",
+        "addOptions": {
+            "logic": {
+                "sword_in_shop": {
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                }
+            }
+        }
+    },
+    "0.3.0-rc1": {
+        "versionName": "v0.3.0-RC1",
+        "desc": "ALBW Randomizer v0.3.0 Release Candidate 1\r\n\r\nFull Changelog: https://github.com/rickfay/z17-randomizer/compare/master...v0.3.0\r\n\r\nEmoTracker Pack for this release (same as dev build 4's): https://github.com/rickfay/ALBW-Randomizer-Tracker/releases/tag/dev-build-4",
+        "addOptions": {
+            "logic": {
+                "logic_mode": {
+                    "comment": "\"Normal\", \"Hard\", \"Glitched\", \"AdvGlitched\", \"Hell\", \"NoLogic\""
+                },
+                "randomize_dungeon_prizes": {
+                    "comment": "This shuffles all Sage Portraits, Pendants, and the Charm among themselves."
+                },
+                "lc_requirement": {
+                    "comment": "Sage Portraits needed to enter Lorule Castles front door"
+                },
+                "ped_requirement": {
+                    "comment": "MS Pedestal Pendant requirement: (2) Vanilla, (3) Charmed, or (4) Standard"
+                },
+                "hyrule_castle_setting": {
+                    "comment": "Hyrule Castle Dungeon setting, choose either: EarlyLoruleCastle or Closed",
+                    "defaultValue": "EarlyLoruleCastle",
+                    "allOptions": ["Closed", "EarlyLoruleCastle"]
+                },
+                "nice_mode": {
+                    "comment": "This shuffles a second progressive copy of each Ravio Item into the general item pool."
+                },
+                "super_items": {
+                    "comment": "This shuffles a second progressive copy of the Lamp and Net into the general item pool."
+                },
+                "reverse_sage_events": {
+                    "comment": "Ties Sage-related checks and events to actually rescuing that Sage."
+                },
+                "no_progression_enemies": {
+                    "comment": "Removes Enemies from dungeons that are themselves Progression (e.g.: Bawbs, the bomb enemy)"
+                },
+                "start_with_merge": {
+                    "comment": "Start with the ability to Merge into walls, without Ravios Bracelet."
+                },
+                "bell_in_shop": {
+                    "comment": "If enabled the Bell will be placed in Ravios Shop."
+                },
+                "pouch_in_shop": {
+                    "comment": "If enabled the Pouch will be placed in Ravios Shop."
+                },
+                "sword_in_shop": {
+                    "comment": "If enabled at least one Sword will be placed in Ravios Shop. (Note: This option is incompatible with Swordless Mode, which removes all Swords from the game.)",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "boots_in_shop": {
+                    "comment": "If enabled the Pegasus Boots will be placed in Ravios Shop."
+                },
+                "assured_weapon": {
+                    "comment": "If enabled at least one weapon is guaranteed to be placed in Ravios Shop. (Note: incompatible with boots_in_shop and sword_in_shop)."
+                },
+                "maiamai_madness": {
+                    "comment": "This shuffles Maiamai into the pool, adding 100 more locations."
+                },
+                "minigames_excluded": {
+                    "comment": "Excludes the following: Octoball Derby, Dodge the Cuccos, Hyrule Hotfoot, Treacherous Tower, and both Rupee Rushes"
+                },
+                "skip_big_bomb_flower": {
+                    "comment": "Skips the Big Bomb Flower by removing the 5 Big Rocks in Lorule Field."
+                },
+                "skip_trials": {
+                    "comment": "Automatically opens the Lorule Castle Trials door."
+                },
+                "bow_of_light_in_castle": {
+                    "comment": "Limits the Bow of Lights placement to somewhere in Lorule Castle (including possibly Zelda)."
+                },
+                "weather_vanes_activated": {
+                    "comment": "Begin the game with all Weather Vanes activated. Not supported by any trackers currently."
+                },
+                "dark_rooms_lampless": {
+                    "comment": "If enabled the logic may expect players to cross Dark Rooms without the Lamp."
+                },
+                "swordless_mode": {
+                    "comment": "Removes *ALL* Swords from the game."
+                },
+                "hint_ghost_price": {
+                    "comment": "Price of Hints from Hint Ghosts. Can be any integer between 0 and 9999 (Recommended: 30).",
+                    "defaultValue": 30,
+                    "rangeNumOptionsTo": 9999
+                }
+            },
+            "options": {
+                "chest_size_matches_contents": {
+                    "comment": "All chests containing progression or unique items will become large, and others will be made small."
+                },
+                "night_mode": {
+                    "comment": "Enables certain shaders on the overworld that make it look like nighttime in Hyrule."
+                }
+            },
+            "exclusions": {
+                "comment": "Exclude certain locations to guarantee Junk Items will be placed there."
+            }
+        }
+    },
+    "0.3.0-rc2": {
+        "versionName": "v0.3.0-rc2",
+        "desc": "ALBW Randomizer v0.3.0 Release Candidate 2\r\n\r\nFull Changelog: https://github.com/rickfay/z17-randomizer/compare/master...v0.3.0\r\n\r\nEmoTracker Pack for this release: https://github.com/rickfay/ALBW-Randomizer-Tracker/releases/tag/v0.3.0-rc2-tracker",
+        "addOptions": {
+            "logic": {
+                "logic_mode": {
+                    "comment": "\"Normal\", \"Hard\", \"Glitched\", \"AdvGlitched\", \"Hell\", \"NoLogic\""
+                },
+                "randomize_dungeon_prizes": {
+                    "comment": "This shuffles all Sage Portraits, Pendants, and the Charm among themselves."
+                },
+                "lc_requirement": {
+                    "comment": "Sage Portraits needed to enter Lorule Castles front door"
+                },
+                "ped_requirement": {
+                    "comment": "MS Pedestal Pendant requirement: (2) Vanilla, (3) Charmed, or (4) Standard"
+                },
+                "hyrule_castle_setting": {
+                    "comment": "Hyrule Castle Dungeon setting, choose either: EarlyLoruleCastle or Closed",
+                    "defaultValue": "EarlyLoruleCastle",
+                    "allOptions": ["Closed", "EarlyLoruleCastle"]
+                },
+                "nice_mode": {
+                    "comment": "This shuffles a second progressive copy of each Ravio Item into the general item pool."
+                },
+                "super_items": {
+                    "comment": "This shuffles a second progressive copy of the Lamp and Net into the general item pool."
+                },
+                "reverse_sage_events": {
+                    "comment": "Ties Sage-related checks and events to actually rescuing that Sage."
+                },
+                "no_progression_enemies": {
+                    "comment": "Removes Enemies from dungeons that are themselves Progression (e.g.: Bawbs, the bomb enemy)"
+                },
+                "start_with_merge": {
+                    "comment": "Start with the ability to Merge into walls, without Ravios Bracelet."
+                },
+                "bell_in_shop": {
+                    "comment": "If enabled the Bell will be placed in Ravios Shop."
+                },
+                "pouch_in_shop": {
+                    "comment": "If enabled the Pouch will be placed in Ravios Shop."
+                },
+                "sword_in_shop": {
+                    "comment": "If enabled at least one Sword will be placed in Ravios Shop. (Note: This option is incompatible with Swordless Mode, which removes all Swords from the game.)",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "boots_in_shop": {
+                    "comment": "If enabled the Pegasus Boots will be placed in Ravios Shop."
+                },
+                "assured_weapon": {
+                    "comment": "If enabled at least one weapon is guaranteed to be placed in Ravios Shop. (Note: incompatible with boots_in_shop and sword_in_shop)."
+                },
+                "maiamai_madness": {
+                    "comment": "This shuffles Maiamai into the pool, adding 100 more locations."
+                },
+                "minigames_excluded": {
+                    "comment": "Excludes the following: Octoball Derby, Dodge the Cuccos, Hyrule Hotfoot, Treacherous Tower, and both Rupee Rushes"
+                },
+                "skip_big_bomb_flower": {
+                    "comment": "Skips the Big Bomb Flower by removing the 5 Big Rocks in Lorule Field."
+                },
+                "skip_trials": {
+                    "comment": "Automatically opens the Lorule Castle Trials door."
+                },
+                "bow_of_light_in_castle": {
+                    "comment": "Limits the Bow of Lights placement to somewhere in Lorule Castle (including possibly Zelda)."
+                },
+                "weather_vanes_activated": {
+                    "comment": "Begin the game with all Weather Vanes activated. Not supported by any trackers currently."
+                },
+                "dark_rooms_lampless": {
+                    "comment": "If enabled the logic may expect players to cross Dark Rooms without the Lamp."
+                },
+                "swordless_mode": {
+                    "comment": "Removes *ALL* Swords from the game."
+                },
+                "hint_ghost_price": {
+                    "comment": "Price of Hints from Hint Ghosts. Can be any integer between 0 and 9999 (Recommended: 30).",
+                    "defaultValue": 30,
+                    "rangeNumOptionsTo": 9999
+                }
+            },
+            "options": {
+                "chest_size_matches_contents": {
+                    "comment": "All chests containing progression or unique items will become large, and others will be made small."
+                },
+                "night_mode": {
+                    "comment": "Enables certain shaders on the overworld that make it look like nighttime in Hyrule."
+                }
+            },
+            "exclusions": {
+                "comment": "Exclude certain locations to guarantee Junk Items will be placed there."
+            }
+        }
+    },
+    "0.3.0": {
+        "versionName": "v0.3.0 - Release",
+        "desc": "ALBW Randomizer v0.3.0\r\n\r\nFull Changelog: https://github.com/rickfay/z17-randomizer/compare/6e223fee779fa39b9852de3e89549cb29148579a...2fc98fc5c273fb19a351277ae63351eaac9e7b99",
+        "addOptions": {
+            "logic": {
+                "logic_mode": {
+                    "comment": "\"Normal\", \"Hard\", \"Glitched\", \"AdvGlitched\", \"Hell\", \"NoLogic\""
+                },
+                "randomize_dungeon_prizes": {
+                    "comment": "This shuffles all Sage Portraits, Pendants, and the Charm among themselves."
+                },
+                "vanilla_charm": {
+                    "comment": "Forces one of the two Pendant of Courage Upgrades to be in Zeldas Throne Room if enabled.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "lc_requirement": {
+                    "comment": "Sage Portraits needed to enter Lorule Castles front door"
+                },
+                "ped_requirement": {
+                    "comment": "MS Pedestal Pendant requirement: (2) Vanilla, (3) Charmed, or (4) Standard"
+                },
+                "hyrule_castle_setting": {
+                    "comment": "Hyrule Castle Dungeon setting, choose either: EarlyLoruleCastle or Closed",
+                    "defaultValue": "EarlyLoruleCastle",
+                    "allOptions": ["Closed", "EarlyLoruleCastle"]
+                },
+                "nice_mode": {
+                    "comment": "This shuffles a second progressive copy of each Ravio Item into the general item pool."
+                },
+                "super_items": {
+                    "comment": "This shuffles a second progressive copy of the Lamp and Net into the general item pool."
+                },
+                "reverse_sage_events": {
+                    "comment": "Ties Sage-related checks and events to actually rescuing that Sage."
+                },
+                "no_progression_enemies": {
+                    "comment": "Removes Enemies from dungeons that are themselves Progression (e.g.: Bawbs, the bomb enemy)"
+                },
+                "start_with_merge": {
+                    "comment": "Start with the ability to Merge into walls, without Ravios Bracelet."
+                },
+                "bell_in_shop": {
+                    "comment": "If enabled the Bell will be placed in Ravios Shop."
+                },
+                "pouch_in_shop": {
+                    "comment": "If enabled the Pouch will be placed in Ravios Shop."
+                },
+                "sword_in_shop": {
+                    "comment": "If enabled at least one Sword will be placed in Ravios Shop. (Note: This option is incompatible with Swordless Mode, which removes all Swords from the game.)",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "boots_in_shop": {
+                    "comment": "If enabled the Pegasus Boots will be placed in Ravios Shop."
+                },
+                "assured_weapon": {
+                    "comment": "If enabled at least one weapon is guaranteed to be placed in Ravios Shop. (Note: incompatible with boots_in_shop and sword_in_shop)."
+                },
+                "maiamai_madness": {
+                    "comment": "This shuffles Maiamai into the pool, adding 100 more locations."
+                },
+                "minigames_excluded": {
+                    "comment": "Excludes the following: Octoball Derby, Dodge the Cuccos, Hyrule Hotfoot, Treacherous Tower, and both Rupee Rushes"
+                },
+                "skip_big_bomb_flower": {
+                    "comment": "Skips the Big Bomb Flower by removing the 5 Big Rocks in Lorule Field."
+                },
+                "skip_trials": {
+                    "comment": "Automatically opens the Lorule Castle Trials door."
+                },
+                "bow_of_light_in_castle": {
+                    "comment": "Limits the Bow of Lights placement to somewhere in Lorule Castle (including possibly Zelda)."
+                },
+                "weather_vanes_activated": {
+                    "comment": "Begin the game with all Weather Vanes activated. Not supported by any trackers currently."
+                },
+                "dark_rooms_lampless": {
+                    "comment": "If enabled the logic may expect players to cross Dark Rooms without the Lamp."
+                },
+                "swordless_mode": {
+                    "comment": "Removes *ALL* Swords from the game."
+                },
+                "hint_ghost_price": {
+                    "comment": "Price of Hints from Hint Ghosts. Can be any integer between 0 and 9999 (Recommended: 30).",
+                    "defaultValue": 30,
+                    "rangeNumOptionsTo": 9999
+                }
+            },
+            "options": {
+                "chest_size_matches_contents": {
+                    "comment": "All chests containing progression or unique items will become large, and others will be made small."
+                },
+                "night_mode": {
+                    "comment": "Enables certain shaders on the overworld that make it look like nighttime in Hyrule."
+                }
+            },
+            "exclusions": {
+                "comment": "Exclude certain locations to guarantee Junk Items will be placed there."
+            }
+        }
+    },
+    "0.3.1": {
+        "versionName": "v0.3.1 - Release",
+        "desc": "ALBW Randomizer v0.3.0\r\n\r\nFull Changelog: https://github.com/rickfay/z17-randomizer/compare/8eb06b3dba137787856be592953230acac90b961...c6554e63af379258b242eb5fa7a8d20c34125416",
+        "addOptions": {
+            "logic": {
+                "logic_mode": {
+                    "comment": "\"Normal\", \"Hard\", \"Glitched\", \"AdvGlitched\", \"Hell\", \"NoLogic\""
+                },
+                "randomize_dungeon_prizes": {
+                    "comment": "This shuffles all Sage Portraits, Pendants, and the Charm among themselves."
+                },
+                "vanilla_charm": {
+                    "comment": "Forces one of the two Pendant of Courage Upgrades to be in Zeldas Throne Room if enabled.",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "lc_requirement": {
+                    "comment": "Sage Portraits needed to enter Lorule Castles front door"
+                },
+                "ped_requirement": {
+                    "comment": "MS Pedestal Pendant requirement: (2) Vanilla, (3) Charmed, or (4) Standard"
+                },
+                "hyrule_castle_setting": {
+                    "comment": "Hyrule Castle Dungeon setting, choose either: EarlyLoruleCastle or Closed",
+                    "defaultValue": "EarlyLoruleCastle",
+                    "allOptions": ["Closed", "EarlyLoruleCastle"]
+                },
+                "nice_mode": {
+                    "comment": "This shuffles a second progressive copy of each Ravio Item into the general item pool."
+                },
+                "super_items": {
+                    "comment": "This shuffles a second progressive copy of the Lamp and Net into the general item pool."
+                },
+                "reverse_sage_events": {
+                    "comment": "Ties Sage-related checks and events to actually rescuing that Sage."
+                },
+                "no_progression_enemies": {
+                    "comment": "Removes Enemies from dungeons that are themselves Progression (e.g.: Bawbs, the bomb enemy)"
+                },
+                "start_with_merge": {
+                    "comment": "Start with the ability to Merge into walls, without Ravios Bracelet."
+                },
+                "bell_in_shop": {
+                    "comment": "If enabled the Bell will be placed in Ravios Shop."
+                },
+                "pouch_in_shop": {
+                    "comment": "If enabled the Pouch will be placed in Ravios Shop."
+                },
+                "sword_in_shop": {
+                    "comment": "If enabled at least one Sword will be placed in Ravios Shop. (Note: This option is incompatible with Swordless Mode, which removes all Swords from the game.)",
+                    "defaultValue": false,
+                    "useBooleanOptions": true
+                },
+                "boots_in_shop": {
+                    "comment": "If enabled the Pegasus Boots will be placed in Ravios Shop."
+                },
+                "assured_weapon": {
+                    "comment": "If enabled at least one weapon is guaranteed to be placed in Ravios Shop. (Note: incompatible with boots_in_shop and sword_in_shop)."
+                },
+                "maiamai_madness": {
+                    "comment": "This shuffles Maiamai into the pool, adding 100 more locations."
+                },
+                "minigames_excluded": {
+                    "comment": "Excludes the following: Octoball Derby, Dodge the Cuccos, Hyrule Hotfoot, Treacherous Tower, and both Rupee Rushes"
+                },
+                "skip_big_bomb_flower": {
+                    "comment": "Skips the Big Bomb Flower by removing the 5 Big Rocks in Lorule Field."
+                },
+                "skip_trials": {
+                    "comment": "Automatically opens the Lorule Castle Trials door."
+                },
+                "bow_of_light_in_castle": {
+                    "comment": "Limits the Bow of Lights placement to somewhere in Lorule Castle (including possibly Zelda)."
+                },
+                "weather_vanes_activated": {
+                    "comment": "Begin the game with all Weather Vanes activated. Not supported by any trackers currently."
+                },
+                "dark_rooms_lampless": {
+                    "comment": "If enabled the logic may expect players to cross Dark Rooms without the Lamp."
+                },
+                "swordless_mode": {
+                    "comment": "Removes *ALL* Swords from the game."
+                },
+                "hint_ghost_price": {
+                    "comment": "Price of Hints from Hint Ghosts. Can be any integer between 0 and 9999 (Recommended: 30).",
+                    "defaultValue": 30,
+                    "rangeNumOptionsTo": 9999
+                }
+            },
+            "options": {
+                "chest_size_matches_contents": {
+                    "comment": "All chests containing progression or unique items will become large, and others will be made small."
+                },
+                "night_mode": {
+                    "comment": "Enables certain shaders on the overworld that make it look like nighttime in Hyrule."
+                }
+            },
+            "exclusions": {
+                "comment": "Exclude certain locations to guarantee Junk Items will be placed there."
+            }
+        }
+    }  
+}

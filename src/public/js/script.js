@@ -1,11 +1,19 @@
 let fileChunks = [];
-let exclusionOptions;
 let fileName = ''; // Variable to store the name of the original file
 const totalChunks = 100; // Variable to store the number of chunks
 let presets; // variable to store all of the presets
 
 // shows an element to the user depending on whatever or not the user uploaded the file.
 if (new URLSearchParams(window.location.search).get("fileUploaded")) loadSettings(document.getElementById('version').value, s => {
+    window.addEventListener("load", e => { // handler for a function where a user is warned about progress on a webpage.
+        window.addEventListener("beforeunload", function (e) {
+            const confirmationMessage = 'It looks like you have been editing something. If you leave before saving, your changes will be lost.';
+            const stuff = (e || window.event);
+            stuff.preventDefault();
+            stuff.returnValue = confirmationMessage;
+            return confirmationMessage;
+        });
+    })
     const elem = document.getElementById('step02');
     elem.addEventListener("submit", randomizeGame);
     elem.style.display = 'block';
@@ -14,7 +22,7 @@ if (new URLSearchParams(window.location.search).get("fileUploaded")) loadSetting
 else document.getElementById(`step01`).style.display = 'block';
 
 // Randomizes ALBW
-function randomizeGame(evt, deletePresetAfterRandomization = true) {
+function randomizeGame(evt) {
     document.getElementById('logo').style.display = 'none';
     document.getElementById('options').style.display = 'none';
     evt.submitter.textContent = "Randomizing Game...";
@@ -37,7 +45,14 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
     const params = new URLSearchParams();
     
     for (const [key, value] of formData.entries()) params.append(key, value);
-    fetch(`/randomize/${(Math.random()).toString().substring(2)}?${params.toString()}`, {
+    const id = document.getElementById('presetCustomization').value != "disabled" ? (Math.random()).toString().substring(2) : (() => {
+        const elem = document.getElementById('presetsSelection');
+        for (const child of elem.children) {
+            if (child.value != elem.value) continue;
+            return child.id;
+        }
+    })();
+    fetch(`/randomizer/${id}?${params.toString()}`, {
         method: "POST"
     }).then(res => res.json()).then(d => {
         if (d.isRandomizing) (async () => {
@@ -59,7 +74,7 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                         document.getElementById('presets').style.display = 'block';
                         document.getElementById('randoVer').style.display = 'block';
                         document.getElementById('randoSettings').style.display = 'block';
-                        document.getElementById('randomizedGameDownload').remove();
+                        document.getElementById('randomizedGameDownload')?.remove();
                         document.getElementById('options').style.display = 'block';
                         document.getElementById('logo').style.display = 'none';
                     });
@@ -71,19 +86,21 @@ function randomizeGame(evt, deletePresetAfterRandomization = true) {
                     }
                     try {
                         term.write('\r\nRetrieving Your Randomized Game...\r\n');
-                        const res = await fetch(`/genZipFromRandomizedGame?v=${d.data.v}&id=${d.data.id}&deletePreset=${deletePresetAfterRandomization}`, {
+                        const res = await fetch(`/genZipFromRandomizedGame?${new URLSearchParams(d.data).toString()}`, {
                             method: "POST"
                         });
                         if (res.ok) {
                             const blob = await res.blob();
-                            evt.submitter.textContent = "Game Randomization Successful";
-                            const buttonName = "Download Your Randomized Game"
-                            term.write(`Your randomized game was retrieved successfully!\r\nTo download it, click on the "${buttonName}" button below.`);
-                            output.insertAdjacentHTML('afterend', `<a class="greenBtn" id="randomizedGameDownload" href="${
-                                URL.createObjectURL(blob)
-                            }" download="albw-randomized.zip">${buttonName} -></a>`);
-                            output.appendChild(back2randobtn);
-                        } else handleError(`Could not get your randomized game due to an error: ${await res.text()}. Please try randomizing your game again.`)
+                            if (blob) {
+                                evt.submitter.textContent = "Game Randomization Successful";
+                                const buttonName = "Download Your Randomized Game"
+                                term.write(`Your randomized game was retrieved successfully!\r\nTo download it, click on the "${buttonName}" button below.`);
+                                output.insertAdjacentHTML('afterend', `<a class="greenBtn" id="randomizedGameDownload" href="${
+                                    URL.createObjectURL(blob)
+                                }" download="albw-randomized.zip">${buttonName} -></a>`);
+                                output.appendChild(back2randobtn);
+                            } else handleError("An unknown error occured while retrieving your game's ZIP file.")
+                        } else handleError(`Could not get your randomized game due to an error:\r\n${await res.text()}.\r\nPlease try randomizing your game again.`);
                     } catch (e) {
                         handleError(e.toString());
                     }
@@ -117,18 +134,24 @@ function versionsChecker(obj) {
         e.removeAttribute('selected')
         if (e.value != obj.value) continue;
         e.setAttribute('selected', '')
-        for (var i = 0; i < presets.length; i++) {
+        for (let i = 0; i < presets.length; i++) {
             const preset = presets[i];
             const infoPlaceholder = {
+                id: preset.id,
                 presetName: preset.presetName + ` Version ${e.value}`,
-                notes: [],
+                notes: preset.notes || [],
                 settings: {}
             }
             if (e.getAttribute('data-versionoptions')) {
                 array[i] = infoPlaceholder;
+                array[i].id += `-${obj.value}`;
                 const info = JSON.parse(e.getAttribute('data-versionoptions'));
                 for (const settingCat in preset.settings) array[i].settings[settingCat] = Object.assign({}, preset.settings[settingCat]);
-                for (const settingCat in info) if (typeof array[i].settings[settingCat] == "object") Object.assign(array[i].settings[settingCat], info[settingCat]);
+                for (const settingCat in info) {
+                    if (
+                        !array[i].settings[settingCat] || typeof array[i].settings[settingCat] == "object"
+                    ) array[i].settings[settingCat] = Object.assign(array[i].settings[settingCat] || {}, info[settingCat]);
+                }
                 for (const settingCat in preset.settings) {
                     for (const d in preset.settings[settingCat]) if (
                         typeof array[i].settings[settingCat][d] == "object"
@@ -141,11 +164,16 @@ function versionsChecker(obj) {
                 for (const settingCat in preset.settings) array[i].settings[settingCat] = array[i].settings[settingCat] || Object.assign({}, preset.settings[settingCat])
                 for (const option of info) {
                     const [key, value] = option.split(".");
-                    if (array[i].settings[key][value]) delete array[i].settings[key][value]
+                    if (key && value) {
+                        if (array[i].settings[key][value]) delete array[i].settings[key][value]
+                    } else if (key) {
+                        if (array[i].settings[key]) delete array[i].settings[key]
+                    }
                 }
             }
         }
     }
+    console.log(array);
     appendSettings(array.length == 0 ? presets : array);
 }
 
@@ -155,6 +183,9 @@ function loadSettings(id, callback) {
     cliLink.style.display = 'block';
     cliLink.setAttribute("data-v", id);
     document.getElementById('noVerboseDiv').style.display = 'none';
+    const devMode = document.getElementById('devModeDiv');
+    devMode.style.display = "none";
+    devMode.innerHTML = '';
     const settings = document.getElementById('randoSettings');
     settings.innerHTML = '';
     let typeInTitle = '', type;
@@ -168,10 +199,10 @@ function loadSettings(id, callback) {
             div.insertAdjacentHTML("beforeend", `<select name="execVersion" onchange="versionsChecker(this)">${(() => {
                 let html = ''
                 const keys = Object.keys(d);
-                for (var i = 0; i < keys.length; i++) { // adds in the version options
+                for (let i = 0; i < keys.length; i++) { // adds in the version options
                     const key = keys[i];
                     if (i == 0) cliLink.setAttribute("data-execv", key);
-                    html += `<option value="${key}" title="${d[key].desc}${d[key].warn ? `\r\nWARNING: ${d[key].warn}` : ''}"${d[key].addOptions ? ` data-versionoptions='${JSON.stringify(d[key].addOptions)}'` : ''}${d[key].removeOptions ? ` data-versionoptionstoremove='${JSON.stringify(d[key].removeOptions)}'` : ''}>${d[key].versionName}</option>`;
+                    html += `<option value="${key}" title="${d[key].desc || ''}${d[key].warn ? `\r\nWARNING: ${d[key].warn}` : ''}"${d[key].addOptions ? ` data-versionoptions='${JSON.stringify(d[key].addOptions)}'` : ''}${d[key].removeOptions ? ` data-versionoptionstoremove='${JSON.stringify(d[key].removeOptions)}'` : ''}>${d[key].versionName}</option>`;
                 }
                 return html;
             })()}`);
@@ -180,9 +211,14 @@ function loadSettings(id, callback) {
         }
         callback(v);
     }
-    fetch(`/settings/${id}`).then(res => res.json()).then(d => {
+    fetch(`/settings/stable/${id}`).then(res => res.json()).then(d => {
         switch (id) { // loads executable versions for specific randomizer versions
-            case "z17v3": if (!typeInTitle) typeInTitle = 'Z17 Randomizer v3'; 
+            case "z17v3": if (
+                !typeInTitle
+            ) typeInTitle = 'Z17 Randomizer v3', devMode.innerHTML = `<label for="devMode">Developer Mode</label><br><select name="settings[dev_mode]" id="devMode">
+                <option value="false">disabled</option>
+                <option value="true">enabled</option>
+            </select><br><br></br>`, devMode.style.display = 'block'; 
             case "z17r": if (!typeInTitle) typeInTitle = 'Z17 Randomizer Beta'; 
             case "z17-rando": if (!typeInTitle) typeInTitle = 'Z17 Randomizer (Old)'; 
             case "z17-local": {
@@ -196,7 +232,7 @@ function loadSettings(id, callback) {
                     document.getElementById('noVerboseDiv').style.display = 'block';
                     cliLink.style.display = 'none';
                 }
-                fetch(`/execVersions/${id}`).then(res => res.json()).then(v => versionsCreator(v, d));
+                fetch(`/execVersions/stable/${id}`).then(res => res.json()).then(v => versionsCreator(v, d));
                 break;
             } default: callback(d)
         }
@@ -277,19 +313,18 @@ function findJsonInfoFrom(json, val, isAttr = false) {
     }
 }
 
-// checks the select element to ensure that options the user added are not overlapping with each other to prevent breaking the randomizer
-function check4SameExcludeOptions(o) {
-    const dom = [];
-    for (const tag of document.getElementsByTagName('select')) {
-        if (!tag.name.startsWith("settings[exclu")) continue;
-        dom.push(tag);
-    }
-    console.log(dom)
+// opens a collapsible
+function toggleCollapsible(coll) {
+    coll.classList.toggle("active");
+    const content = coll.nextElementSibling;
+    if (content.style.display === "block") content.style.display = "none";
+    else content.style.display = "block";
 }
 
 // loads randomizer settings based off of a user's selected preset.
-function randomizerSettings(d, clearSettingsHTML = false) {
-    if (clearSettingsHTML) document.getElementById('randoSettings').innerHTML = document.getElementById('versionSelect')?.outerHTML || '';
+function randomizerSettings(d) {
+    if (document.getElementById('presetCustomization').value == "disabled") return;
+    document.getElementById('randoSettings').innerHTML = (document.getElementById('versionSelect')?.outerHTML || '') + `<input type="hidden" name="writeNewPreset" value="true"/><input type="hidden" name="deletePreset" value="true"/>`
     const booleans = [true, false];
     for (const setting in d.settings) {
         if (typeof d.settings[setting] != "object") continue;
@@ -308,7 +343,7 @@ function randomizerSettings(d, clearSettingsHTML = false) {
         function appendRandoSettings(setting2, json, noSetting2 = false) {
             const info = json[setting2];
             if (setting2 != setting) html += `<h4>${setting2.split("_").map(captializeBegLetterInWord).join(" ")}</h4>`;
-            if (info.comment) html += `<p>${info.comment}</p>`;
+            if (info.comment && !noSetting2) html += `<p>${info.comment}</p>`;
             function createSelectBox(n, elemId, val) {
                 let select = ''
                 const name = `settings[${setting}]${!noSetting2 ? `[${setting2}]` : ''}${n && typeof n == "number" ? `[${n - 1}]` : ''}`;
@@ -316,7 +351,7 @@ function randomizerSettings(d, clearSettingsHTML = false) {
                     elemId ? 'id' : 'name'
                 }', '${elemId ? `${elemId}.${n - 1}` : name}', '${info.rangeNumOptionsTo}')"/><input type="number" name="${name}" min="0" value="${info.defaultValue}" max="${info.rangeNumOptionsTo}"/>`;
                 else {
-                    select += `<select${setting2 == "exclude" || setting2 == "exclusions" ? ' onchange="excludeOptionSelected(this)"' : ''} name="settings[${setting}]${
+                    select += `<select name="settings[${setting}]${
                         !noSetting2 ? `[${setting2}]` : ''
                     }${
                         n && typeof n == "number" ? `[${n - 1}]` : ''
@@ -335,58 +370,39 @@ function randomizerSettings(d, clearSettingsHTML = false) {
                 select += '<br>';
                 return select;
             }
-            if (!info.userCanAddNewLines) html += createSelectBox() + '<hr>';
-            else {
-                let n = 1;
-                const optionId = `myOptions.${setting}${!noSetting2 ? `.${setting2}` : ''}`;
-                html += `<div id="${optionId}">${
-                    (() => {
-                        let html = '';
-                        if (info.defaultValue) {
-                            function append(j) {
-                                for (var I = 0; I < j.length; I++) html += createSelectBox(n, optionId, j[I]), n++;
+            function createCheckmarks(info2, p) {
+                let html = '';
+                for (const l in info2) {
+                    if (typeof info2[l] == "object") {
+                        html += `<input onclick="toggleCollapsible(this)" class="collapsible" type="button" value="${l}">`
+                        html += `<div class="collapsibleContent">${createCheckmarks(info2[l], `${p || ''}.${l}`)}</div>`;
+                    } else if (typeof info.defaultValue == "object") {
+                        if (Array.isArray(info.defaultValue)) {
+                            const defaultValue = info.defaultValue.find(i => i == l);
+                            html += `<input${defaultValue ? ' checked=""' : ''} id="${l.split(' ').join('').split("'").join('')}" type="checkbox" name="settings[${setting}]${
+                                !noSetting2 ? `[${setting2}]` : ''
+                            }[${l}]"/>`
+                            html += `<label for="${l.split(' ').join('').split("'").join('')}">${l}</label><br><br>`;
+                        } else {
+                            const [_, cat1, cat2] = p.split(".")
+                            const defaultValueProp = info.defaultValue[cat1];
+                            const keys = Object.keys(info.allOptions[cat1][cat2]);
+                            for (let i = 0; i < keys.length; i++) {
+                                const defaultValue = defaultValueProp ? defaultValueProp[cat2]?.find(l => l == keys[i]) : '';
+                                html += `<input${defaultValue ? ' checked=""' : ''} id="${keys[i].split(' ').join('').split("'").join('')}${i}" type="checkbox" name="settings[${setting}]${
+                                    !noSetting2 ? `[${setting2}]` : ''
+                                }[${setting}.${cat1}][${cat2}][${i}][${keys[i]}]"/><label for="${keys[i].split(' ').join('').split("'").join('')}${i}">${keys[i]}</label><br><br>`;
                             }
-                            switch (typeof info.defaultValue) {
-                                case "object": {
-                                    if (Array.isArray(info.defaultValue)) append(info.defaultValue);
-                                    else {
-                                        function c(k) {
-                                            for (const i in k) {
-                                                if (Array.isArray(k[i])) append(k[i])
-                                                else c(k[i]);
-                                            }
-                                        }
-                                        c(info.defaultValue);
-                                    }
-                                }
-                            }
+                            break;
                         }
-                        return html;
-                    })()
-                }</div><hr>`
-                const newOptionBtn = document.createElement('input');
-                newOptionBtn.type = "button";
-                newOptionBtn.value = 'Add New Option';
-                newOptionBtn.style.float = "left";
-                newOptionBtn.addEventListener("click", function(e) {
-                    document.getElementById(optionId).insertAdjacentHTML('beforeend', createSelectBox(n++, optionId));
-                    check4SameExcludeOptions(info.allOptions);
-                });
-                document.getElementById('randoSettings').appendChild(newOptionBtn);
-                const removeOptionBtn = document.createElement('input');
-                removeOptionBtn.type = "button";
-                removeOptionBtn.value = 'Remove Option';
-                removeOptionBtn.style.float = "right";
-                removeOptionBtn.addEventListener("click", function() {
-                    const elem = document.getElementById(optionId + `.${n - 2}`);
-                    const elem2 = elem.nextSibling;
-                    if (elem && elem2) {
-                        elem2.remove();
-                        elem.remove();
-                        n--
                     }
-                });
-                document.getElementById('randoSettings').appendChild(removeOptionBtn);
+                }
+                return html;
+            }
+            if (!info.useCheckmarks) html += createSelectBox() + '<hr>';
+            else {
+                if (info.comment) html += `<p>${info.comment}</p>`;
+                html += createCheckmarks(info.allOptions) + '<hr>';
             }
         }
         document.getElementById('randoSettings').insertAdjacentHTML('beforeend', html)
@@ -398,14 +414,14 @@ function randomizerSettings(d, clearSettingsHTML = false) {
 function appendSettings(s) {
     // Loads the presets
     function listener(evt) {
-        randomizerSettings(s[evt.target.value], true)
+        randomizerSettings(s[evt.target.value])
     }
     document.getElementById('presets').style.display = 'none';
     document.getElementById('presetsSelection').innerHTML = '';
     document.getElementById('presetsSelection').removeEventListener("change", listener);
     document.getElementById('presetsSelection').addEventListener("change", listener);
-    for (var i = 0; i < s.length; i++) {
-        document.getElementById('presetsSelection').insertAdjacentHTML('afterbegin', `<option value="${i}">${s[i].presetName}</option>`);
+    for (let i = 0; i < s.length; i++) {
+        document.getElementById('presetsSelection').insertAdjacentHTML('afterbegin', `<option value="${i}" id="${s[i].id}">${s[i].presetName}</option>`);
         if (i == 0) listener({
             target: {
                 value: i
@@ -416,9 +432,18 @@ function appendSettings(s) {
     document.getElementById('presets').style.display = 'block';
 }
 
+// shows an alert banner
+function displayAlert(color, headerText, bodyText) {
+    document.getElementById('alertBlock').innerHTML = `<div class="w3-panel${color ? ` w3-${color}` : ''}">
+        <h3>${headerText}</h3>
+        <p>${bodyText}</p>
+    </div>`;
+}
+
 // The file input event handler
 function handleFileSelect(event) {
     const file = event.target.files[0];
+    if (!file) return;
     const fileSize = file.size;
 
     fileChunks = [];
@@ -445,68 +470,41 @@ function isFileUploaded() {
 }
 
 // Uploads the file chunks to the server
-async function uploadChunks() {
+function uploadChunks() {
     console.log('Uploading chunks...');
     document.getElementById('logo').style.display = 'none';
-    const id = (Math.random()).toString().substring(2);
-    const ext = fileName.substring(fileName.lastIndexOf("."));
-
-    // Create an array to hold all the upload promises
-    const uploadPromises = [];
-
-    for (let i = 0; i < totalChunks; i++) {
-        const formData = new FormData();
-        formData.append('file', fileChunks[i], `${i+1}-.-.`+id+ext);
-        formData.append('filename',id+ext);
-        formData.append('totalChunks', totalChunks);
-        formData.append('chunkNumber', i + 1);
-
-        // Send the chunk upload request asynchronously and store the promise
-        const uploadPromise = uploadChunk(formData,i+1);
-
-        uploadPromise.then(() => {
-            var percentage = ((i + 1) / totalChunks) * 101;
-            if(percentage===101){
-                percentage=100;
+    const fileInfo = {};
+    for (const i in fileInput) fileInfo[i] = fileInput[i]
+    const socket = new WebSocket(`${window.location.protocol.startsWith("https") ? 'wss' : 'ws'}://${window.location.host}/uploadFile?${new URLSearchParams(fileInfo).toString()}`);
+    let start = 0;
+    socket.addEventListener("message", result => {
+        switch (result.data) {
+            case "ok": {
+                if (start < totalChunks) {
+                    console.log('Server response:', result.data);
+                    socket.send(fileChunks[start]);
+                    start++;
+                    setBar(start);
+                } else {
+                    console.log('All chunks uploaded successfully.');
+                    console.log(`The final response from server: ${result.data}`);
+                    socket.send(JSON.stringify({
+                        onFileUploadAfter: "make3dsrom"
+                    }))
+                }
+                break;
+            } case "success": {
+                setBar(101);
+                break;
             }
-            setBar(percentage); // Call setBar function with the percentage
-        });
-
-        uploadPromises.push(uploadPromise);
-    }
-
-    // Wait for all upload promises to resolve
-    await Promise.all(uploadPromises);
-    console.log('All chunks uploaded successfully.');
-
-    fetch(`/combine?filename=${encodeURIComponent(id+ext)}`)
-        .then(response => {
-            if (!response.ok) return handleError();
-            return response.text(); // The response from server(in texts)
-        })
-        .then(data => {
-            // The data from the server
-            console.log(`The final response from server: ${data}`);
-            setBar(101);
-        })
-        .catch(error => {
-            // Display errors when failed to get response from the server
-            handleError('Fetch error:', error);
-        });
-
-    
+        }
+    })
 }
 
 // Uploads a single file chunk to the server using the provided form data and progress of the file upload.
-async function uploadChunk(formData,progress) {
+async function uploadChunk(formData,socket) {
     try {
-        const response = await fetch('/documents', {
-            method: 'POST',
-            body: formData
-        });
-        const result = await response.text();
-        console.log(`Client Response: The file ${progress} sent to server!`);
-        console.log('Server response:', result); // Log the response from the server
+        socket.send(formData);
     } catch (error) {
         handleError('Error uploading file chunk:', error);
     }
@@ -517,6 +515,7 @@ document.getElementById('uploadButtonChunk').addEventListener('click', function(
         // Check if a file was uploaded
     if (isFileUploaded()) {
         setBar(0);
+        document.getElementById('dropArea').style.display = "none";
         event.target.setAttribute("disabled", "");
         event.target.innerHTML = 'Uploading File...';
         uploadChunks();
@@ -529,3 +528,10 @@ document.getElementById('uploadButtonChunk').addEventListener('click', function(
 
 // When file is loaded then quickly save the changes
 fileInput.addEventListener('change', handleFileSelect);
+
+// closes a modal when a user clicks on the X button.
+for (const span of document.getElementsByClassName("modal-close")) {
+    span.onclick = function() {
+        this.parentElement.parentElement.parentElement.style.display = 'none';
+    }
+}
