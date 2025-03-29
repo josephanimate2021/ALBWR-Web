@@ -793,8 +793,9 @@
                                 if (blob) {
                                   randoGameBtn.textContent = `Game Randomization Successful`;
                                   term.write(
-                                    `Your randomized game was retrieved successfully!\r\nTo download it, click on the "Download Randomized Game" button below.`
+                                    `Your randomized game was retrieved successfully!\r\nTo download it, click on the "Download Randomized Game" button below.\r\n`
                                   );
+                                  term.write(`By the way, don't forget to use a tracker: ${window.location.origin}/tracker`);
                                   back2rando.addEventListener("click", back2randobtnlistenr);
                                   back2rando.classList.remove("d-none");
                                   back2rando.classList.add("d-flex");

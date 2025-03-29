@@ -108,6 +108,7 @@ wss.on('connection', (ws, req) => {
                                         ws.send(`\nYour zip file is available for download!`);
                                         ws.send(`\nclick on the "Download Randomized Game" button below to download your randomized game.`);
                                         ws.send(`\nIn order to randomize your game again, simply reload this page.`);
+                                        term.write(`\nBy the way, don't forget to use a tracker: ${window.location.origin}/tracker`);
                                     } else {
                                         ws.send(`\nThe Randomizer CLI Closed unexpectedly with code ${c}.`);
                                         ws.send('\nTry refreshing this page and then randomizing your game again.');

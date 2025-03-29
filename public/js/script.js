@@ -37,9 +37,12 @@ function randomizeGame(evt) {
         rows: 30,
     });
     const fitAddon = new FitAddon.FitAddon();
+    const webLinksAddon = new WebLinksAddon.WebLinksAddon();
     term.loadAddon(fitAddon);
-    term.open(output);
+    term.loadAddon(webLinksAddon);
+    term.open(output)
     fitAddon.fit();
+    window.addEventListener("resize", e => fitAddon.fit());
     term.write('Running Randomizer...')
     const formData = new FormData(evt.currentTarget);
     const params = new URLSearchParams();
@@ -94,7 +97,8 @@ function randomizeGame(evt) {
                             if (blob) {
                                 evt.submitter.textContent = "Game Randomization Successful";
                                 const buttonName = "Download Your Randomized Game"
-                                term.write(`Your randomized game was retrieved successfully!\r\nTo download it, click on the "${buttonName}" button below.`);
+                                term.write(`Your randomized game was retrieved successfully!\r\nTo download it, click on the "${buttonName}" button below.\r\n`);
+                                term.write(`By the way, don't forget to use a tracker: ${window.location.origin}/tracker`);
                                 output.insertAdjacentHTML('afterend', `<a class="greenBtn" id="randomizedGameDownload" href="${
                                     URL.createObjectURL(blob)
                                 }" download="albw-randomized.zip">${buttonName} -></a>`);
