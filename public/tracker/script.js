@@ -1,75 +1,93 @@
 /**
  * A Script File for the ALBWR Tracker
  */
-
 // Toggles an element to show and hide
-let connected2archipelago = false, spoiler;
+let connected2archipelago = false, trackerStuff;
 function toggle(id, display = "flex") {
     const elem = document.getElementById(id);
+    if (id.endsWith("Cat")) document.getElementById('tracker').setAttribute("data-cat", id.split("Cat")[0]);
     elem.style.display = elem.style.display == display ? 'none' : display;
 }
-
-function switchTrackerMode(type, originalDisplaysetting = {}) { // loads the map and items by default
+const defaultLayouts = ["Hyrule", "Lorule", "Dungeons"];
+let loadLayouts = Object.assign([], defaultLayouts);
+function loadTracker(t, s = 'itemsAndMap') {
+    trackerStuff = Object.assign({}, t);
+    switchTrackerMode(s)
+}
+function switchTrackerMode(type, j) { // loads the map and items by default
     const tracker = document.getElementById('tracker');
+    j ||= !tracker.getAttribute("data-cat") ? "Progression Items" : tracker.getAttribute("data-cat");
     tracker.setAttribute("data-mode", type);
+    tracker.setAttribute("data-cat", j);
     const drawer = tracker.getContext('2d');
     function drawMap() { // draws a layout 
         const map = document.getElementById('mapIng');
         drawer.drawImage(map, 0, 0);
-        for (const location in checkLocations) {
-            for (const itemLocation in checkLocations[location]) {
-                const info = checkLocations[location][itemLocation];
-                if (info.position) {
-                    const [x, y] = info.position.toString().split("x");
-                    drawer.beginPath();
-                    const size = info.small ? 5 : 10
-                    drawer.rect(x, y, size, size);
-                    drawer.fillStyle = info.completed ? 'gray' : info.unlockedByDefault ? 'lime' : 'red';
-                    drawer.fill();
-                    if (info.stroke) {
-                        if (info.completed) drawer.strokeStyle = 'grey';
-                        else if (!info.unlockedByDefault) drawer.strokeStyle = 'brown';
-                        drawer.stroke();
+        for (const locationType in trackerStuff.layout) {
+            if (loadLayouts.findIndex(i => i == locationType) != undefined) for (const location in trackerStuff.layout[locationType]) {
+                for (const check in trackerStuff.layout[locationType][location]) {
+                    const info = trackerStuff.layout[locationType][location][check];
+                    if (info.position) {
+                        const [x, y] = info.position.toString().split("x");
+                        drawer.beginPath();
+                        drawer.rect(x, y, 5, 5);
+                        drawer.fillStyle = info.completed ? 'gray' : info.unlocked ? 'lime' : 'red';
+                        drawer.fill();
+                        if (info.stroke) {
+                            if (info.completed) drawer.strokeStyle = 'grey';
+                            else if (!info.unlocked) drawer.strokeStyle = 'brown';
+                            drawer.stroke();
+                        }
                     }
                 }
             }
         }
     }
     const items = document.getElementById('gameItems');
-    function getItems(h = false) { 
+    async function getItems(h = false) { 
         items.innerHTML = '';
-        const cats = {
-            gear: "Gear Items",
-            items: "Progression Items",
-            others: "Other Items"
-        }
         if (!h) {
             items.style.display = "block";
-            for (const type in cats) {
-                const display = type != "items" ? originalDisplaysetting[type] || 'none' : 'flex';
-                console.log(display);
+            for (const cat in trackerStuff.itemLayout) {
+                if (typeof trackerStuff.itemLayout[cat] == "function") continue;
+                const display = cat != j ? 'none' : 'flex';
                 let html = `<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
-                    <span>${cats[type]}</span>
-                    <a class="link-secondary" href="javascript:toggle('${type}Cat')">
+                    <span>${cat}</span>
+                    <a class="link-secondary" href="javascript:toggle('${cat}Cat')">
                         <svg id="plus-circle" viewBox="0 0 16 16" class="bi">
                             <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
                             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                         </svg>
                     </a>
-                </h6><ul class="nav flex-row" id="${type}Cat" style="display: ${display};">`;
-                for (const item in checkItems) {
-                    if (checkItems[item].cat == type) {
-                        html += `<li class="nav-item" title="${!checkItems[item].dontSayTitle ? item : ''}">
-                            <a id="${checkItems[item].id}" class="nav-link d-flex align-items-center gap-2" href="javascript:;" onclick="retrievedItem('${checkItems[item].id}', '${type}', 'flex')">
-                                <img src="/tracker/images/${type}/${checkItems[item].id}${
-                                    checkItems[item].counts != undefined && checkItems[item].hasImageWithCount ? `-${
-                                        checkItems[item].counts[1] == 0 && !checkItems[item].startImageCountAt0 ? 1 : checkItems[item].counts[1]
-                                    }` : ''
-                                }.png" alt="${item}"${!checkItems[item].obtained ? ` class="gameItemNotObtained"` : ''}/>
-                                ${!checkItems[item].counts || checkItems[item].dontShowCount ? '' : checkItems[item].counts[1] || checkItems[item].counts[0]}
-                            </a>
-                        </li>`;
+                </h6><ul class="nav flex-row" id="${cat}Cat" style="display: ${display};">`;
+                for (const item in trackerStuff.itemLayout[cat]) {
+                    if (!trackerStuff.itemLayout[cat][item].imageFile) continue;
+                    if (!trackerStuff.itemLayout[cat][item].preloadedImages) {
+                        if (
+                            trackerStuff.itemLayout[cat][item].counts && !trackerStuff.itemLayout[cat][item].noImageCount
+                        ) for (var i = trackerStuff.itemLayout[cat][item].counts[1]; i <= trackerStuff.itemLayout[cat][item].counts[2]; i++) {
+                            const img = document.createElement('img');
+                            img.src = `/tracker/images/${trackerStuff.itemLayout[cat][item].imageFile}-${i}.png`;
+                        } else {
+                            const img = document.createElement('img');
+                            img.src = `/tracker/images/${trackerStuff.itemLayout[cat][item].imageFile}.png`;
+                        }
+                        trackerStuff.itemLayout[cat][item].preloadedImages = true;
                     }
+                    html += `<li class="nav-item" title="${trackerStuff.itemLayout[cat][item].alt || item}">
+                        <a id="${item}" class="nav-link d-flex align-items-center gap-2" href="javascript:;" onclick="retrievedItem('${item}', '${cat}')">
+                            <img src="${
+                                trackerStuff.itemLayout[cat][item].counts && (
+                                    !trackerStuff.itemLayout[cat][item].noImageCount
+                                ) ? `/tracker/images/${trackerStuff.itemLayout[cat][item].imageFile}-${
+                                    trackerStuff.itemLayout[cat][item].counts[1]
+                                }.png` : `/tracker/images/${trackerStuff.itemLayout[cat][item].imageFile}.png`
+                            }" alt="${trackerStuff.itemLayout[cat][item].alt || item}"${
+                                !trackerStuff.itemLayout[cat][item].obtained && !trackerStuff.itemLayout[cat][item].noDisable ? ` class="gameItemNotObtained"` : ''
+                            }/>
+                            ${!trackerStuff.itemLayout[cat][item].counts ? '' : trackerStuff.itemLayout[cat][item].counts[0]}
+                        </a>
+                    </li>`;
                 }
                 items.insertAdjacentHTML("beforeend", html + '</ul>');
             }
@@ -95,33 +113,27 @@ function switchTrackerMode(type, originalDisplaysetting = {}) { // loads the map
         }
     }
 }
-function findCheckItem(itemId) {
-    for (const item in checkItems) {
-        if (checkItems[item].id == itemId) return checkItems[item];
-    }
-    return false;
-}
-function retrievedItem(itemId, cat, displaySetting) {
-    const info = {};
-    if (cat && displaySetting) info[cat] = displaySetting;
-    const itemInfo = findCheckItem(itemId);
+function retrievedItem(itemId, cat) {
+    const itemInfo = trackerStuff.itemLayout[cat][itemId];
     if (itemInfo) {
         if (itemInfo.counts) {
-            let [start, current, limit] = itemInfo.counts;
+            let [_, current, limit] = itemInfo.counts;
             if (current != undefined && limit != undefined) {
                 if (current == limit) {
-                    itemInfo.counts[1] = start;
+                    itemInfo.counts[0] = 0;
+                    itemInfo.counts[1] = itemInfo.counts[3] ? 0 : 1;
                     itemInfo.obtained = false;
                 } else {
                     itemInfo.obtained = true;
-                    itemInfo.counts[1]++;
+                    itemInfo.counts[0]++;
+                    if (itemInfo.counts[0] > 1 || itemInfo.counts[3]) itemInfo.counts[1]++
                 }
             } else {
                 itemInfo.obtained = true;
                 itemInfo.counts[0]++;
             }
         } else itemInfo.obtained = !itemInfo.obtained;
-        switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), info);
+        switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), cat);
     }
 }
 // clears a message upon modal close for connecting to an archipelago server.
@@ -201,7 +213,7 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
                                 for (const location in games[game].location_name_to_id) {
                                     spoiler.locations[location] = Object.assign({
                                         id: games[game].location_name_to_id[location]
-                                    }, checkLocations[location] || {});
+                                    }, trackerStuff.layout[location] || {});
                                 }
                                 for (const item in games[game].item_name_to_id) {
                                     spoiler.items[item] = Object.assign({
@@ -238,8 +250,8 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
                 /*if (typeof e.data == "string" && connectionSuccessful) {
                     console.log(e.data)
                     const [playerName, term, itemName, idk, location] = e.data.split(",");
-                    for (const l in checkLocations) {
-                        const info = checkLocations[l][location];
+                    for (const l in trackerStuff.layout) {
+                        const info = trackerStuff.layout[l][location];
                         if (!info) continue;
                         info.completed = true;
                         switchTrackerMode(tracker.getAttribute("data-mode"));
@@ -269,8 +281,8 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
 }
 
 function findCheckLocation(f) {
-    for (const i in checkLocations) if (checkLocations[i][f]) return {
-        info: checkLocations[i][f],
+    for (const i in trackerStuff.layout) if (trackerStuff.layout[i][f]) return {
+        info: trackerStuff.layout[i][f],
         cat: i
     };
     return false;

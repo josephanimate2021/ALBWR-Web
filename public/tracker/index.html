@@ -101,7 +101,7 @@
     <!-- Custom styles for this template -->
     <link href="style.css" rel="stylesheet">
   </head>
-  <body onload="switchTrackerMode('itemsAndMap')">
+  <body onload="loadTracker(trackerCore)">
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
       <symbol id="check2" viewBox="0 0 16 16">
         <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
@@ -199,7 +199,7 @@
               </h6>
               <ul class="nav flex-column" id="trackerOptions" style="display: none;">
                 <li class="nav-item">
-                  <a id="itemsAndMap" class="nav-link d-flex align-items-center gap-2 trackerOption" href="javascript:switchTrackerMode('itemsAndMap')">
+                  <a id="itemsAndMap" class="nav-link d-flex align-items-center gap-2 trackerOption" href="javascript:;" onclick="switchTrackerMode('itemsAndMap', document.getElementById('tracker').getAttribute('data-cat'))">
                     <svg class="bi" viewBox="0 0 512 512">
                       <path d="M256,110.933c-18.825,0-34.133,15.309-34.133,34.133S237.175,179.2,256,179.2s34.133-15.309,34.133-34.133
                         S274.825,110.933,256,110.933z"/>
@@ -232,7 +232,7 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a id="items" class="nav-link d-flex align-items-center gap-2 trackerOption" href="javascript:switchTrackerMode('items')">
+                  <a id="items" class="nav-link d-flex align-items-center gap-2 trackerOption" href="javascript:;" onclick="switchTrackerMode('items', document.getElementById('tracker').getAttribute('data-cat'))">
                     <svg class="bi" viewBox="0 0 512 512">
                       <path d="M256,110.933c-18.825,0-34.133,15.309-34.133,34.133S237.175,179.2,256,179.2s34.133-15.309,34.133-34.133
                         S274.825,110.933,256,110.933z"/>
@@ -260,7 +260,7 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a id="map" class="nav-link d-flex align-items-center gap-2 trackerOption" href="javascript:switchTrackerMode('map')">
+                  <a id="map" class="nav-link d-flex align-items-center gap-2 trackerOption" href="javascript:;" onclick="switchTrackerMode('map', document.getElementById('tracker').getAttribute('data-cat'))">
                     <svg class="bi" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                       <path d="M4 2L0 1V14L4 15V2Z"/>
                       <path d="M16 2L12 1V14L16 15V2Z"/>
@@ -319,13 +319,15 @@
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
           <div id="alertBlock">
             <div class="alert alert-info alert-dismissible" role="alert">
-              The tracker is currently displaying all check locations (with little squares) from 
-              <a href="https://github.com/rickfay/z17-randomizer/releases/tag/v0.4.0-release">v0.4</a> 
-              of the <a href="https://github.com/rickfay/z17-randomizer">z17 randomizer</a> 
-              created by <a href="https://github.com/rickfay">rickfay</a>. 
-              If you're playing ALBWR on a different version that either is or isn't created by him, 
-              please upload your spoiler log in order for your items to be tracked accurately. 
-              If your spoiler log has check locations that aren't listed on the tracker, please dm me on discord to get them added. My username is josephalt7000.
+              This tracker is using a structure from a spoiler log found after generating a randomized game in
+              <a href="https://github.com/rickfay/z17-randomizer/releases/tag/v0.4.1-beta-2025-03-25" target="_blank">v0.4.1 beta</a> 
+              of the <a href="https://github.com/rickfay/z17-randomizer" target="_blank">z17 randomizer</a>
+              created by <a href="https://github.com/rickfay" target="_blank">rickfay</a> in order to help precicely keep track your progress. 
+              It is also assuming that you are playing the vanilla game of ALBW with Normal logic. If you are playing the ALBW Randomizer, 
+              please upload your spoiler log in order for this tracker to keep track of your progress in a more accurate manner.<br> 
+              You may choose to track your progress based off of your spoiler log's item metrics (
+                JSON Spoiler Logs Only & <strong>BETA FEATURE</strong>
+              ) or layout after upload to keep tracking easier for some setting configurations.
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           </div>
@@ -338,8 +340,7 @@
       </div>
     </div>
     <script src="/js/bootstrap.bundle.min.js"></script>
-    <script src="checkLocations.js"></script>
-    <script src="checkItems.js"></script>
+    <script src="core.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gradient Square</title>
+</head>
+<body>
+<canvas id="myCanvas" width="200" height="200"></canvas>
+<script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Create a linear gradient
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0.2, 'red');
+    gradient.addColorStop(0.4, 'green');
+    gradient.addColorStop(0.6, 'blue');
+
+    // Fill the square with the gradient
+    ctx.fillStyle = gradient;
+    ctx.fillRect(50, 50, 100, 100);
+</script>
+</body>
+</html>
