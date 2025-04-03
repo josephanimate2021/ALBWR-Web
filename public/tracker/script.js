@@ -2,19 +2,19 @@
  * A Script File for the ALBWR Tracker
  */
 // Toggles an element to show and hide
-let connected2archipelago = false, trackerStuff;
+let connected2archipelago = false;
 function toggle(id, display = "flex") {
     const elem = document.getElementById(id);
     if (id.endsWith("Cat")) document.getElementById('tracker').setAttribute("data-cat", id.split("Cat")[0]);
     elem.style.display = elem.style.display == display ? 'none' : display;
 }
-const defaultLayouts = ["Hyrule", "Lorule", "Dungeons"];
-let loadLayouts = Object.assign([], defaultLayouts);
+const trackerStuff = {};
 function loadTracker(t, s = 'itemsAndMap') {
-    trackerStuff = Object.assign({}, t);
+    for (const i in trackerStuff) delete trackerStuff[i];
+    for (const i in t) trackerStuff[i] = t[i];
     switchTrackerMode(s)
 }
-function switchTrackerMode(type, j) { // loads the map and items by default
+function switchTrackerMode(type, j, loadLayouts = ["Hyrule", "Lorule", "Dungeons"]) { // loads the map and items by default
     const tracker = document.getElementById('tracker');
     j ||= !tracker.getAttribute("data-cat") ? "Progression Items" : tracker.getAttribute("data-cat");
     tracker.setAttribute("data-mode", type);
@@ -28,6 +28,17 @@ function switchTrackerMode(type, j) { // loads the map and items by default
                 for (const check in trackerStuff.layout[locationType][location]) {
                     const info = trackerStuff.layout[locationType][location][check];
                     if (info.position) {
+                        if (info.housesItem) {
+                            const itemInfo = trackerStuff.itemLayout.searchFor(info.housesItem);
+                            if (!itemInfo.cat && !itemInfo.data) continue;
+                            trackerStuff.itemLayout[itemInfo.cat][info.housesItem].locatedInChecks ||= [];
+                            if (trackerStuff.itemLayout[itemInfo.cat][info.housesItem]) {
+                                const together = `${locationType}@${location}@${check}`;
+                                if (
+                                    !trackerStuff.itemLayout[itemInfo.cat][info.housesItem].locatedInChecks.find(i => i == together)
+                                ) trackerStuff.itemLayout[itemInfo.cat][info.housesItem].locatedInChecks.push(together);
+                            }
+                        }
                         const [x, y] = info.position.toString().split("x");
                         drawer.beginPath();
                         drawer.rect(x, y, 5, 5);
@@ -44,7 +55,7 @@ function switchTrackerMode(type, j) { // loads the map and items by default
         }
     }
     const items = document.getElementById('gameItems');
-    async function getItems(h = false) { 
+    async function getItems(h = false) { // lists out all items using a spoiler log structure
         items.innerHTML = '';
         if (!h) {
             items.style.display = "block";
@@ -61,7 +72,7 @@ function switchTrackerMode(type, j) { // loads the map and items by default
                     </a>
                 </h6><ul class="nav flex-row" id="${cat}Cat" style="display: ${display};">`;
                 for (const item in trackerStuff.itemLayout[cat]) {
-                    if (!trackerStuff.itemLayout[cat][item].imageFile) continue;
+                    if (!trackerStuff.itemLayout[cat][item].imageFile || trackerStuff.removed_from_play.find(i => i == item)) continue;
                     if (!trackerStuff.itemLayout[cat][item].preloadedImages) {
                         if (
                             trackerStuff.itemLayout[cat][item].counts && !trackerStuff.itemLayout[cat][item].noImageCount
@@ -113,7 +124,7 @@ function switchTrackerMode(type, j) { // loads the map and items by default
         }
     }
 }
-function retrievedItem(itemId, cat) {
+function retrievedItem(itemId, cat, confirmWithUser = true) {
     const itemInfo = trackerStuff.itemLayout[cat][itemId];
     if (itemInfo) {
         if (itemInfo.counts) {
@@ -133,7 +144,122 @@ function retrievedItem(itemId, cat) {
                 itemInfo.counts[0]++;
             }
         } else itemInfo.obtained = !itemInfo.obtained;
+        if (itemInfo.locatedInChecks) {
+            const checks = itemInfo.locatedInChecks.filter(i => {
+                const [locationType, location, check] = i.split("@");
+                return !trackerStuff.layout[locationType][location][check].completed;
+            });
+            if (confirmWithUser) {
+                if (checks.length > 1) {
+                    const modal = $('#checkSelectModal');
+                    modal.find("span").text(itemId);
+                    modal.find('div[class="accordion-body"]').html(checks.map(v => `<div class="form-check">
+                        <input type="radio" name="check" value="${v}" id="${v}" class="form-check-input" required/>
+                        <label class="form-check-label" for="${v}">${v.split("@")[1]} ${v.split("@")[2]} (${v.split("@")[0]} Area)</label>
+                    </div>`).join('<br>'));
+                    modal.find('form[action="javascript:;"]').on("submit", e => {
+                        $(e.target).off("submit");
+                        const info = Object.fromEntries(new URLSearchParams($(e.target).serialize()));
+                        itemInfo.selectedCheck = true;
+                        checkCompleted(info.check, itemInfo, itemId);
+                        modal.modal('hide');
+                    })
+                    modal.modal('show');
+                    modal.on("hidden.bs.modal", () => {
+                        modal.off("hidden.bs.modal");
+                        if (!itemInfo.selectedCheck) {
+                            itemInfo.counts[0]--;
+                            if (itemInfo.counts[0] == 0) {
+                                itemInfo.counts[1] = itemInfo.counts[3] ? 0 : 1;
+                                itemInfo.obtained = false;
+                            } else itemInfo.counts[1]--;
+                        } else delete itemInfo.selectedCheck;
+                        switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), cat);
+                    })
+                } else checkCompleted(checks[0], itemInfo, itemId)
+            }
+            if (itemInfo.counts[0] == 0) for (const l of itemInfo.locatedInChecks) {
+                const [locationType, location, check] = l.split("@");
+                delete trackerStuff.layout[locationType][location][check].completed;
+            }
+            delete itemInfo.locatedInChecks
+        }
         switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), cat);
+    }
+}
+function checkCompleted(k, j = {}, itemId, showItemRecievedMessage = false) { // clears a check as completed
+    const [locationType, location, check] = k.split("@");
+    trackerStuff.layout[locationType][location][check].completed = j.obtained;
+    if (showItemRecievedMessage) displayAlert('success', `You have recieved the ${itemId} from ${location} ${check.split(location).join('')} (${locationType} Area)`);
+    if (j.locatedInChecks) delete j.locatedInChecks;
+}
+function uploadSpoilerLog(obj) {
+    const file = obj.files[0];
+    const modal = $("#processModal");
+    modal.find('h5[class="modal-title"]').text("Loading Spoiler Log...");
+    const progress = modal.find('progress');
+    progress.val(0);
+    progress.attr("max", file.size);
+    const status = modal.find("p");
+    status.text(`Loaded 0 out of ${file.size} bytes.`);
+    modal.modal('show');
+    const fs = new FileReader();
+    fs.addEventListener("loadend", e => {
+        status.text("The tracker is now loading the contents of your spoiler log.")
+        progress.removeAttr("value");
+        progress.removeAttr("max");
+        try {
+            const json = JSON.parse(e.target.result);
+            clearTracker();
+            for (const locationType in json.layout) {
+                for (const location in json.layout[locationType]) {
+                    for (const check in json.layout[locationType][location]) {
+                        if (trackerStuff.layout[locationType][location][check] && typeof trackerStuff.layout[locationType][location][check] == "object") {
+                            if (trackerStuff.layout[locationType][location][check].completed) delete trackerStuff.layout[locationType][location][check].completed 
+                            if (
+                                trackerStuff.layout[locationType][location][check].unlocked 
+                                && !trackerStuff.layout[locationType][location][check].unlockedByDefault
+                            ) delete trackerStuff.layout[locationType][location][check].unlocked; 
+                            const item = json.layout[locationType][location][check];
+                            json.layout[locationType][location][check] = Object.assign(trackerStuff.layout[locationType][location][check], {
+                                housesItem: item
+                            });
+                        }
+                    }
+                }
+            }
+            json.itemLayout = trackerStuff.itemLayout;
+            console.log(json)
+            loadTracker(json, document.getElementById('tracker').getAttribute("data-mode"));
+            modal.modal('hide');
+            displayAlert('Your spoiler log was successfuly loaded! have fun tracking your progress!');
+        } catch (eone) {
+            try {
+                const yaml = jsyaml.load(e.target.result);
+                console.log(eone)
+                clearTracker();
+            } catch (etwo) {
+                modal.modal('hide');
+                displayAlert('danger', `${
+                    !file.name.endsWith(".json") && !file.name.endsWith(".yaml") ? 'Unspoorted file type!' : 'There was an error while loading your spoiler log.'
+                }<br><br><strong>JSON Parsing Error</strong>: ${eone.toString()}<br><br><strong>YAML Parsing Error</strong>: ${etwo.toString()}`);
+            }
+        }
+    });
+    fs.addEventListener("progress", e => {
+        if (!Number.isNaN(e.loaded)) {
+            status.text(`Loaded ${e.loaded} out of ${file.size} bytes.`);
+            progress.val(e.loaded);
+        }
+    })
+    fs.readAsText(file);
+}
+function clearTracker() {
+    for (const cat in trackerStuff.itemLayout) {
+        if (typeof trackerStuff.itemLayout[cat] == "function") continue;
+        for (const item in trackerStuff.itemLayout[cat]) {
+            if (trackerStuff.itemLayout[cat][item].locatedInChecks) delete trackerStuff.itemLayout[cat][item].locatedInChecks
+        }
     }
 }
 // clears a message upon modal close for connecting to an archipelago server.

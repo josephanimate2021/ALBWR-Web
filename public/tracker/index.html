@@ -125,7 +125,7 @@
             <h5 class="modal-title">Connect To An Archipelago Server</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body" onsubmit="archipelagoConnector(this)" action="javascript:;">
+          <div class="modal-body">
             <p></p>
             <label for="host">Host</label>
             <input class="form-control" type="text" id="host" name="host" required/>
@@ -135,6 +135,51 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-primary" data-connected="false">Connect To Archipelago</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" id="processModal">
+      <div class="modal-dialog">
+        <div class="modal-content justify-content-center">
+          <div class="modal-header">
+            <h5 class="modal-title"></h5>
+          </div>
+          <center class="modal-body">
+            <p></p>
+            <progress></progress>
+          </center>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" id="checkSelectModal">
+      <div class="modal-dialog">
+        <form class="modal-content" action="javascript:;">
+          <div class="modal-header">
+            <h5 class="modal-title">What check did you get the <span></span> from?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p></p>
+            <h6>This infomation is needed in order for the tracker to accurately track the checks that you visted in either the vanilla game or randomizer of ALBW.</h6>
+            <div class="accordion" id="accordionChecks">
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    All Checks
+                  </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionChecks">
+                  <div class="accordion-body"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close Modal Dialog</button>
+            <button type="submit" class="btn btn-primary">Mark As Complete</button>
           </div>
         </form>
       </div>
@@ -315,7 +360,7 @@
             </div>
           </div>
         </div>
-        <input id="logsUploader" onchange="uploadSpoilerLog()" type="file" style="display: none;" accept=".json,.yaml"/>
+        <input id="logsUploader" onchange="uploadSpoilerLog(this)" type="file" style="display: none;" accept=".json,.yaml"/>
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
           <div id="alertBlock">
             <div class="alert alert-info alert-dismissible" role="alert">

@@ -63,14 +63,21 @@ const trackerCore = {
     "hook_trial":                                        false
   },
   "itemLayout": {
-    find(value) {
+    searchFor(value) {
       function c(i) {
         const info = {};
-        for (info.parent in i) {
-          if (typeof i[info.parent] == "function") continue;
-          console.log(i[info.parent], info.parent);
-          if (info.parent == value || i[info.parent].alt == value || i[info.parent].hasOwnProperty(value)) info.child = i[info.parent];
-          else info.child = c(i[info.parent]);
+        for (const k in i) {
+          if (typeof i[k] != "object") continue;
+          if (i[k][value]) {
+            info.cat = k;
+            info.data = i[info.cat][value];
+          } else if (i[k].alt == value || k == value) {
+            info.cat = k;
+            info.data = i[info.cat];
+          } else {
+            info.parent = k;
+            info.child = c(i[info.parent]);
+          }
         }
         return info;
       }
@@ -360,19 +367,19 @@ const trackerCore = {
         "Tower of Hera Weather Vane":                    {
           "position": "308x18"
         },
-        "[Mai] Death Mountain Base Rock":                "Lost Maiamai",
-        "[Mai] Death Mountain West Ledge":               "Lost Maiamai",
-        "[Mai] Fire Cave Ledge":                         "Lost Maiamai",
-        "[Mai] Outside Hookshot Mini-Dungeon":           "Lost Maiamai",
-        "[Mai] Rosso's Ore Mine":                        "Lost Maiamai"
+        "[Mai] Death Mountain Base Rock": {},
+        "[Mai] Death Mountain West Ledge": {},
+        "[Mai] Fire Cave Ledge": {},
+        "[Mai] Outside Hookshot Mini-Dungeon": {},
+        "[Mai] Rosso's Ore Mine": {}
       },
       "Desert": {
         "Desert Palace Weather Vane":                    {
           "position": "44x432"
         },
-        "[Mai] Buried in the Desert":                    "Lost Maiamai",
-        "[Mai] Buried near Desert Palace":               "Lost Maiamai",
-        "[Mai] Southern Ruins Big Rock":                 "Lost Maiamai"
+        "[Mai] Buried in the Desert": {},
+        "[Mai] Buried near Desert Palace": {},
+        "[Mai] Southern Ruins Big Rock": {}
       },
       "Eastern Ruins": {
         "Bird Lover":                                    "Green Rupee",
@@ -385,12 +392,12 @@ const trackerCore = {
         "Eastern Ruins Merge Chest":                     "Red Rupee",
         "Eastern Ruins Peg Circle":                      "Piece of Heart",
         "Merge Mini-Dungeon":                            "Letter in a Bottle",
-        "[Mai] Eastern Ruins Bonk Rocks":                "Lost Maiamai",
-        "[Mai] Eastern Ruins Green Tree":                "Lost Maiamai",
-        "[Mai] Eastern Ruins River":                     "Lost Maiamai",
-        "[Mai] Eastern Ruins Rock":                      "Lost Maiamai",
-        "[Mai] Eastern Ruins Wall":                      "Lost Maiamai",
-        "[Mai] Eastern Ruins Yellow Tree":               "Lost Maiamai"
+        "[Mai] Eastern Ruins Bonk Rocks": {},
+        "[Mai] Eastern Ruins Green Tree": {},
+        "[Mai] Eastern Ruins River": {},
+        "[Mai] Eastern Ruins Rock": {},
+        "[Mai] Eastern Ruins Wall": {},
+        "[Mai] Eastern Ruins Yellow Tree": {}
       },
       "Hyrule Castle Area": {
         "Blacksmith":                                    "Silver Rupee",
@@ -402,16 +409,17 @@ const trackerCore = {
         "Hyrule Castle Rocks":                           "Fire Rod+",
         "Your House Weather Vane":                       {
           "position": "262x342",
-          "unlocked": true
+          "unlocked": true,
+          "unlockedByDefault": true
         },
-        "[Mai] Behind Your House":                       "Lost Maiamai",
-        "[Mai] Blacksmith Tiles":                        "Lost Maiamai",
-        "[Mai] Blacksmith Tree":                         "Lost Maiamai",
-        "[Mai] Haunted Grove Tree":                      "Lost Maiamai",
-        "[Mai] Hyrule Castle Tiles":                     "Lost Maiamai",
-        "[Mai] Hyrule Castle Tree":                      "Lost Maiamai",
-        "[Mai] Outside Cucco Mini-Dungeon":              "Lost Maiamai",
-        "[Mai] Your House Tree":                         "Lost Maiamai"
+        "[Mai] Behind Your House": {},
+        "[Mai] Blacksmith Tiles": {},
+        "[Mai] Blacksmith Tree": {},
+        "[Mai] Haunted Grove Tree": {},
+        "[Mai] Hyrule Castle Tiles": {},
+        "[Mai] Hyrule Castle Tree": {},
+        "[Mai] Outside Cucco Mini-Dungeon": {},
+        "[Mai] Your House Tree": {}
       },
       "Irene the Witch": {
         "Irene":                                         "Red Rupee"
@@ -419,58 +427,69 @@ const trackerCore = {
       "Kakariko Village": {
         "Bee Guy (1)":                                   {
           "position": "76x273",
-          "unlocked": true
+          "unlocked": true,
+          "unlockedByDefault": true
         },
         "Bee Guy (2)":                                   {
           "position": "93.5x273",
-          "unlocked": true
+          "unlocked": true,
+          "unlockedByDefault": true
         },
         "Dodge the Cuccos":                              {
           "position": "93x339",
-          "unlocked": true
+          "unlocked": true,
+          "unlockedByDefault": true
         },
         "Kakariko Item Shop (3)":                        {
           "position": "23.5x226",
-          "unlocked": true
+          "unlocked": true,
+          "unlockedByDefault": true
         },
         "Kakariko Jail":                                 {
           "position": "72.5x215",
-          "unlocked": true
+          "unlocked": true,
+          "unlockedByDefault": true
         },
         "Kakariko Village Weather Vane":                 {
           "position": "71x242",
-          "unlocked": true
+          "unlocked": true,
+          "unlockedByDefault": true
         },
         "Kakariko Well (Bottom)":                        {
           "position": "30x218",
-          "unlocked": true
+          "unlocked": true,
+          "unlockedByDefault": true
         },
         "Kakariko Well (Top)":                           {
           "position": "20.3x218.5"
         },
         "Rupee Rush (Hyrule)":                           {
           "position": "38x344.5",
-          "unlocked": true
+          "unlocked": true,
+          "unlockedByDefault": true
         },
         "Shady Guy":                                     "Monster Tail",
         "Street Merchant (Left)":                        {
           "position": "45x237",
-          "unlocked": true
+          "unlocked": true,
+          "unlockedByDefault": true
         },
         "Street Merchant (Right)":                       {
           "position": "58.5x237",
-          "unlocked": true
+          "unlocked": true,
+          "unlockedByDefault": true
         },
         "Stylish Woman":                                 "Red Rupee",
         "Stylish Woman (Repeat)":                        "Red Rupee",
         "Woman":                                         "Red Rupee",
-        "[Mai] Cucco Ranch Tree":                        "Lost Maiamai",
-        "[Mai] Hyrule Rupee Rush Wall":                  "Lost Maiamai",
-        "[Mai] Kakariko Bush":                           "Lost Maiamai",
+        "[Mai] Cucco Ranch Tree": {},
+        "[Mai] Hyrule Rupee Rush Wall": {},
+        "[Mai] Kakariko Bush": {},
         "[Mai] Kakariko Sand":                           {
-          "position": "50.4x294"
+          "position": "50.4x294",
+          "housesItem": "Lost Maiamai"
         },
-        "[Mai] Woman's Roof":                            "Lost Maiamai"
+        "[Mai] Woman's Roof": {}
       },
       "Lake Hylia": {
         "100 Maiamai":                                   "Monster Tail",
@@ -491,11 +510,11 @@ const trackerCore = {
         "Maiamai Ice Rod Upgrade":                       "Silver Rupee",
         "Maiamai Sand Rod Upgrade":                      "Heart Container",
         "Maiamai Tornado Rod Upgrade":                   "Piece of Heart",
-        "[Mai] Hyrule Hotfoot Rock":                     "Lost Maiamai",
-        "[Mai] Lake Hylia East River":                   "Lost Maiamai",
-        "[Mai] Lake Hylia Island Tile":                  "Lost Maiamai",
-        "[Mai] Lake Hylia Shallow Ring":                 "Lost Maiamai",
-        "[Mai] Outside Maiamai Cave":                    "Lost Maiamai"
+        "[Mai] Hyrule Hotfoot Rock": {},
+        "[Mai] Lake Hylia East River": {},
+        "[Mai] Lake Hylia Island Tile": {},
+        "[Mai] Lake Hylia Shallow Ring": {},
+        "[Mai] Outside Maiamai Cave": {}
       },
       "Lost Woods Area": {
         "Fortune-Teller":                                "Ravio's Bracelet+",
@@ -507,61 +526,82 @@ const trackerCore = {
         "Rosso (1)":                                     "Gold Rupee",
         "Rosso (2)":                                     "Silver Rupee",
         "Rosso Cave":                                    "Bombs+",
-        "[Mai] Fortune-Teller Tent":                     "Lost Maiamai",
-        "[Mai] Lost Woods Bush":                         "Lost Maiamai",
-        "[Mai] Lost Woods Path Rock":                    "Lost Maiamai",
-        "[Mai] Lost Woods Rock":                         "Lost Maiamai",
-        "[Mai] Lost Woods Tree":                         "Lost Maiamai",
-        "[Mai] Moldorm Ledge":                           "Lost Maiamai",
-        "[Mai] Rosso Wall":                              "Lost Maiamai",
-        "[Mai] Small Pond":                              "Lost Maiamai"
+        "[Mai] Fortune-Teller Tent": {},
+        "[Mai] Lost Woods Bush": {},
+        "[Mai] Lost Woods Path Rock": {},
+        "[Mai] Lost Woods Rock": {},
+        "[Mai] Lost Woods Tree": {},
+        "[Mai] Moldorm Ledge": {},
+        "[Mai] Rosso Wall": {},
+        "[Mai] Small Pond": {}
       },
       "Ravio's Shop": {
         "Ravio's Gift":                                  {
           "position": "274x342",
-          "unlocked": true
+          "unlocked": true,
+          "unlockedByDefault": true
         },
         "Ravio's Shop (1)":                              {
           "position": "268x346",
-          "unlocked": true
+          "unlocked": true,
+          "housesItem": "Ice Rod+",
+          "unlockedByDefault": true
         },
         "Ravio's Shop (2)":                              {
           "position": "268x340",
-          "unlocked": true
+          "unlocked": true,
+          "housesItem": "Hookshot+",
+          "unlockedByDefault": true
         },
         "Ravio's Shop (3)":                              {
           "position": "268x334",
-          "unlocked": true
+          "unlocked": true,
+          "housesItem": "Tornado Rod+",
+          "unlockedByDefault": true
         },
         "Ravio's Shop (4)":                              {
           "position": "274x334",
-          "unlocked": true
+          "unlocked": true,
+          "housesItem": "Bombs+",
+          "unlockedByDefault": true
         },
         "Ravio's Shop (5)":                              {
           "position": "280x334",
-          "unlocked": true
+          "unlocked": true,
+          "housesItem": "Bow+",
+          "unlockedByDefault": true
         },
         "Ravio's Shop (6)":                              {
           "position": "280x340",
-          "unlocked": true
+          "unlocked": true,
+          "housesItem": "Sand Rod+",
+          "unlockedByDefault": true
         },
         "Ravio's Shop (7)":                              {
           "position": "280x346",
-          "unlocked": true
+          "unlocked": true,
+          "housesItem": "Hammer+",
+          "unlockedByDefault": true
         },
         "Ravio's Shop (8)":                              {
           "position": "280x352",
-          "unlocked": true
+          "unlocked": true,
+          "housesItem": "Boomerang+",
+          "unlockedByDefault": true
         },
         "Ravio's Shop (9)":                              {
           "position": "286x352",
-          "unlocked": true
+          "unlocked": true,
+          "housesItem": "Fire Rod+",
+          "unlockedByDefault": true
         }
       },
       "River Area": {
         "Dampe":                                         {
           "position": "234x154",
-          "unlocked": true
+          "unlocked": true,
+          "housesItem": "Sword+",
+          "unlockedByDefault": true
         },
         "Graveyard Ledge Cave":                          {
           "position": "288x142.2"
@@ -571,7 +611,8 @@ const trackerCore = {
         "Sanctuary Pegs":                                "Master Ore",
         "Sanctuary Weather Vane":                        {
           "position": "230x147",
-          "unlocked": true
+          "unlocked": true,
+          "unlockedByDefault": true
         },
         "Waterfall Cave":                                {
           "position": "450x69"
@@ -584,22 +625,22 @@ const trackerCore = {
         "[HS] Ledge":                                    "Hookshot+",
         "[HS] Lower Chest":                              "Hyrule Sewers Key",
         "[HS] Upper Chest":                              "Gold Rupee",
-        "[Mai] Hyrule Graveyard Wall":                   "Lost Maiamai",
-        "[Mai] Sanctuary Wall":                          "Lost Maiamai",
-        "[Mai] South of Zora's Domain":                  "Lost Maiamai",
-        "[Mai] Waterfall Ledge":                         "Lost Maiamai",
-        "[Mai] Witch's House":                           "Lost Maiamai",
-        "[Mai] Wooden Bridge":                           "Lost Maiamai",
-        "[Mai] Zora's Domain":                           "Lost Maiamai"
+        "[Mai] Hyrule Graveyard Wall": {},
+        "[Mai] Sanctuary Wall":                          {},
+        "[Mai] South of Zora's Domain": {},
+        "[Mai] Waterfall Ledge": {},
+        "[Mai] Witch's House": {},
+        "[Mai] Wooden Bridge": {},
+        "[Mai] Zora's Domain": {}
       },
       "Southern Ruins": {
         "Flippers Mini-Dungeon":                         "Silver Rupee",
         "Runaway Item Seller":                           "Piece of Heart",
         "Southern Ruins Ledge":                          "Red Rupee",
         "Southern Ruins Pillar Cave":                    "Piece of Heart",
-        "[Mai] Outside Flippers Mini-Dungeon":           "Lost Maiamai",
-        "[Mai] Southern Ruins Bomb Cave":                "Lost Maiamai",
-        "[Mai] Southern Ruins Pillars":                  "Lost Maiamai"
+        "[Mai] Outside Flippers Mini-Dungeon": {},
+        "[Mai] Southern Ruins Bomb Cave": {},
+        "[Mai] Southern Ruins Pillars": {}
       }
     },
     "Lorule": {
@@ -616,16 +657,16 @@ const trackerCore = {
         "Hinox (5)":                                     "Purple Rupee",
         "Hinox (6)":                                     "Silver Rupee",
         "Ku's Domain Fight":                             "Master Ore",
-        "[Mai] Dark Maze Center Wall":                   "Lost Maiamai",
-        "[Mai] Dark Maze Entrance Wall":                 "Lost Maiamai",
-        "[Mai] Dark Ruins Bonk Rocks":                   "Lost Maiamai",
-        "[Mai] Dark Ruins East Tree":                    "Lost Maiamai",
-        "[Mai] Dark Ruins South Wall":                   "Lost Maiamai",
-        "[Mai] Dark Ruins Waterfall":                    "Lost Maiamai",
-        "[Mai] Dark Ruins West Tree":                    "Lost Maiamai",
-        "[Mai] Ku's Domain Grass":                       "Lost Maiamai",
-        "[Mai] Ku's Domain Water":                       "Lost Maiamai",
-        "[Mai] Outside Hinox Cave":                      "Lost Maiamai"
+        "[Mai] Dark Maze Center Wall": {},
+        "[Mai] Dark Maze Entrance Wall": {},
+        "[Mai] Dark Ruins Bonk Rocks": {},
+        "[Mai] Dark Ruins East Tree": {},
+        "[Mai] Dark Ruins South Wall": {},
+        "[Mai] Dark Ruins Waterfall": {},
+        "[Mai] Dark Ruins West Tree": {},
+        "[Mai] Ku's Domain Grass": {},
+        "[Mai] Ku's Domain Water": {},
+        "[Mai] Outside Hinox Cave": {}
       },
       "Graveyard": {
         "Graveyard Peninsula":                           "Silver Rupee",
@@ -639,9 +680,9 @@ const trackerCore = {
         "[LS] Ledge":                                    "Piece of Heart",
         "[LS] Lower Chest":                              "Net+",
         "[LS] Upper Chest":                              "Empty Bottle",
-        "[Mai] Lorule Graveyard Big Rock":               "Lost Maiamai",
-        "[Mai] Lorule Graveyard Tree":                   "Lost Maiamai",
-        "[Mai] Lorule Graveyard Wall":                   "Lost Maiamai"
+        "[Mai] Lorule Graveyard Big Rock": {},
+        "[Mai] Lorule Graveyard Tree": {},
+        "[Mai] Lorule Graveyard Wall": {}
       },
       "Lorule Castle Area": {
         "Big Bomb Flower Cave":                          "Silver Rupee",
@@ -679,30 +720,33 @@ const trackerCore = {
           "position": "545x255"
         },
         "Vacant House":                                  {
-          "position": "788.5x335"
+          "position": "788.5x335",
+          "housesItem": "Empty Bottle"
         },
         "Vacant House Weather Vane":                     {
           "position": "795x350"
         },
         "[Mai] Behind Vacant House":                     {
-          "position": "788.5x328.5"
+          "position": "788.5x328.5",
+          "housesItem": "Lost Maiamai"
         },
-        "[Mai] Big Bomb Flower Grass":                   "Lost Maiamai",
-        "[Mai] Lorule Blacksmith Wall":                  "Lost Maiamai",
-        "[Mai] Lorule Castle Tree":                      "Lost Maiamai",
-        "[Mai] Lorule Castle Wall":                      "Lost Maiamai",
-        "[Mai] Lorule Fortune-Teller Rock":              "Lost Maiamai",
-        "[Mai] Lorule Haunted Grove Wall":               "Lost Maiamai",
-        "[Mai] Lorule Rupee Rush Wall":                  "Lost Maiamai",
-        "[Mai] Lorule S Ruins Pillars":                  "Lost Maiamai",
-        "[Mai] Lorule S Ruins Wall":                     "Lost Maiamai",
-        "[Mai] Lorule S Ruins Water":                    "Lost Maiamai",
+        "[Mai] Big Bomb Flower Grass": {},
+        "[Mai] Lorule Blacksmith Wall": {},
+        "[Mai] Lorule Castle Tree": {},
+        "[Mai] Lorule Castle Wall": {},
+        "[Mai] Lorule Fortune-Teller Rock": {},
+        "[Mai] Lorule Haunted Grove Wall": {},
+        "[Mai] Lorule Rupee Rush Wall": {},
+        "[Mai] Lorule S Ruins Pillars": {},
+        "[Mai] Lorule S Ruins Wall": {},
+        "[Mai] Lorule S Ruins Water": {},
         "[Mai] Octoball Derby Skull":                    {
-          "position": "660x360"
+          "position": "660x360",
+          "housesItem": "Lost Maiamai"
         },
-        "[Mai] Thieves' Town Tree":                      "Lost Maiamai",
-        "[Mai] Thieves' Town Wall":                      "Lost Maiamai",
-        "[Mai] Vacant House Rock":                       "Lost Maiamai"
+        "[Mai] Thieves' Town Tree": {},
+        "[Mai] Thieves' Town Wall": {},
+        "[Mai] Vacant House Rock": {}
       },
       "Lorule Death Mountain": {
         "Behind Ice Gimos":                              "Piece of Heart",
@@ -721,12 +765,12 @@ const trackerCore = {
         "Treacherous Tower Weather Vane":                {
           "position": "805x30"
         },
-        "[Mai] Ice Cave Ledge":                          "Lost Maiamai",
-        "[Mai] Lorule Mountain E Big Rock":              "Lost Maiamai",
-        "[Mai] Lorule Mountain E Wall":                  "Lost Maiamai",
-        "[Mai] Lorule Mountain W Big Rock":              "Lost Maiamai",
-        "[Mai] Lorule Mountain W Skull":                 "Lost Maiamai",
-        "[Mai] Outside Ice Ruins":                       "Lost Maiamai"
+        "[Mai] Ice Cave Ledge":                          {},
+        "[Mai] Lorule Mountain E Big Rock": {},
+        "[Mai] Lorule Mountain E Wall": {},
+        "[Mai] Lorule Mountain W Big Rock": {},
+        "[Mai] Lorule Mountain W Skull": {},
+        "[Mai] Outside Ice Ruins": {}
       },
       "Misery Mire": {
         "Misery Mire Ledge":                             "Monster Guts",
@@ -734,9 +778,9 @@ const trackerCore = {
           "position": "627x455"
         },
         "Sand Mini-Dungeon":                             "Red Rupee",
-        "[Mai] Misery Mire Rock":                        "Lost Maiamai",
-        "[Mai] Misery Mire Wall":                        "Lost Maiamai",
-        "[Mai] Misery Mire Water":                       "Lost Maiamai"
+        "[Mai] Misery Mire Rock": {},
+        "[Mai] Misery Mire Wall": {},
+        "[Mai] Misery Mire Water": {}
       },
       "Skull Woods Area": {
         "Destroyed House":                               "Purple Rupee",
@@ -746,14 +790,14 @@ const trackerCore = {
         "Skull Woods Weather Vane":                      {
           "position": "608x100"
         },
-        "[Mai] Destroyed House Tree":                    "Lost Maiamai",
-        "[Mai] Skull Woods Bush":                        "Lost Maiamai",
-        "[Mai] Skull Woods Dry Pond":                    "Lost Maiamai",
-        "[Mai] Skull Woods Entrance Wall":               "Lost Maiamai",
-        "[Mai] Skull Woods Grass":                       "Lost Maiamai",
-        "[Mai] Skull Woods Rock":                        "Lost Maiamai",
-        "[Mai] Skull Woods Skull":                       "Lost Maiamai",
-        "[Mai] n-Shaped House Wall":                     "Lost Maiamai",
+        "[Mai] Destroyed House Tree": {},
+        "[Mai] Skull Woods Bush": {},
+        "[Mai] Skull Woods Dry Pond": {},
+        "[Mai] Skull Woods Entrance Wall": {},
+        "[Mai] Skull Woods Grass": {},
+        "[Mai] Skull Woods Rock": {},
+        "[Mai] Skull Woods Skull": {},
+        "[Mai] n-Shaped House Wall": {},
         "n-Shaped House":                                "Silver Rupee"
       },
       "Turtle Rock Area": {
@@ -766,11 +810,11 @@ const trackerCore = {
         "Turtle Rock Weather Vane":                      {
           "position": "913x438"
         },
-        "[Mai] Lorule Lake Rock":                        "Lost Maiamai",
-        "[Mai] Lorule Lake SE Wall":                     "Lost Maiamai",
-        "[Mai] Lorule Lake Skull":                       "Lost Maiamai",
-        "[Mai] Lorule Lake Water":                       "Lost Maiamai",
-        "[Mai] Lorule Lake West Wall":                   "Lost Maiamai"
+        "[Mai] Lorule Lake Rock": {},
+        "[Mai] Lorule Lake SE Wall": {},
+        "[Mai] Lorule Lake Skull": {},
+        "[Mai] Lorule Lake Water": {},
+        "[Mai] Lorule Lake West Wall": {}
       }
     },
     "Dungeons": {

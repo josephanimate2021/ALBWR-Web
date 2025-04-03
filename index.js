@@ -184,7 +184,7 @@ wss.on('connection', (ws, req) => {
                                             try { // most spoiler logs don't have comments so it should be fine.
                                                 preset = JSON.parse(preset)
                                                 Object.assign(preset, info.publishingPreset);
-                                            } catch { 
+                                            } finally { 
                                                 // most preset files made with JSON have comments so the JSON won't be able to get parsed. 
                                                 // As a result of this, we will have to manually input data without parsing the JSON string.
                                                 for (const i in info.publishingPreset) preset = preset.replace("{", `{\n\t"${i}": ${
@@ -228,7 +228,7 @@ wss.on('connection', (ws, req) => {
                                     break;
                                 }
                             }
-                        } catch {
+                        } finally {
                             fs.appendFileSync(`./uploads/${name}`, e);
                             ws.send("ok");
                         }
