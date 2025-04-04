@@ -26,17 +26,25 @@ function switchTrackerMode(type, j, loadLayouts = ["Hyrule", "Lorule", "Dungeons
         for (const locationType in trackerStuff.layout) {
             if (loadLayouts.findIndex(i => i == locationType) != undefined) for (const location in trackerStuff.layout[locationType]) {
                 for (const check in trackerStuff.layout[locationType][location]) {
+                    if (
+                        (
+                            trackerStuff.settings.user_exclusions || trackerStuff.settings.exclusions?.exclusions || trackerStuff.settings.exclusions || []
+                        ).find(i => i == check)
+                    ) continue;
+                    if (trackerStuff.settings.exclude && trackerStuff.settings.exclude[locationType][location].find(i => i == check)) continue;
+                    if (trackerStuff.full_exclusions && trackerStuff.full_exclusions.find(i => i == check)) continue;
                     const info = trackerStuff.layout[locationType][location][check];
                     if (info.position) {
                         if (info.housesItem) {
                             const itemInfo = trackerStuff.itemLayout.searchFor(info.housesItem);
                             if (!itemInfo.cat && !itemInfo.data) continue;
-                            trackerStuff.itemLayout[itemInfo.cat][info.housesItem].locatedInChecks ||= [];
-                            if (trackerStuff.itemLayout[itemInfo.cat][info.housesItem]) {
+                            const itemInfoFromLayout = trackerStuff.itemLayout[itemInfo.cat][itemInfo.realItemName || info.housesItem];
+                            if (itemInfoFromLayout) {
+                                itemInfoFromLayout.locatedInChecks ||= [];
                                 const together = `${locationType}@${location}@${check}`;
                                 if (
-                                    !trackerStuff.itemLayout[itemInfo.cat][info.housesItem].locatedInChecks.find(i => i == together)
-                                ) trackerStuff.itemLayout[itemInfo.cat][info.housesItem].locatedInChecks.push(together);
+                                    !itemInfoFromLayout.locatedInChecks.find(i => i == together)
+                                ) itemInfoFromLayout.locatedInChecks.push(together);
                             }
                         }
                         const [x, y] = info.position.toString().split("x");
@@ -153,9 +161,9 @@ function retrievedItem(itemId, cat, confirmWithUser = true) {
                 if (checks.length > 1) {
                     const modal = $('#checkSelectModal');
                     modal.find("span").text(itemId);
-                    modal.find('div[class="accordion-body"]').html(checks.map(v => `<div class="form-check">
+                    modal.find('div[class="accordion-body"]').html(checks.map(v => `<div class="form-check" title="If you got the ${itemId} from this check, then you can select this one.">
                         <input type="radio" name="check" value="${v}" id="${v}" class="form-check-input" required/>
-                        <label class="form-check-label" for="${v}">${v.split("@")[1]} ${v.split("@")[2]} (${v.split("@")[0]} Area)</label>
+                        <label class="form-check-label" for="${v}">${v.split("@")[1]} ${v.split("@")[2].split(v.split("@")[1]).join('')} (${v.split("@")[0]} Area)</label>
                     </div>`).join('<br>'));
                     modal.find('form[action="javascript:;"]').on("submit", e => {
                         $(e.target).off("submit");
@@ -176,13 +184,12 @@ function retrievedItem(itemId, cat, confirmWithUser = true) {
                         } else delete itemInfo.selectedCheck;
                         switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), cat);
                     })
-                } else checkCompleted(checks[0], itemInfo, itemId)
+                } else checkCompleted(checks[0] || itemInfo.locatedInChecks[0], itemInfo, itemId)
             }
-            if (itemInfo.counts[0] == 0) for (const l of itemInfo.locatedInChecks) {
+            if (!itemInfo.obtained) for (const l of itemInfo.locatedInChecks) {
                 const [locationType, location, check] = l.split("@");
                 delete trackerStuff.layout[locationType][location][check].completed;
             }
-            delete itemInfo.locatedInChecks
         }
         switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), cat);
     }
@@ -191,9 +198,8 @@ function checkCompleted(k, j = {}, itemId, showItemRecievedMessage = false) { //
     const [locationType, location, check] = k.split("@");
     trackerStuff.layout[locationType][location][check].completed = j.obtained;
     if (showItemRecievedMessage) displayAlert('success', `You have recieved the ${itemId} from ${location} ${check.split(location).join('')} (${locationType} Area)`);
-    if (j.locatedInChecks) delete j.locatedInChecks;
 }
-function uploadSpoilerLog(obj) {
+function uploadSpoilerLog(obj) { // takes a spoiler log file and converts it into a usable format that the tracker can handle.
     const file = obj.files[0];
     const modal = $("#processModal");
     modal.find('h5[class="modal-title"]').text("Loading Spoiler Log...");
@@ -209,9 +215,15 @@ function uploadSpoilerLog(obj) {
         progress.removeAttr("value");
         progress.removeAttr("max");
         try {
-            const json = JSON.parse(e.target.result);
+            const json = jsyaml.load(e.target.result);
             clearTracker();
-            for (const locationType in json.layout) {
+            if (json.layout && json.metrics) {
+                if ((json.settings.logic_mode || json.settings.logic.logic_mode || json.settings.logic.mode) == "Normal") { 
+                    // Only let the user choose their preferences when logic settings are set to normal to prevent inaccuracy with both methods.
+                } else { // default to using the metrics if the logic mode settings are not set to normal.
+
+                }
+            } else if (json.layout) for (const locationType in json.layout) {
                 for (const location in json.layout[locationType]) {
                     for (const check in json.layout[locationType][location]) {
                         if (trackerStuff.layout[locationType][location][check] && typeof trackerStuff.layout[locationType][location][check] == "object") {
@@ -227,23 +239,20 @@ function uploadSpoilerLog(obj) {
                         }
                     }
                 }
+            } else {
+                modal.modal('hide');
+                displayAlert('warning', 'Your spoiler log does not contain a layout or the metrics that can be used by the tracker to help you accurately track your progress. Please upload a valid spoiler log file.');
             }
             json.itemLayout = trackerStuff.itemLayout;
             console.log(json)
             loadTracker(json, document.getElementById('tracker').getAttribute("data-mode"));
             modal.modal('hide');
-            displayAlert('Your spoiler log was successfuly loaded! have fun tracking your progress!');
-        } catch (eone) {
-            try {
-                const yaml = jsyaml.load(e.target.result);
-                console.log(eone)
-                clearTracker();
-            } catch (etwo) {
-                modal.modal('hide');
-                displayAlert('danger', `${
-                    !file.name.endsWith(".json") && !file.name.endsWith(".yaml") ? 'Unspoorted file type!' : 'There was an error while loading your spoiler log.'
-                }<br><br><strong>JSON Parsing Error</strong>: ${eone.toString()}<br><br><strong>YAML Parsing Error</strong>: ${etwo.toString()}`);
-            }
+            displayAlert('success', 'Your spoiler log was successfuly loaded! have fun tracking your progress!');
+        } catch (e) {
+            modal.modal('hide');
+            displayAlert('danger', `${
+                !file.name.endsWith(".json") && !file.name.endsWith(".yaml") ? 'Unspoorted file type!' : 'There was an error while loading your spoiler log.'
+            }<br><br><strong>File Parsing Error</strong>: ${e.toString()}`);
         }
     });
     fs.addEventListener("progress", e => {

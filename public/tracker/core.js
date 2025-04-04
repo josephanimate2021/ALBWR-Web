@@ -1,87 +1,26 @@
 const trackerCore = {
-  "version":                                             "v0.4.1 - Beta Build 2025-03-25",
-  "settings": {
-    "lc_requirement":                                    7,
-    "ped_requirement":                                   "Standard",
-    "logic_mode":                                        "Normal",
-    "dark_rooms_lampless":                               false,
-    "dungeon_prize_shuffle":                             true,
-    "maiamai_limit":                                     50,
-    "maiamai_madness":                                   false,
-    "nice_items":                                        "Shuffled",
-    "super_items":                                       true,
-    "lamp_and_net_as_weapons":                           false,
-    "cracks":                                            "Closed",
-    "door_shuffle":                                      "Off",
-    "cracksanity":                                       "Off",
-    "weather_vanes":                                     "Hyrule",
-    "bow_of_light_in_castle":                            false,
-    "no_progression_enemies":                            false,
-    "keysy":                                             "Off",
-    "swordless_mode":                                    false,
-    "start_with_merge":                                  false,
-    "start_with_pouch":                                  false,
-    "bell_in_shop":                                      false,
-    "sword_in_shop":                                     false,
-    "boots_in_shop":                                     false,
-    "assured_weapon":                                    true,
-    "chest_size_matches_contents":                       true,
-    "minigames_excluded":                                false,
-    "skip_big_bomb_flower":                              true,
-    "trials_door":                                       "OpenFromInsideOnly",
-    "treacherous_tower_floors":                          5,
-    "purple_potion_bottles":                             true,
-    "night_mode":                                        false,
-    "user_exclusions": [
-      "Dodge the Cuccos",
-      "Hyrule Hotfoot 65s",
-      "Hyrule Hotfoot 75s",
-      "Octoball Derby",
-      "Rupee Rush (Hyrule)",
-      "Rupee Rush (Lorule)"
-    ]
-  },
-  "full_exclusions": [
-    "100 Maiamai",
-    "Dodge the Cuccos",
-    "Hyrule Hotfoot 65s",
-    "Hyrule Hotfoot 75s",
-    "Octoball Derby",
-    "Rupee Rush (Hyrule)",
-    "Rupee Rush (Lorule)",
-    "Stylish Woman (Repeat)"
-  ],
-  "removed_from_play": [
-    "Red Rupee",
-    "Monster Guts"
-  ],
+  "settings": {},
+  "full_exclusions": [],
+  "removed_from_play": ["Quake"],
   "treacherous_tower_floors": [],
-  "trials_config": {
-    "bomb_trial":                                        false,
-    "tile_trial":                                        false,
-    "lamp_trial":                                        false,
-    "hook_trial":                                        false
-  },
+  "trials_config": {},
   "itemLayout": {
     searchFor(value) {
-      function c(i) {
-        const info = {};
-        for (const k in i) {
-          if (typeof i[k] != "object") continue;
-          if (i[k][value]) {
+      const info = {};
+      for (const k in this) {
+        if (typeof this[k] != "object") continue;
+        if (this[k][value]) {
+          info.cat = k;
+          info.data = this[info.cat][value];
+        } else for (const j in this[k]) {
+          if (this[k][j].alt == value) {
             info.cat = k;
-            info.data = i[info.cat][value];
-          } else if (i[k].alt == value || k == value) {
-            info.cat = k;
-            info.data = i[info.cat];
-          } else {
-            info.parent = k;
-            info.child = c(i[info.parent]);
+            info.realItemName = j;
+            info.data = this[info.cat][j];
           }
         }
-        return info;
       }
-      return c(this);
+      return info;
     },
     "Progression Items": {
       "Fire Rod+": {
@@ -144,15 +83,13 @@ const trackerCore = {
         "imageFile": "items/irod",
         "counts": [0, 1, 3]
       },
-      "Bell": {
-        "imageFile": "gear/bell"
-      },
       "Tornado Rod+": {
         "alt": "Tornado Rod",
         "imageFile": "items/trod",
         "counts": [0, 1, 3]
       },
       "Progressive Bracelet": {
+        "alt": "Ravio's Bracelet+",
         "imageFile": "gear/bracelet",
         "counts": [0, 1, 2]
       },
@@ -163,6 +100,7 @@ const trackerCore = {
         "imageFile": "items/bow-of-light",
       },
       "Flippers": {
+        "alt": "Zora's Flippers",
         "imageFile": "gear/flippers"
       },
     },
@@ -277,6 +215,9 @@ const trackerCore = {
       },
     },
     "Other Items": {
+      "Bell": {
+        "imageFile": "gear/bell"
+      },
       "Smooth Gem": {
         "imageFile": "gear/gem"
       },
@@ -406,7 +347,9 @@ const trackerCore = {
         "Blacksmith Table":                              "Ravio's Bracelet+",
         "Cucco Mini-Dungeon":                            "Zora's Flippers",
         "Haunted Grove Stump":                           "Hammer+",
-        "Hyrule Castle Rocks":                           "Fire Rod+",
+        "Hyrule Castle Rocks":                           {
+          "position": "300x209"
+        },
         "Your House Weather Vane":                       {
           "position": "262x342",
           "unlocked": true,
@@ -417,12 +360,21 @@ const trackerCore = {
         "[Mai] Blacksmith Tree": {},
         "[Mai] Haunted Grove Tree": {},
         "[Mai] Hyrule Castle Tiles": {},
-        "[Mai] Hyrule Castle Tree": {},
+        "[Mai] Hyrule Castle Tree": {
+          "position": "209x209",
+          "housesItem": "Lost Maiamai"
+        },
         "[Mai] Outside Cucco Mini-Dungeon": {},
-        "[Mai] Your House Tree": {}
+        "[Mai] Your House Tree": {
+          "position": "238x342",
+          "housesItem": "Lost Maiamai"
+        },
       },
       "Irene the Witch": {
-        "Irene":                                         "Red Rupee"
+        "Irene":                                         {
+          "position": "348x350",
+          "housesItem": "Bell"
+        },
       },
       "Kakariko Village": {
         "Bee Guy (1)":                                   {
@@ -468,7 +420,9 @@ const trackerCore = {
           "unlocked": true,
           "unlockedByDefault": true
         },
-        "Shady Guy":                                     "Monster Tail",
+        "Shady Guy":                                     {
+          "position": "90x226"
+        },
         "Street Merchant (Left)":                        {
           "position": "45x237",
           "unlocked": true,
@@ -522,7 +476,10 @@ const trackerCore = {
         "Hyrule Hotfoot 75s":                            "Monster Guts",
         "Lost Woods Alcove":                             "Heart Container",
         "Lost Woods Chest":                              "Purple Rupee",
-        "Master Sword Pedestal":                         "Piece of Heart",
+        "Master Sword Pedestal":                         {
+          "housesItem": "Sword+",
+          "position": "33x15"
+        },
         "Rosso (1)":                                     "Gold Rupee",
         "Rosso (2)":                                     "Silver Rupee",
         "Rosso Cave":                                    "Bombs+",
@@ -615,7 +572,8 @@ const trackerCore = {
           "unlockedByDefault": true
         },
         "Waterfall Cave":                                {
-          "position": "450x69"
+          "position": "450x69",
+          "housesItem": "Zora's Flippers"
         },
         "Witch's House Weather Vane":                    {
           "position": "407x175"
