@@ -298,26 +298,44 @@ const trackerCore = {
         "Death Mountain Blocked Cave":                   "Silver Rupee",
         "Death Mountain Fairy Cave":                     "Silver Rupee",
         "Death Mountain Open Cave":                      "Bee Badge",
-        "Death Mountain West Highest Cave":              "Silver Rupee",
-        "Donkey Cave":                                   "Silver Rupee",
-        "Donkey Cave Ledge":                             "Heart Container",
+        "Death Mountain West Highest Cave":              {
+          "position": "237x34"
+        },
+        "Donkey Cave":                                   {
+          "position": "259x81"
+        },
+        "Donkey Cave Ledge":                             {
+          "position": "253x60"
+        },
         "Fire Cave Pillar":                              {
-          "position": "253x60",
           "housesItem": "Red Rupee"
         },
         "Floating Island":                               "Mail+",
-        "Hookshot Mini-Dungeon":                         "Red Rupee",
-        "Spectacle Rock":                                "Piece of Heart",
+        "Hookshot Mini-Dungeon":                         {
+          "position": "467.5x47"
+        },
+        "Spectacle Rock":                                {
+          "position": "250x36",
+          "housesItem": "Piece of Heart"
+        },
         "Tower of Hera Weather Vane":                    {
           "position": "308x18"
         },
-        "[Mai] Death Mountain Base Rock": {},
-        "[Mai] Death Mountain West Ledge": {},
-        "[Mai] Fire Cave Ledge": {
+        "[Mai] Death Mountain Base Rock": {
+          "position": "284x116",
+          "housesItem": "Lost Maiamai"
+        },
+        "[Mai] Death Mountain West Ledge": {
           "position": "259x58",
           "housesItem": "Lost Maiamai"
         },
-        "[Mai] Outside Hookshot Mini-Dungeon": {},
+        "[Mai] Fire Cave Ledge": {
+          "housesItem": "Lost Maiamai"
+        },
+        "[Mai] Outside Hookshot Mini-Dungeon": {
+          "position": "475x40",
+          "housesItem": "Lost Maiamai"
+        },
         "[Mai] Rosso's Ore Mine": {}
       },
       "Desert": {
@@ -380,7 +398,10 @@ const trackerCore = {
         "Blacksmith Table":                              {
           "position": "154x260"
         },
-        "Cucco Mini-Dungeon":                            "Zora's Flippers",
+        "Cucco Mini-Dungeon":                            {
+          "position": "139x410",
+          "housesItem": "Silver Rupee"
+        },
         "Haunted Grove Stump":                           {
           "position": "162.5x346.5",
           "unlocked": true,
@@ -413,7 +434,10 @@ const trackerCore = {
           "position": "209x209",
           "housesItem": "Lost Maiamai"
         },
-        "[Mai] Outside Cucco Mini-Dungeon": {},
+        "[Mai] Outside Cucco Mini-Dungeon": {
+          "position": "146x418",
+          "housesItem": "Lost Maiamai"
+        },
         "[Mai] Your House Tree": {
           "position": "238x342",
           "housesItem": "Lost Maiamai"
@@ -569,9 +593,7 @@ const trackerCore = {
         },
         "Rosso (1)":                                     {
           "housesItem": "Glove+",
-          "position": "183x30",
-          "unlocked": true,
-          "unlockedByDefault": true
+          "position": "183x29"
         },
         "Rosso (2)":                                     {
           "position": "183x35",
@@ -595,8 +617,14 @@ const trackerCore = {
           "position": "111x126",
           "housesItem": "Lost Maiamai"
         },
-        "[Mai] Moldorm Ledge": {},
-        "[Mai] Rosso Wall": {},
+        "[Mai] Moldorm Ledge": {
+          "housesItem": "Lost Maiamai",
+          "position": "180x80"
+        },
+        "[Mai] Rosso Wall": {
+          "housesItem": "Lost Maiamai",
+          "position": "175x64"
+        },
         "[Mai] Small Pond": {}
       },
       "Ravio's Shop": {
@@ -728,7 +756,9 @@ const trackerCore = {
       "Southern Ruins": {
         "Flippers Mini-Dungeon":                         "Silver Rupee",
         "Runaway Item Seller":                           "Piece of Heart",
-        "Southern Ruins Ledge":                          "Red Rupee",
+        "Southern Ruins Ledge":                          {
+          "position": "206x438"
+        },
         "Southern Ruins Pillar Cave":                    "Piece of Heart",
         "[Mai] Outside Flippers Mini-Dungeon": {},
         "[Mai] Southern Ruins Bomb Cave": {},
@@ -780,7 +810,9 @@ const trackerCore = {
         "[Mai] Lorule Graveyard Wall": {}
       },
       "Lorule Castle Area": {
-        "Big Bomb Flower Cave":                          "Silver Rupee",
+        "Big Bomb Flower Cave":                          {
+          "position": "660x420"
+        },
         "Blacksmith (Lorule)":                           "Silver Rupee",
         "Blacksmith Weather Vane":                       {
           "position": "680x270"
@@ -789,17 +821,21 @@ const trackerCore = {
           "position": "621x270",
           "housesItem": "Piece of Heart"
         },
-        "Great Rupee Fairy":                             "Heart Container",
+        "Great Rupee Fairy":                             {
+          "position": "598x325"
+        },
         "Lorule Castle Weather Vane":                    {
           "position": "762x240"
         },
         "Lorule Field Hookshot Chest":                   "Red Rupee",
         "Octoball Derby":                                {
-          "position": "674.4x340"
+          "position": "674.4x340",
+          "housesItem": "Piece of Heart"
         },
         "Pegasus Boots Pyramid":                         "Purple Rupee",
         "Rupee Rush (Lorule)":                           {
-          "position": "553.2x346"
+          "position": "553.2x346",
+          "housesItem": "Piece of Heart"
         },
         "Swamp Cave (Left)":                             "Tornado Rod+",
         "Swamp Cave (Middle)":                           "Purple Rupee",
@@ -850,7 +886,10 @@ const trackerCore = {
         },
         "[Mai] Lorule Fortune-Teller Rock": {},
         "[Mai] Lorule Haunted Grove Wall": {},
-        "[Mai] Lorule Rupee Rush Wall": {},
+        "[Mai] Lorule Rupee Rush Wall": {
+          "position": "540x320",
+          "housesItem": "Lost Maiamai"
+        },
         "[Mai] Lorule S Ruins Pillars": {},
         "[Mai] Lorule S Ruins Wall": {},
         "[Mai] Lorule S Ruins Water": {},
@@ -923,8 +962,14 @@ const trackerCore = {
         "[Mai] Skull Woods Grass": {},
         "[Mai] Skull Woods Rock": {},
         "[Mai] Skull Woods Skull": {},
-        "[Mai] n-Shaped House Wall": {},
-        "n-Shaped House":                                "Silver Rupee"
+        "[Mai] n-Shaped House Wall": {
+          "position": "581x214",
+          "housesItem": "Lost Maiamai"
+        },
+        "n-Shaped House":                                {
+          "position": "595x217",
+          "housesItem": "Piece of Heart"
+        },
       },
       "Turtle Rock Area": {
         "Dark/Turtle Chest":                             "Blue Rupee",
