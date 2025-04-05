@@ -163,7 +163,9 @@ function retrievedItem(itemId, cat, confirmWithUser = true) {
                     modal.find("span").text(itemId);
                     modal.find('div[class="accordion-body"]').html(checks.map(v => `<div class="form-check" title="If you got the ${itemId} from this check, then you can select this one.">
                         <input type="radio" name="check" value="${v}" id="${v}" class="form-check-input" required/>
-                        <label class="form-check-label" for="${v}">${v.split("@")[1]} ${v.split("@")[2].split(v.split("@")[1]).join('')} (${v.split("@")[0]} Area)</label>
+                        <label class="form-check-label" for="${v}">${v.split("@")[1]} ${
+                            v.split("@")[2].split(v.split("@")[1]).join('').split(v.split("@")[1].split(' ')[0]).join('')
+                        } (${v.split("@")[0]} Area)</label>
                     </div>`).join('<br>'));
                     modal.find('form[action="javascript:;"]').on("submit", e => {
                         $(e.target).off("submit");

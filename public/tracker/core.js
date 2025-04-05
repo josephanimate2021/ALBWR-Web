@@ -123,15 +123,15 @@ const trackerCore = {
         "imageFile": "gear/sage-impa"
       },
       "Sage Gulley": {
-        "alt": "Rescue Impa",
+        "alt": "Rescue Gulley",
         "imageFile": "gear/sage-gulley"
       },
       "Sage Irene": {
-        "alt": "Rescue Impa",
+        "alt": "Rescue Irene",
         "imageFile": "gear/sage-irene"
       },
       "Sage Rosso": {
-        "alt": "Rescue Impa",
+        "alt": "Rescue Rosso",
         "imageFile": "gear/sage-rosso"
       },
       "Sage Oren": {
@@ -301,7 +301,10 @@ const trackerCore = {
         "Death Mountain West Highest Cave":              "Silver Rupee",
         "Donkey Cave":                                   "Silver Rupee",
         "Donkey Cave Ledge":                             "Heart Container",
-        "Fire Cave Pillar":                              "Silver Rupee",
+        "Fire Cave Pillar":                              {
+          "position": "253x60",
+          "housesItem": "Red Rupee"
+        },
         "Floating Island":                               "Mail+",
         "Hookshot Mini-Dungeon":                         "Red Rupee",
         "Spectacle Rock":                                "Piece of Heart",
@@ -310,7 +313,10 @@ const trackerCore = {
         },
         "[Mai] Death Mountain Base Rock": {},
         "[Mai] Death Mountain West Ledge": {},
-        "[Mai] Fire Cave Ledge": {},
+        "[Mai] Fire Cave Ledge": {
+          "position": "259x58",
+          "housesItem": "Lost Maiamai"
+        },
         "[Mai] Outside Hookshot Mini-Dungeon": {},
         "[Mai] Rosso's Ore Mine": {}
       },
@@ -318,21 +324,46 @@ const trackerCore = {
         "Desert Palace Weather Vane":                    {
           "position": "44x432"
         },
-        "[Mai] Buried in the Desert": {},
-        "[Mai] Buried near Desert Palace": {},
+        "[Mai] Buried in the Desert": {
+          "position": "77x415"
+        },
+        "[Mai] Buried near Desert Palace": {
+          "position": "44x444"
+        },
         "[Mai] Southern Ruins Big Rock": {}
       },
       "Eastern Ruins": {
-        "Bird Lover":                                    "Green Rupee",
+        "Bird Lover":                                    {
+          "position": "350x350",
+          "housesItem": "Empty Bottle"
+        },
         "Eastern Palace Weather Vane":                   {
           "position": "484x202"
         },
-        "Eastern Ruins Armos Chest":                     "Bombs+",
-        "Eastern Ruins Cave":                            "Red Rupee",
-        "Eastern Ruins Hookshot Chest":                  "Silver Rupee",
-        "Eastern Ruins Merge Chest":                     "Red Rupee",
-        "Eastern Ruins Peg Circle":                      "Piece of Heart",
-        "Merge Mini-Dungeon":                            "Letter in a Bottle",
+        "Eastern Ruins Armos Chest":                     {
+          "position": "430x206",
+          "housesItem": "Red Rupee"
+        },
+        "Eastern Ruins Cave":                            {
+          "position": "472.5x264",
+          "housesItem": "Piece of Heart"
+        },
+        "Eastern Ruins Hookshot Chest":                  {
+          "position": "430x224",
+          "housesItem": "Red Rupee"
+        },
+        "Eastern Ruins Merge Chest":                     {
+          "position": "450x200",
+          "housesItem": "Silver Rupee"
+        },
+        "Eastern Ruins Peg Circle":                      {
+          "position": "485x360",
+          "housesItem": "Piece of Heart"
+        },
+        "Merge Mini-Dungeon":                            {
+          "housesItem": "Silver Rupee",
+          "position": "405x232"
+        },
         "[Mai] Eastern Ruins Bonk Rocks": {},
         "[Mai] Eastern Ruins Green Tree": {},
         "[Mai] Eastern Ruins River": {},
@@ -343,10 +374,19 @@ const trackerCore = {
       "Hyrule Castle Area": {
         "Blacksmith":                                    "Silver Rupee",
         "Blacksmith Cave":                               "Hammer+",
-        "Blacksmith Ledge":                              "Green Rupee",
-        "Blacksmith Table":                              "Ravio's Bracelet+",
+        "Blacksmith Ledge":                              {
+          "position": "159x250"
+        },
+        "Blacksmith Table":                              {
+          "position": "154x260"
+        },
         "Cucco Mini-Dungeon":                            "Zora's Flippers",
-        "Haunted Grove Stump":                           "Hammer+",
+        "Haunted Grove Stump":                           {
+          "position": "162.5x346.5",
+          "unlocked": true,
+          "unlockedByDefault": true,
+          "housesItem": "Pouch"
+        },
         "Hyrule Castle Rocks":                           {
           "position": "300x209"
         },
@@ -355,10 +395,19 @@ const trackerCore = {
           "unlocked": true,
           "unlockedByDefault": true
         },
-        "[Mai] Behind Your House": {},
-        "[Mai] Blacksmith Tiles": {},
+        "[Mai] Behind Your House": {
+          "position": "274x330",
+          "housesItem": "Lost Maiamai"
+        },
+        "[Mai] Blacksmith Tiles": {
+          "position": "144x268",
+          "housesItem": "Lost Maiamai"
+        },
         "[Mai] Blacksmith Tree": {},
-        "[Mai] Haunted Grove Tree": {},
+        "[Mai] Haunted Grove Tree": {
+          "position": "160.9x323",
+          "housesItem": "Lost Maiamai"
+        },
         "[Mai] Hyrule Castle Tiles": {},
         "[Mai] Hyrule Castle Tree": {
           "position": "209x209",
@@ -372,7 +421,7 @@ const trackerCore = {
       },
       "Irene the Witch": {
         "Irene":                                         {
-          "position": "348x350",
+          "position": "0x0",
           "housesItem": "Bell"
         },
       },
@@ -390,17 +439,18 @@ const trackerCore = {
         "Dodge the Cuccos":                              {
           "position": "93x339",
           "unlocked": true,
-          "unlockedByDefault": true
+          "unlockedByDefault": true,
+          "housesItem": "Piece of Heart"
         },
         "Kakariko Item Shop (3)":                        {
           "position": "23.5x226",
           "unlocked": true,
-          "unlockedByDefault": true
+          "unlockedByDefault": true,
+          "housesItem": "Shield"
         },
         "Kakariko Jail":                                 {
           "position": "72.5x215",
-          "unlocked": true,
-          "unlockedByDefault": true
+          "housesItem": "Silver Rupee"
         },
         "Kakariko Village Weather Vane":                 {
           "position": "71x242",
@@ -410,7 +460,8 @@ const trackerCore = {
         "Kakariko Well (Bottom)":                        {
           "position": "30x218",
           "unlocked": true,
-          "unlockedByDefault": true
+          "unlockedByDefault": true,
+          "housesItem": "Red Rupee"
         },
         "Kakariko Well (Top)":                           {
           "position": "20.3x218.5"
@@ -418,27 +469,38 @@ const trackerCore = {
         "Rupee Rush (Hyrule)":                           {
           "position": "38x344.5",
           "unlocked": true,
-          "unlockedByDefault": true
+          "unlockedByDefault": true,
+          "housesItem": "Piece of Heart"
         },
         "Shady Guy":                                     {
-          "position": "90x226"
+          "position": "90x226",
+          "housesItem": "Pegasus Boots"
         },
         "Street Merchant (Left)":                        {
           "position": "45x237",
           "unlocked": true,
-          "unlockedByDefault": true
+          "unlockedByDefault": true,
+          "housesItem": "Empty Bottle"
         },
         "Street Merchant (Right)":                       {
           "position": "58.5x237",
-          "unlocked": true,
-          "unlockedByDefault": true
+          "housesItem": "Smooth Gem"
         },
         "Stylish Woman":                                 "Red Rupee",
         "Stylish Woman (Repeat)":                        "Red Rupee",
         "Woman":                                         "Red Rupee",
-        "[Mai] Cucco Ranch Tree": {},
-        "[Mai] Hyrule Rupee Rush Wall": {},
-        "[Mai] Kakariko Bush": {},
+        "[Mai] Cucco Ranch Tree": {
+          "position": "109x339",
+          "housesItem": "Lost Maiamai"
+        },
+        "[Mai] Hyrule Rupee Rush Wall": {
+          "position": "30x367",
+          "housesItem": "Lost Maiamai"
+        },
+        "[Mai] Kakariko Bush": {
+          "position": "125x235",
+          "housesItem": "Lost Maiamai"
+        },
         "[Mai] Kakariko Sand":                           {
           "position": "50.4x294",
           "housesItem": "Lost Maiamai"
@@ -454,7 +516,12 @@ const trackerCore = {
         "Lake Hylia Dark Cave":                          "Monster Guts",
         "Lake Hylia Eastern Shore":                      "Red Rupee",
         "Lake Hylia Ledge Chest":                        "Blue Rupee",
-        "Lakeside Item Shop (3)":                        "Shield",
+        "Lakeside Item Shop (3)":                        {
+          "position": "320x390",
+          "unlocked": true,
+          "unlockedByDefault": true,
+          "housesItem": "Shield"
+        },
         "Maiamai Bombs Upgrade":                         "Gold Rupee",
         "Maiamai Boomerang Upgrade":                     "Silver Rupee",
         "Maiamai Bow Upgrade":                           "Heart Container",
@@ -465,29 +532,69 @@ const trackerCore = {
         "Maiamai Sand Rod Upgrade":                      "Heart Container",
         "Maiamai Tornado Rod Upgrade":                   "Piece of Heart",
         "[Mai] Hyrule Hotfoot Rock": {},
-        "[Mai] Lake Hylia East River": {},
-        "[Mai] Lake Hylia Island Tile": {},
-        "[Mai] Lake Hylia Shallow Ring": {},
-        "[Mai] Outside Maiamai Cave": {}
+        "[Mai] Lake Hylia East River": {
+          "position": "358x350",
+          "housesItem": "Lost Maiamai"
+        },
+        "[Mai] Lake Hylia Island Tile": {
+          "position": "410x410",
+          "housesItem": "Lost Maiamai"
+        },
+        "[Mai] Lake Hylia Shallow Ring": {
+          "position": "395x460",
+          "housesItem": "Lost Maiamai"
+        },
+        "[Mai] Outside Maiamai Cave": {
+          "position": "358x380",
+          "housesItem": "Lost Maiamai"
+        },
       },
       "Lost Woods Area": {
-        "Fortune-Teller":                                "Ravio's Bracelet+",
+        "Fortune-Teller":                                {
+          "position": "107.5x170",
+          "unlocked": true,
+          "unlockedByDefault": true,
+          "housesItem": "Hint Glasses"
+        },
         "Hyrule Hotfoot 65s":                            "Red Rupee",
         "Hyrule Hotfoot 75s":                            "Monster Guts",
-        "Lost Woods Alcove":                             "Heart Container",
+        "Lost Woods Alcove":                             {
+          "housesItem": "Piece of Heart",
+          "position": "60x56"
+        },
         "Lost Woods Chest":                              "Purple Rupee",
         "Master Sword Pedestal":                         {
           "housesItem": "Sword+",
           "position": "33x15"
         },
-        "Rosso (1)":                                     "Gold Rupee",
-        "Rosso (2)":                                     "Silver Rupee",
-        "Rosso Cave":                                    "Bombs+",
-        "[Mai] Fortune-Teller Tent": {},
-        "[Mai] Lost Woods Bush": {},
+        "Rosso (1)":                                     {
+          "housesItem": "Glove+",
+          "position": "183x30",
+          "unlocked": true,
+          "unlockedByDefault": true
+        },
+        "Rosso (2)":                                     {
+          "position": "183x35",
+          "housesItem": "Purple Rupee"
+        },
+        "Rosso Cave":                                    {
+          "position": "171x24",
+          "housesItem": "Red Rupee"
+        },
+        "[Mai] Fortune-Teller Tent": {
+          "position": "100x166",
+          "housesItem": "Lost Maiamai"
+        },
+        "[Mai] Lost Woods Bush": {
+          "housesItem": "Lost Maiamai",
+          "position": "20x40"
+        },
         "[Mai] Lost Woods Path Rock": {},
         "[Mai] Lost Woods Rock": {},
-        "[Mai] Lost Woods Tree": {},
+        "[Mai] Lost Woods Tree": {
+          "position": "111x126",
+          "housesItem": "Lost Maiamai"
+        },
         "[Mai] Moldorm Ledge": {},
         "[Mai] Rosso Wall": {},
         "[Mai] Small Pond": {}
@@ -496,7 +603,8 @@ const trackerCore = {
         "Ravio's Gift":                                  {
           "position": "274x342",
           "unlocked": true,
-          "unlockedByDefault": true
+          "unlockedByDefault": true,
+          "housesItem": "Ravio's Bracelet+"
         },
         "Ravio's Shop (1)":                              {
           "position": "268x346",
@@ -555,7 +663,7 @@ const trackerCore = {
       },
       "River Area": {
         "Dampe":                                         {
-          "position": "234x154",
+          "position": "234.5x154",
           "unlocked": true,
           "housesItem": "Sword+",
           "unlockedByDefault": true
@@ -563,31 +671,57 @@ const trackerCore = {
         "Graveyard Ledge Cave":                          {
           "position": "288x142.2"
         },
-        "Queen Oren":                                    "Gold Rupee",
+        "Queen Oren":                                    {
+          "position": "450x69",
+          "housesItem": "Zora's Flippers"
+        },
         "River Mini-Dungeon":                            "Bow+",
-        "Sanctuary Pegs":                                "Master Ore",
+        "Sanctuary Pegs":                                {
+          "position": "207x168",
+          "housesItem": "Red Rupee"
+        },
         "Sanctuary Weather Vane":                        {
           "position": "230x147",
           "unlocked": true,
           "unlockedByDefault": true
         },
         "Waterfall Cave":                                {
-          "position": "450x69",
-          "housesItem": "Zora's Flippers"
+          "position": "460x139",
+          "housesItem": "Piece of Heart"
         },
         "Witch's House Weather Vane":                    {
           "position": "407x175"
         },
         "Zora's Domain Ledge":                           "Gold Rupee",
-        "[HS] Entrance":                                 "Sword+",
-        "[HS] Ledge":                                    "Hookshot+",
-        "[HS] Lower Chest":                              "Hyrule Sewers Key",
-        "[HS] Upper Chest":                              "Gold Rupee",
+        "[HS] Entrance":                                 {
+          "position": "284.5x160",
+          "unlocked": true,
+          "unlockedByDefault": true
+        },
+        "[HS] Ledge":                                    {
+          "position": "284x154",
+          "unlocked": true,
+          "unlockedByDefault": true
+        },
+        "[HS] Lower Chest":                              {
+          "position": "278x160",
+          "unlocked": true,
+          "unlockedByDefault": true,
+          "housesItem": "Red Rupee"
+        },
+        "[HS] Upper Chest":                              {
+          "position": "278x154",
+          "unlocked": true,
+          "unlockedByDefault": true
+        },
         "[Mai] Hyrule Graveyard Wall": {},
         "[Mai] Sanctuary Wall":                          {},
         "[Mai] South of Zora's Domain": {},
         "[Mai] Waterfall Ledge": {},
-        "[Mai] Witch's House": {},
+        "[Mai] Witch's House": {
+          "position": "393x163",
+          "housesItem": "Lost Maiamai"
+        },
         "[Mai] Wooden Bridge": {},
         "[Mai] Zora's Domain": {}
       },
@@ -598,7 +732,10 @@ const trackerCore = {
         "Southern Ruins Pillar Cave":                    "Piece of Heart",
         "[Mai] Outside Flippers Mini-Dungeon": {},
         "[Mai] Southern Ruins Bomb Cave": {},
-        "[Mai] Southern Ruins Pillars": {}
+        "[Mai] Southern Ruins Pillars": {
+          "position": "280.5x413",
+          "housesItem": "Lost Maiamai",
+        }
       }
     },
     "Lorule": {
@@ -649,7 +786,8 @@ const trackerCore = {
           "position": "680x270"
         },
         "Fortune's Choice":                              {
-          "position": "621x270"
+          "position": "621x270",
+          "housesItem": "Piece of Heart"
         },
         "Great Rupee Fairy":                             "Heart Container",
         "Lorule Castle Weather Vane":                    {
@@ -670,10 +808,22 @@ const trackerCore = {
           "position": "744x460"
         },
         "Thief Girl":                                    "Pouch",
-        "Thieves' Town Item Shop (1)":                   "Bee",
-        "Thieves' Town Item Shop (2)":                   "Golden Bee",
-        "Thieves' Town Item Shop (3)":                   "Fairy",
-        "Thieves' Town Item Shop (4)":                   "Shield",
+        "Thieves' Town Item Shop (1)":                   {
+          "position": "535x240",
+          "housesItem": "Bee"
+        },
+        "Thieves' Town Item Shop (2)":                   {
+          "position": "541x240",
+          "housesItem": "Golden Bee"
+        },
+        "Thieves' Town Item Shop (3)":                   {
+          "position": "547x240",
+          "housesItem": "Fairy"
+        },
+        "Thieves' Town Item Shop (4)":                   {
+          "position": "553x240",
+          "housesItem": "Shield"
+        },
         "Thieves' Town Weather Vane":                    {
           "position": "545x255"
         },
@@ -685,13 +835,19 @@ const trackerCore = {
           "position": "795x350"
         },
         "[Mai] Behind Vacant House":                     {
-          "position": "788.5x328.5",
+          "position": "778x332",
           "housesItem": "Lost Maiamai"
         },
         "[Mai] Big Bomb Flower Grass": {},
         "[Mai] Lorule Blacksmith Wall": {},
-        "[Mai] Lorule Castle Tree": {},
-        "[Mai] Lorule Castle Wall": {},
+        "[Mai] Lorule Castle Tree": {
+          "position": "814x302",
+          "housesItem": "Lost Maiamai"
+        },
+        "[Mai] Lorule Castle Wall": {
+          "position": "784x266",
+          "housesItem": "Lost Maiamai"
+        },
         "[Mai] Lorule Fortune-Teller Rock": {},
         "[Mai] Lorule Haunted Grove Wall": {},
         "[Mai] Lorule Rupee Rush Wall": {},
@@ -702,7 +858,10 @@ const trackerCore = {
           "position": "660x360",
           "housesItem": "Lost Maiamai"
         },
-        "[Mai] Thieves' Town Tree": {},
+        "[Mai] Thieves' Town Tree": {
+          "position": "626x288",
+          "housesItem": "Lost Maiamai"
+        },
         "[Mai] Thieves' Town Wall": {},
         "[Mai] Vacant House Rock": {}
       },
@@ -731,14 +890,23 @@ const trackerCore = {
         "[Mai] Outside Ice Ruins": {}
       },
       "Misery Mire": {
-        "Misery Mire Ledge":                             "Monster Guts",
+        "Misery Mire Ledge":                             {
+          "position": "596x396",
+          "housesItem": "Piece of Heart"
+        },
         "Misery Mire Weather Vane":                      {
-          "position": "627x455"
+          "position": "624x455"
         },
         "Sand Mini-Dungeon":                             "Red Rupee",
         "[Mai] Misery Mire Rock": {},
-        "[Mai] Misery Mire Wall": {},
-        "[Mai] Misery Mire Water": {}
+        "[Mai] Misery Mire Wall": {
+          "position": "627x452",
+          "housesItem": "Lost Maiamai"
+        },
+        "[Mai] Misery Mire Water": {
+          "position": "544x470",
+          "housesItem": "Lost Maiamai"
+        }
       },
       "Skull Woods Area": {
         "Destroyed House":                               "Purple Rupee",
@@ -793,7 +961,8 @@ const trackerCore = {
         "[PD] (B1) Helmasaur Room (Fall)":               "Dark Palace Small Key",
         "[PD] Gemesaur King":                            "Purple Rupee",
         "[PD] Prize":                                    {
-          "position": "990x214"
+          "position": "990x214",
+          "housesItem": "Sage Gulley"
         },
       },
       "Desert Palace": {
@@ -813,7 +982,8 @@ const trackerCore = {
         "[DP] (3F) Armos Room":                          "Desert Palace Small Key",
         "[DP] (3F) Behind Falling Sand":                 "Desert Palace Big Key",
         "[DP] Prize":                                    {
-          "position": "43.5x402"
+          "position": "43.5x402",
+          "housesItem": "Sage Irene"
         },
         "[DP] Zaganaga":                                 "Sword+"
       },
@@ -830,7 +1000,8 @@ const trackerCore = {
         "[EP] (2F) Switch Room":                         "Pegasus Boots",
         "[EP] (3F) Escape Chest":                        "Eastern Palace Small Key",
         "[EP] Prize":                                    {
-          "position": "478x194"
+          "position": "478x194",
+          "housesItem": "Ravio's Bracelet+"
         },
         "[EP] Yuga (1)":                                 "Blue Rupee",
         "[EP] Yuga (2)":                                 "Piece of Heart"
@@ -848,7 +1019,8 @@ const trackerCore = {
         "[HG] (3F) Rat Room":                            "House of Gales Big Key",
         "[HG] Margomill":                                "Charm",
         "[HG] Prize":                                    {
-          "position": "403x425"
+          "position": "403x425",
+          "housesItem": "Pendant of Wisdom"
         },
       },
       "Hyrule Castle": {
@@ -873,7 +1045,8 @@ const trackerCore = {
         "[IR] (B5) Big Chest":                           "Silver Rupee",
         "[IR] Dharkstare":                               "Sword+",
         "[IR] Prize":                                    {
-          "position": "980x40"
+          "position": "980x40",
+          "housesItem": "Sage Rosso"
         },
       },
       "Lorule Castle": {
@@ -904,7 +1077,8 @@ const trackerCore = {
         "[SW] Knucklemaster":                            "Blue Rupee",
         "[SW] Outdoor Chest":                            "Piece of Heart",
         "[SW] Prize":                                    {
-          "position": "558x50"
+          "position": "558x50",
+          "housesItem": "Sage Seres"
         },
       },
       "Swamp Palace": {
@@ -921,7 +1095,8 @@ const trackerCore = {
         "[SP] (B1) Waterfall Room":                      "Swamp Palace Compass",
         "[SP] Arrghus":                                  "Great Spin",
         "[SP] Prize":                                    {
-          "position": "750x450"
+          "position": "750x450",
+          "housesItem": "Sage Oren"
         },
       },
       "Thieves' Hideout": {
@@ -936,7 +1111,8 @@ const trackerCore = {
         "[TT] (B3) Big Chest (Hidden)":                  "Red Rupee",
         "[TT] (B3) Underwater":                          "Hint Glasses",
         "[TT] Prize":                                    {
-          "position": "584x245"
+          "position": "584x245",
+          "housesItem": "Sage Osfala"
         },
         "[TT] Stalblind":                                "Silver Rupee"
       },
@@ -952,7 +1128,8 @@ const trackerCore = {
         "[TH] (8F) Fairy Room":                          "Piece of Heart",
         "[TH] Moldorm":                                  "Sword+",
         "[TH] Prize":                                    {
-          "position": "300.2x12"
+          "position": "300.2x12",
+          "housesItem": "Pendant of Power"
         },
       },
       "Turtle Rock": {
@@ -972,7 +1149,8 @@ const trackerCore = {
         "[TR] Grinexx":                                  "Monster Tail",
         "[TR] Left Balcony":                             "Monster Horn",
         "[TR] Prize":                                    {
-          "position": "903x425"
+          "position": "903x425",
+          "housesItem": "Sage Impa"
         },
       }
     }
