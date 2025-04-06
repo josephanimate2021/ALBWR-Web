@@ -341,7 +341,8 @@ const trackerCore = {
                     "position": "237x34"
                 },
                 "Donkey Cave":                                   {
-                    "position": "259x81"
+                    "position": "259x81",
+                    "housesItem": "Red Rupee"
                 },
                 "Donkey Cave Ledge":                             {
                     "position": "253x60"
@@ -377,7 +378,7 @@ const trackerCore = {
                 },
                 "[Mai] Rosso's Ore Mine": {
                     "housesItem": "Lost Maiamai",
-                    "position": "180x80"
+                    //"position": "180x80"
                 },
             },
             "Desert": {
@@ -429,15 +430,18 @@ const trackerCore = {
                     "position": "405x232"
                 },
                 "[Mai] Eastern Ruins Bonk Rocks": {
+                    "position": "365.5x290.5",
                     "housesItem": "Lost Maiamai"
                 },
                 "[Mai] Eastern Ruins Green Tree": {
+                    "position": "416x337",
                     "housesItem": "Lost Maiamai"
                 },
                 "[Mai] Eastern Ruins River": {
                     "housesItem": "Lost Maiamai"
                 },
                 "[Mai] Eastern Ruins Rock": {
+                    "position": "475x366",
                     "housesItem": "Lost Maiamai"
                 },
                 "[Mai] Eastern Ruins Wall": {
@@ -445,6 +449,7 @@ const trackerCore = {
                     "housesItem": "Lost Maiamai"
                 },
                 "[Mai] Eastern Ruins Yellow Tree": {
+                    "position": "444.5x300",
                     "housesItem": "Lost Maiamai"
                 },
             },
@@ -483,12 +488,18 @@ const trackerCore = {
                     "position": "144x268",
                     "housesItem": "Lost Maiamai"
                 },
-                "[Mai] Blacksmith Tree": {},
+                "[Mai] Blacksmith Tree": {
+                    "position": "159x230",
+                    "housesItem": "Lost Maiamai"
+                },
                 "[Mai] Haunted Grove Tree": {
                     "position": "160.9x323",
                     "housesItem": "Lost Maiamai"
                 },
-                "[Mai] Hyrule Castle Tiles": {},
+                "[Mai] Hyrule Castle Tiles": {
+                    "position": "210x305",
+                    "housesItem": "Lost Maiamai"
+                },
                 "[Mai] Hyrule Castle Tree": {
                     "position": "209x209",
                     "housesItem": "Lost Maiamai"
@@ -498,7 +509,7 @@ const trackerCore = {
                     "housesItem": "Lost Maiamai"
                 },
                 "[Mai] Your House Tree": {
-                    "position": "238x342",
+                    "position": "225x332",
                     "housesItem": "Lost Maiamai"
                 },
             },
@@ -632,7 +643,10 @@ const trackerCore = {
                 "Maiamai Tornado Rod Upgrade":                   {
                     "housesItem": "Tornado Rod+"
                 },
-                "[Mai] Hyrule Hotfoot Rock": {},
+                "[Mai] Hyrule Hotfoot Rock": {
+                    "position": "490x420",
+                    "housesItem": "Lost Maiamai"
+                },
                 "[Mai] Lake Hylia East River": {
                     "position": "358x350",
                     "housesItem": "Lost Maiamai"
@@ -657,8 +671,14 @@ const trackerCore = {
                     "unlockedByDefault": true,
                     "housesItem": "Hint Glasses"
                 },
-                "Hyrule Hotfoot 65s":                            "Red Rupee",
-                "Hyrule Hotfoot 75s":                            "Monster Guts",
+                "Hyrule Hotfoot 65s":                            {
+                    "position": "484x380",
+                    "housesItem": "Piece of Heart"
+                },
+                "Hyrule Hotfoot 75s":                            {
+                    "position": "490x380",
+                    "housesItem": "Silver Rupee"
+                },
                 "Lost Woods Alcove":                             {
                     "housesItem": "Piece of Heart",
                     "position": "60x56"
@@ -690,7 +710,10 @@ const trackerCore = {
                     "housesItem": "Lost Maiamai",
                     "position": "20x40"
                 },
-                "[Mai] Lost Woods Path Rock": {},
+                "[Mai] Lost Woods Path Rock": {
+                    "position": "115x50",
+                    "housesItem": "Lost Maiamai"
+                },
                 "[Mai] Lost Woods Rock": {},
                 "[Mai] Lost Woods Tree": {
                     "position": "111x126",
@@ -698,12 +721,16 @@ const trackerCore = {
                 },
                 "[Mai] Moldorm Ledge": {
                     "housesItem": "Lost Maiamai",
+                    "position": "180x80"
                 },
                 "[Mai] Rosso Wall": {
                     "housesItem": "Lost Maiamai",
                     "position": "175x64"
                 },
-                "[Mai] Small Pond": {}
+                "[Mai] Small Pond": {
+                    "position": "155x174",
+                    "housesItem": "Lost Maiamai"
+                },
             },
             "Ravio's Shop": {
                 "Ravio's Gift":                                  {
@@ -775,13 +802,17 @@ const trackerCore = {
                     "unlockedByDefault": true
                 },
                 "Graveyard Ledge Cave":                          {
-                    "position": "288x142.2"
+                    "position": "288x142.2",
+                    "housesItem": "Piece of Heart"
                 },
                 "Queen Oren":                                    {
                     "position": "450x69",
                     "housesItem": "Zora's Flippers"
                 },
-                "River Mini-Dungeon":                            "Bow+",
+                "River Mini-Dungeon":                            {
+                    "position": "336x147",
+                    "housesItem": "Silver Rupee"
+                },
                 "Sanctuary Pegs":                                {
                     "position": "207x168",
                     "housesItem": "Red Rupee"
@@ -799,12 +830,14 @@ const trackerCore = {
                     "position": "407x175"
                 },
                 "Zora's Domain Ledge":                           "Gold Rupee",
-                    "[HS] Entrance":                                 {
+                "[HS] Entrance":                                 {
+                    "housesItem": "Lamp",
                     "position": "284.5x160",
                     "unlocked": true,
                     "unlockedByDefault": true
                 },
                 "[HS] Ledge":                                    {
+                    "housesItem": "Piece of Heart",
                     "position": "284x154",
                     "unlocked": true,
                     "unlockedByDefault": true
@@ -820,19 +853,31 @@ const trackerCore = {
                     "unlocked": true,
                     "unlockedByDefault": true
                 },
-                "[Mai] Hyrule Graveyard Wall": {},
-                "[Mai] Sanctuary Wall":                          {
+                "[Mai] Hyrule Graveyard Wall": {
                     "position": "213x172",
                     "housesItem": "Lost Maiamai"
                 },
-                "[Mai] South of Zora's Domain": {},
+                "[Mai] Sanctuary Wall":                          {
+                    "position": "273x142",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] South of Zora's Domain": {
+                    "position": "470x188",
+                    "housesItem": "Lost Maiamai"
+                },
                 "[Mai] Waterfall Ledge": {},
                 "[Mai] Witch's House": {
                     "position": "393x163",
                     "housesItem": "Lost Maiamai"
                 },
-                "[Mai] Wooden Bridge": {},
-                "[Mai] Zora's Domain": {}
+                "[Mai] Wooden Bridge": {
+                    "position": "350x224",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Zora's Domain": {
+                    "position": "444x98",
+                    "housesItem": "Lost Maiamai"
+                },
             },
             "Southern Ruins": {
                 "Flippers Mini-Dungeon":                         "Silver Rupee",
@@ -852,7 +897,10 @@ const trackerCore = {
         "Lorule": {
             "Dark Ruins": {
                 "Dark Maze Chest":                               "Heart Container",
-                "Dark Maze Ledge":                               "Purple Rupee",
+                "Dark Maze Ledge":                               {
+                    "position": "960.5x215.5",
+                    "housesItem": "Piece of Heart"
+                },
                 "Dark Palace Weather Vane":                      {
                     "position": "1002x218"
                 },
@@ -863,15 +911,42 @@ const trackerCore = {
                 "Hinox (5)":                                     "Purple Rupee",
                 "Hinox (6)":                                     "Silver Rupee",
                 "Ku's Domain Fight":                             "Master Ore",
-                "[Mai] Dark Maze Center Wall": {},
-                "[Mai] Dark Maze Entrance Wall": {},
-                "[Mai] Dark Ruins Bonk Rocks": {},
-                "[Mai] Dark Ruins East Tree": {},
-                "[Mai] Dark Ruins South Wall": {},
-                "[Mai] Dark Ruins Waterfall": {},
-                "[Mai] Dark Ruins West Tree": {},
-                "[Mai] Ku's Domain Grass": {},
-                "[Mai] Ku's Domain Water": {},
+                "[Mai] Dark Maze Center Wall": {
+                    "position": "970.5x225.5",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Dark Maze Entrance Wall": {
+                    "position": "905.5x295.5",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Dark Ruins Bonk Rocks": {
+                    "position": "869.5x282.5",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Dark Ruins East Tree": {
+                    "position": "905.5x330.5",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Dark Ruins South Wall": {
+                    "position": "988.5x373",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Dark Ruins Waterfall": {
+                    "position": "945x145",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Dark Ruins West Tree": {
+                    "position": "843.5x330.5",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Ku's Domain Grass": {
+                    "position": "972x184",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Ku's Domain Water": {
+                    "position": "957x108",
+                    "housesItem": "Lost Maiamai"
+                },
                 "[Mai] Outside Hinox Cave": {}
             },
             "Graveyard": {
@@ -880,15 +955,35 @@ const trackerCore = {
                     "position": "817x166"
                 },
                 "Philosopher's Cave":                            {
-                    "position": "746x144"
+                    "position": "746x144",
+                    "housesItem": "Master Ore"
                 },
-                "[LS] Entrance Chest":                           "Lorule Sewers Key",
-                "[LS] Ledge":                                    "Piece of Heart",
-                "[LS] Lower Chest":                              "Net+",
-                "[LS] Upper Chest":                              "Empty Bottle",
-                "[Mai] Lorule Graveyard Big Rock": {},
-                "[Mai] Lorule Graveyard Tree": {},
-                "[Mai] Lorule Graveyard Wall": {}
+                "[LS] Entrance Chest":                           {
+                    "position": "815x150",
+                    "housesItem": "Green Rupee"
+                },
+                "[LS] Ledge":                                    {
+                    "position": "815x144"
+                },
+                "[LS] Lower Chest":                              {
+                    "position": "809x150"
+                },
+                "[LS] Upper Chest":                              {
+                    "position": "809x144",
+                    "housesItem": "Red Rupee"
+                },
+                "[Mai] Lorule Graveyard Big Rock": {
+                    //"position": "735x150",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Lorule Graveyard Tree": {
+                    //"position": "853x203",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Lorule Graveyard Wall": {
+                    "position": "785x144",
+                    "housesItem": "Lost Maiamai"
+                },
             },
             "Lorule Castle Area": {
                 "Big Bomb Flower Cave":                          {
@@ -1062,11 +1157,26 @@ const trackerCore = {
                 "Turtle Rock Weather Vane":                      {
                     "position": "913x438"
                 },
-                "[Mai] Lorule Lake Rock": {},
-                "[Mai] Lorule Lake SE Wall": {},
-                "[Mai] Lorule Lake Skull": {},
-                "[Mai] Lorule Lake Water": {},
-                "[Mai] Lorule Lake West Wall": {}
+                "[Mai] Lorule Lake Rock": {
+                    "position": "847x485",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Lorule Lake SE Wall": {
+                    "position": "990x490",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Lorule Lake Skull": {
+                    "position": "955x400",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Lorule Lake Water": {
+                    "position": "930x430",
+                    "housesItem": "Lost Maiamai"
+                },
+                "[Mai] Lorule Lake West Wall": {
+                    "position": "847x445",
+                    "housesItem": "Lost Maiamai"
+                }
             }
         },
         "Dungeons": {
