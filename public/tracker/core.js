@@ -324,13 +324,25 @@ const trackerCore = {
         },
         "Hyrule": {
             "Death Mountain": {
+                "itemRequirements": {
+                    "Progressive Bracelet": 2,
+                    "Progressive Glove": 1
+                },
                 "Bouldering Guy":                                {
-                    "position": "422x55"
+                    "position": "422x55",
+                    "itemRequirements": {
+                        "Letter in a Bottle": 1,
+                    },
+                    "housesItem": "Empty Bottle"
                 },
                 "Death Mountain (Hyrule) Weather Vane":          {
                     "position": "254x85"
                 },
-                "Death Mountain Blocked Cave":                   "Silver Rupee",
+                "Death Mountain Blocked Cave":                   {
+                    "itemRequirements": {
+                        "Bombs": 1
+                    }
+                },
                 "Death Mountain Fairy Cave":                     {
                     "position": "296x94"
                 },
@@ -342,15 +354,18 @@ const trackerCore = {
                 },
                 "Donkey Cave":                                   {
                     "position": "259x81",
-                    "housesItem": "Red Rupee"
+                    //"housesItem": "Red Rupee"
                 },
                 "Donkey Cave Ledge":                             {
-                    "position": "253x60"
+                    "position": "253x60",
+                    "housesItem": "Red Rupee"
                 },
                 "Fire Cave Pillar":                              {
                     "housesItem": "Red Rupee"
                 },
-                "Floating Island":                               "Mail+",
+                "Floating Island":                               {
+                    "itemRequirements": {}
+                },
                 "Hookshot Mini-Dungeon":                         {
                     "position": "467.5x47"
                 },
@@ -382,6 +397,10 @@ const trackerCore = {
                 },
             },
             "Desert": {
+                "itemRequirements": {
+                    "Sand Rod": 1,
+                    "Progressive Bracelet": 2
+                },
                 "Desert Palace Weather Vane":                    {
                     "position": "44x432"
                 },
@@ -394,13 +413,22 @@ const trackerCore = {
                     "housesItem": "Lost Maiamai"
                 },
                 "[Mai] Southern Ruins Big Rock": {
-                    "housesItem": "Lost Maiamai"
+                    "housesItem": "Lost Maiamai",
+                    "itemRequirements": {
+                        "Progressive Glove": 2
+                    }
                 }
             },
             "Eastern Ruins": {
+                "itemRequirements": {
+                    "Bow": 1
+                },
                 "Bird Lover":                                    {
                     "position": "350x350",
-                    "housesItem": "Empty Bottle"
+                    "housesItem": "Empty Bottle",
+                    "itemRequirements": {
+                        "Flippers": 1
+                    }
                 },
                 "Eastern Palace Weather Vane":                   {
                     "position": "484x202"
@@ -411,46 +439,79 @@ const trackerCore = {
                 },
                 "Eastern Ruins Cave":                            {
                     "position": "472.5x264",
-                    "housesItem": "Piece of Heart"
+                    "housesItem": "Piece of Heart",
+                    "itemRequirements": {
+                        "Bombs": 1
+                    }
                 },
                 "Eastern Ruins Hookshot Chest":                  {
                     "position": "430x224",
-                    "housesItem": "Red Rupee"
+                    "housesItem": "Red Rupee",
+                    "itemRequirements": {
+                        "Hookshot": 1
+                    }
                 },
                 "Eastern Ruins Merge Chest":                     {
                     "position": "450x200",
-                    "housesItem": "Silver Rupee"
+                    "housesItem": "Silver Rupee",
+                    "itemRequirements": {
+                        "Progressive Bracelet": 2
+                    }
                 },
                 "Eastern Ruins Peg Circle":                      {
                     "position": "485x360",
-                    "housesItem": "Piece of Heart"
+                    "housesItem": "Piece of Heart",
+                    "itemRequirements": {
+                        "Hammer": 1
+                    }
                 },
                 "Merge Mini-Dungeon":                            {
                     "housesItem": "Silver Rupee",
-                    "position": "405x232"
+                    "position": "405x232",
+                    "itemRequirements": {
+                        "Progressive Bracelet": 2
+                    }
                 },
                 "[Mai] Eastern Ruins Bonk Rocks": {
                     "position": "365.5x290.5",
-                    "housesItem": "Lost Maiamai"
+                    "housesItem": "Lost Maiamai",
+                    "itemRequirements": {
+                        "Pegasus Boots": 1
+                    }
                 },
                 "[Mai] Eastern Ruins Green Tree": {
                     "position": "416x337",
-                    "housesItem": "Lost Maiamai"
+                    "housesItem": "Lost Maiamai",
+                    "itemRequirements": {
+                        "Pegasus Boots": 1
+                    }
                 },
                 "[Mai] Eastern Ruins River": {
-                    "housesItem": "Lost Maiamai"
+                    "housesItem": "Lost Maiamai",
+                    "itemRequirements": {
+                        "Flippers": 1
+                    }
                 },
                 "[Mai] Eastern Ruins Rock": {
                     "position": "475x366",
-                    "housesItem": "Lost Maiamai"
+                    "housesItem": "Lost Maiamai",
+                    "itemRequirements": {
+                        "Progressive Glove": 1
+                    }
                 },
                 "[Mai] Eastern Ruins Wall": {
                     "position": "424.5x248",
-                    "housesItem": "Lost Maiamai"
+                    "housesItem": "Lost Maiamai",
+                    "itemRequirements": {
+                        "Progressive Bracelet": 2
+                    }
                 },
                 "[Mai] Eastern Ruins Yellow Tree": {
                     "position": "444.5x300",
-                    "housesItem": "Lost Maiamai"
+                    "housesItem": "Lost Maiamai",
+                    "itemRequirements": {
+                        "Pegasus Boots": 1
+                    }
                 },
             },
             "Hyrule Castle Area": {
@@ -486,7 +547,10 @@ const trackerCore = {
                 },
                 "[Mai] Blacksmith Tiles": {
                     "position": "144x268",
-                    "housesItem": "Lost Maiamai"
+                    "housesItem": "Lost Maiamai",
+                    "itemRequirements": {
+                        "Tornado Rod": 1
+                    }
                 },
                 "[Mai] Blacksmith Tree": {
                     "position": "159x230",
@@ -498,7 +562,10 @@ const trackerCore = {
                 },
                 "[Mai] Hyrule Castle Tiles": {
                     "position": "210x305",
-                    "housesItem": "Lost Maiamai"
+                    "housesItem": "Lost Maiamai",
+                    "itemRequirements": {
+                        "Tornado Rod": 1
+                    }
                 },
                 "[Mai] Hyrule Castle Tree": {
                     "position": "209x209",
@@ -771,9 +838,8 @@ const trackerCore = {
                 },
                 "Ravio's Shop (6)":                              {
                     "position": "287x334",
-                    "unlocked": true,
                     "housesItem": "Sand Rod+",
-                    "unlockedByDefault": true
+                    "requiredCheckCompletions": ["[TT] Prize"]
                 },
                 "Ravio's Shop (7)":                              {
                     "position": "287x340",
@@ -815,7 +881,10 @@ const trackerCore = {
                 },
                 "Sanctuary Pegs":                                {
                     "position": "207x168",
-                    "housesItem": "Red Rupee"
+                    "housesItem": "Red Rupee",
+                    "itemRequirements": {
+                        "Hammer": 1
+                    }
                 },
                 "Sanctuary Weather Vane":                        {
                     "position": "230x147",
@@ -895,6 +964,9 @@ const trackerCore = {
             }
         },
         "Lorule": {
+            "itemRequirements": {
+                "Progressive Bracelet": 2
+            },
             "Dark Ruins": {
                 "Dark Maze Chest":                               "Heart Container",
                 "Dark Maze Ledge":                               {
@@ -987,21 +1059,38 @@ const trackerCore = {
             },
             "Lorule Castle Area": {
                 "Big Bomb Flower Cave":                          {
-                    "position": "660x420"
+                    "position": "660x420",
+                    "itemRequirements": {
+                        "Progressive Bracelet": 2
+                    }
                 },
-                "Blacksmith (Lorule)":                           "Silver Rupee",
+                "Blacksmith (Lorule)":                           {
+                    "itemRequirements": {
+                        "Progressive Bracelet": 2
+                    }
+                },
                 "Blacksmith Weather Vane":                       {
-                    "position": "680x270"
+                    "position": "680x270",
+                    "itemRequirements": {
+                        "Progressive Bracelet": 2
+                    }
                 },
                 "Fortune's Choice":                              {
                     "position": "621x270",
                     "housesItem": "Piece of Heart"
                 },
                 "Great Rupee Fairy":                             {
-                    "position": "598x325"
+                    "position": "598x325",
+                    "itemRequirements": {
+                        "Progressive Bracelet": 2
+                    },
+                    "housesItem": "Empty Bottle"
                 },
                 "Lorule Castle Weather Vane":                    {
-                    "position": "762x240"
+                    "position": "762x240",
+                    "itemRequirements": {
+                        "Progressive Bracelet": 2
+                    }
                 },
                 "Lorule Field Hookshot Chest":                   "Red Rupee",
                 "Octoball Derby":                                {
@@ -1365,7 +1454,11 @@ const trackerCore = {
                 "[TH] Moldorm":                                  "Sword+",
                 "[TH] Prize":                                    {
                     "position": "300.2x12",
-                    "housesItem": "Pendant of Power"
+                    "housesItem": "Pendant of Power",
+                    "itemRequirements": {
+                        "Hammer": 1,
+                        "Progressive Bracelet": 2
+                    }
                 },
             },
             "Turtle Rock": {

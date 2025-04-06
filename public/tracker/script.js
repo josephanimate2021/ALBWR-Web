@@ -193,11 +193,19 @@ function retrievedItem(itemId, cat, confirmWithUser = true) {
             switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), cat);
         }
     }
+    return itemInfo
 }
 function checkCompleted(k, j = {}, itemId, showItemRecievedMessage = false) { // clears a check as completed
     const [locationType, location, check] = k.split("@");
     trackerStuff.layout[locationType][location][check].completed = j.obtained;
-    if (showItemRecievedMessage) displayAlert('success', `You have recieved the ${itemId} from ${location} ${check.split(location).join('')} (${locationType} Area)`);
+    const checkItemRequirements = trackerStuff.layout[locationType][location].itemRequirements;
+    const locationItemRequirements = trackerStuff.layout[locationType][location].itemRequirements;
+    const locationTypeItemRequirements = trackerStuff.layout[locationType].itemRequirements;
+    if (locationItemRequirements) for (const i in locationItemRequirements) {
+        const itemInfo = trackerStuff.itemLayout.searchFor(i);
+        console.log(itemInfo)
+    }
+    if (showItemRecievedMessage) displayAlert('success', `You have recieved the ${j.realItemName || itemId} from ${location} ${check.split(location).join('')} (${locationType} Area)`);
 }
 function uploadSpoilerLog(obj) { // takes a spoiler log file and converts it into a usable format that the tracker can handle.
     const file = obj.files[0];
@@ -372,10 +380,10 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
                         } case "ReceivedItems": {
                             for (const archipelagoItemInfo of info2.items) {
                                 const itemInfo = trackerStuff.itemLayout.searchFor(archipelagoItemInfo.item);
-                                retrievedItem(itemInfo.realItemName, itemInfo.cat, false);
-                                if (itemInfo.data.buyOnRandoDetection) retrievedItem(itemInfo.realItemName, itemInfo.cat, false);
+                                Object.assign(itemInfo, retrievedItem(itemInfo.realItemName, itemInfo.cat, false));
+                                if (itemInfo.data.buyOnRandoDetection) Object.assign(itemInfo, retrievedItem(itemInfo.realItemName, itemInfo.cat, false));
                                 const locationInfo = trackerStuff.layout.searchFor(archipelagoItemInfo.location);
-                                trackerStuff.layout[locationInfo.cat][locationInfo.realLocationName][locationInfo.realCheckName].completed = true;
+                                checkCompleted(`${locationInfo.cat}@${locationInfo.realLocationName}@${locationInfo.realCheckName}`, itemInfo)
                                 switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), itemInfo.cat);
                             }
                             break;
