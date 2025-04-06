@@ -152,48 +152,46 @@ function retrievedItem(itemId, cat, confirmWithUser = true) {
                 itemInfo.counts[0]++;
             }
         } else itemInfo.obtained = !itemInfo.obtained;
-        if (itemInfo.locatedInChecks) {
+        if (itemInfo.locatedInChecks && confirmWithUser) {
             const checks = itemInfo.locatedInChecks.filter(i => {
                 const [locationType, location, check] = i.split("@");
                 return !trackerStuff.layout[locationType][location][check].completed;
             });
-            if (confirmWithUser) {
-                if (checks.length > 1) {
-                    const modal = $('#checkSelectModal');
-                    modal.find("span").text(itemId);
-                    modal.find('div[class="accordion-body"]').html(checks.map(v => `<div class="form-check" title="If you got the ${itemId} from this check, then you can select this one.">
-                        <input type="radio" name="check" value="${v}" id="${v}" class="form-check-input" required/>
-                        <label class="form-check-label" for="${v}">${v.split("@")[1]} ${
-                            v.split("@")[2].split(v.split("@")[1]).join('').split(v.split("@")[1].split(' ')[0]).join('')
-                        } (${v.split("@")[0]} Area)</label>
-                    </div>`).join('<br>'));
-                    modal.find('form[action="javascript:;"]').on("submit", e => {
-                        $(e.target).off("submit");
-                        const info = Object.fromEntries(new URLSearchParams($(e.target).serialize()));
-                        itemInfo.selectedCheck = true;
-                        checkCompleted(info.check, itemInfo, itemId);
-                        modal.modal('hide');
-                    })
-                    modal.modal('show');
-                    modal.on("hidden.bs.modal", () => {
-                        modal.off("hidden.bs.modal");
-                        if (!itemInfo.selectedCheck) {
-                            itemInfo.counts[0]--;
-                            if (itemInfo.counts[0] == 0) {
-                                itemInfo.counts[1] = itemInfo.counts[3] ? 0 : 1;
-                                itemInfo.obtained = false;
-                            } else itemInfo.counts[1]--;
-                        } else delete itemInfo.selectedCheck;
-                        switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), cat);
-                    })
-                } else checkCompleted(checks[0] || itemInfo.locatedInChecks[0], itemInfo, itemId)
-            }
+            if (checks.length > 1) {
+                const modal = $('#checkSelectModal');
+                modal.find("span").text(itemId);
+                modal.find('div[class="accordion-body"]').html(checks.map(v => `<div class="form-check" title="If you got the ${itemId} from this check, then you can select this one.">
+                    <input type="radio" name="check" value="${v}" id="${v}" class="form-check-input" required/>
+                    <label class="form-check-label" for="${v}">${v.split("@")[1]} ${
+                        v.split("@")[2].split(v.split("@")[1]).join('').split(v.split("@")[1].split(' ')[0]).join('')
+                    } (${v.split("@")[0]} Area)</label>
+                </div>`).join('<br>'));
+                modal.find('form[action="javascript:;"]').on("submit", e => {
+                    $(e.target).off("submit");
+                    const info = Object.fromEntries(new URLSearchParams($(e.target).serialize()));
+                    itemInfo.selectedCheck = true;
+                    checkCompleted(info.check, itemInfo, itemId);
+                    modal.modal('hide');
+                })
+                modal.modal('show');
+                modal.on("hidden.bs.modal", () => {
+                    modal.off("hidden.bs.modal");
+                    if (!itemInfo.selectedCheck) {
+                        itemInfo.counts[0]--;
+                        if (itemInfo.counts[0] == 0) {
+                            itemInfo.counts[1] = itemInfo.counts[3] ? 0 : 1;
+                            itemInfo.obtained = false;
+                        } else itemInfo.counts[1]--;
+                    } else delete itemInfo.selectedCheck;
+                    switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), cat);
+                })
+            } else checkCompleted(checks[0] || itemInfo.locatedInChecks[0], itemInfo, itemId)
             if (!itemInfo.obtained) for (const l of itemInfo.locatedInChecks) {
                 const [locationType, location, check] = l.split("@");
                 delete trackerStuff.layout[locationType][location][check].completed;
             }
+            switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), cat);
         }
-        switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), cat);
     }
 }
 function checkCompleted(k, j = {}, itemId, showItemRecievedMessage = false) { // clears a check as completed
@@ -289,7 +287,7 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
         $("#statusKindof").html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span role="status">Connecting To Archipelago...</span>')
         $(obj).find('button[type="submit"]').attr("disabled", "");
         $(obj).find('button[type="submit"]').html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span role="status">Connecting To Archipelago...</span>');
-        function handleError(e) {
+        function handleError(e) { /// handles an error of one occurs during connection.
             $("#statusKindof").text(originalText2);
             $(obj).find('button[type="submit"]').attr("disabled", false)
             $(obj).find('button[type="submit"]').text(originalText);
@@ -301,7 +299,7 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
         try {
             const info = Object.fromEntries(new URLSearchParams($(obj).serialize()));
             const socket = new WebSocket(`${info.host.startsWith("localhost") || info.host.startsWith("127.0.0.1") ? 'ws' : 'wss'}://${info.host}`);
-            setTimeout(() => {
+            setTimeout(() => { // added this in case archipelago tries to take forever to connect. You are better off having a fast internet connection.
                 if (!connectionSuccessful) {
                     socket.close();
                     handleError("Timeout occured. Please try again later.")
@@ -313,10 +311,10 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
                 for (const info2 of array) {
                     switch (info2.cmd) {
                         case "RoomInfo": {
-                            if (!info2.password || info.password) {
+                            if (info2.password == false || info.password) {
                                 roomInfo = info2;
                                 roomInfo.tags.push("Tracker");
-                                info2.password = !info.password ? info2.password : info.password;
+                                if (info.password) roomInfo.password = info.password;
                                 info2.cmd = "GetDataPackage";
                             } else {
                                 handleError("Please enter in the password");
@@ -324,10 +322,6 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
                             }
                             break;
                         } case "DataPackage": {
-                            spoiler = {
-                                locations: {},
-                                items: {}
-                            };
                             const games = info2.data.games;
                             function uuidGenV4() { // generates a v4 UUID for archipelago
                                 const G = [];
@@ -338,7 +332,7 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
                                 if (game == "Archipelago") continue;
                                 Object.assign(info2, {
                                     cmd: "Connect",
-                                    password: info.password || "",
+                                    password: roomInfo.password || '',
                                     name: info.user,
                                     game,
                                     slot_data: true,
@@ -348,14 +342,12 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
                                     version: roomInfo.version,
                                 });
                                 for (const location in games[game].location_name_to_id) {
-                                    spoiler.locations[location] = Object.assign({
-                                        id: games[game].location_name_to_id[location]
-                                    }, trackerStuff.layout[location] || {});
+                                    const locationInfo = trackerStuff.layout.searchFor(location);
+                                    if (locationInfo.cat && locationInfo.realLocationName) trackerStuff.layout[locationInfo.cat][locationInfo.realLocationName][location].id = games[game].location_name_to_id[location];
                                 }
                                 for (const item in games[game].item_name_to_id) {
-                                    spoiler.items[item] = Object.assign({
-                                        id: games[game].item_name_to_id[item]
-                                    }, checkItems[item] || {});
+                                    const itemInfo = trackerStuff.itemLayout.searchFor(item);
+                                    if (itemInfo.cat) trackerStuff.itemLayout[itemInfo.cat][itemInfo.realItemName || item].id = games[game].item_name_to_id[item]
                                 }
                             }
                             break;
@@ -378,38 +370,19 @@ function archipelagoConnector(obj) { // Connects to an Archipelago server
                             $(obj).find("p").text(`Successfully connected to the Archipelago server!`);
                             break;
                         } case "ReceivedItems": {
-                            // I will begin working on this once the tracker fully works because right now i don't feel comftable inplmenting this feature 
-                            // due to the current instability issues that are going on with the tracker right now.
+                            for (const archipelagoItemInfo of info2.items) {
+                                const itemInfo = trackerStuff.itemLayout.searchFor(archipelagoItemInfo.item);
+                                retrievedItem(itemInfo.realItemName, itemInfo.cat, false);
+                                if (itemInfo.data.buyOnRandoDetection) retrievedItem(itemInfo.realItemName, itemInfo.cat, false);
+                                const locationInfo = trackerStuff.layout.searchFor(archipelagoItemInfo.location);
+                                trackerStuff.layout[locationInfo.cat][locationInfo.realLocationName][locationInfo.realCheckName].completed = true;
+                                switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), itemInfo.cat);
+                            }
+                            break;
                         }
                     }
                 }
-                if (!connectionSuccessful) socket.send(JSON.stringify(array))
-                /*if (typeof e.data == "string" && connectionSuccessful) {
-                    console.log(e.data)
-                    const [playerName, term, itemName, idk, location] = e.data.split(",");
-                    for (const l in trackerStuff.layout) {
-                        const info = trackerStuff.layout[l][location];
-                        if (!info) continue;
-                        info.completed = true;
-                        switchTrackerMode(tracker.getAttribute("data-mode"));
-                    }
-                } else if (JSON.parse(e.data).connectionSuccessful) {
-                    jQuery(obj).bind("archipelagoDisconnect", () => {
-                        $(obj).find('button[type="submit"]').attr("data-connected", false);
-                        socket.close();
-                        $(obj).find('button[type="submit"]').text(originalText);
-                        $("#statusKindof").html(originalText2);
-                        connected2archipelago= false;
-                        $(obj).find("p").text('Successfully disconnected from the Archipelago Server')
-                    })
-                    connectionSuccessful = true;
-                    $("#statusKindof").text("Connected To Archipelago")
-                    $(obj).find("p").css("color", "lime");
-                    $(obj).find('button[type="submit"]').attr("data-connected", true);
-                    $(obj).find('button[type="submit"]').attr("disabled", false);
-                    $(obj).find('button[type="submit"]').text("Disconnect From Archipelago");
-                    $(obj).find("p").text(`Successfully connected to the Archipelago server!`);
-                }*/
+                if (!connectionSuccessful) socket.send(JSON.stringify(array));
             })
         } catch (e) {
             handleError(e);
