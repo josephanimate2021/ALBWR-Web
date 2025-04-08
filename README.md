@@ -21,8 +21,8 @@
 
 ## Introduction
 
-You may have seen videos of people playing The Legend Of Zelda: A Link Between Worlds Randomizer on youtube and said to yourself:<br>
-`I want to play the randomizer for myself to see what the hype is about.`
+You may have seen videos of people playing The Legend Of Zelda: A Link Between Worlds Randomizer on youtube and said to yourself:
+`I want to play the randomizer for myself to see what the hype is about.`<br>
 And this is where this source code, including the actual albw randomizer source codes come in. You may use all to your advantage to randomize your legally dumped North America Rom file of A Link Between Worlds. Read below for more instructions.
 
 
