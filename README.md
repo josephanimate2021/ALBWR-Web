@@ -8,7 +8,7 @@
   </h1>
   <img src="https://github.com/user-attachments/assets/a1185a97-2e5f-4bde-901b-23836b2ca64e" alt="A Link Between Worlds">
   <p>A Node.js application meant to randomize your game using the original albw randomizer source codes and Node.JS's shell interface.</p>
-  <small>I am aware of an already exiisting <a href="https://github.com/rickfay/z17-randomizer/tree/webapp">web app</a> being put in the works, but this source code will serve as an alternative for the time being until the actual app is stable enough for production (i might need to keep this source code up just in case though + it has some better features over the original webapp anyway)</small>
+  <h6>I am aware of an already exiisting <a href="https://github.com/rickfay/z17-randomizer/tree/webapp">web app</a> being put in the works, but this source code will serve as an alternative for the time being until the actual app is stable enough for production<br>(i might need to keep this source code up just in case though + it has some better features over the original webapp anyway).</h6>
 </div>
 
 ## Table of Contents
