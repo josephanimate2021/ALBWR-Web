@@ -647,7 +647,9 @@ const trackerCore = {
                     "position": "58.5x237",
                     "housesItem": "Smooth Gem"
                 },
-                "Stylish Woman":                                 "Red Rupee",
+                "Stylish Woman":                                 {
+                    "housesItem": "Piece of Heart"
+                },
                 "Stylish Woman (Repeat)":                        "Red Rupee",
                 "Woman":                                         "Red Rupee",
                 "[Mai] Cucco Ranch Tree": {
@@ -778,10 +780,13 @@ const trackerCore = {
                     "position": "20x40"
                 },
                 "[Mai] Lost Woods Path Rock": {
-                    "position": "115x50",
+                    "position": "49x181",
                     "housesItem": "Lost Maiamai"
                 },
-                "[Mai] Lost Woods Rock": {},
+                "[Mai] Lost Woods Rock": {
+                    "position": "95x45",
+                    "housesItem": "Lost Maiamai"
+                },
                 "[Mai] Lost Woods Tree": {
                     "position": "111x126",
                     "housesItem": "Lost Maiamai"
@@ -1213,7 +1218,9 @@ const trackerCore = {
                 }
             },
             "Skull Woods Area": {
-                "Destroyed House":                               "Purple Rupee",
+                "Destroyed House":                               {
+                    "housesItem": "Piece of Heart"
+                },
                 "Mysterious Man":                                {
                     "position": "567x20"
                 },
