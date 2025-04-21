@@ -2,17 +2,26 @@
   "name": "albwr-web",
   "version": "1.0.0",
   "description": "A Node.JS app that runs the albw randomizer cli executables to randomize albw with user input from the GUI",
-  "main": "src/index.js",
+  "type": "module",
+  "homepage": "https://josephanimate2021.github.io/ALBWR-Web/",
   "scripts": {
-    "start": "node src/index.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "devDependencies": {
+    "gh-pages": "latest",
+    "vite": "latest"
   },
   "keywords": [],
   "author": "Joseph",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.19.2",
-    "jszip": "^3.10.1",
-    "ws": "^8.18.1",
-    "yaml": "^2.7.0"
+    "@webcontainer/api": "latest",
+    "jszip": "latest",
+    "ws": "latest",
+    "yaml": "latest"
   }
 }
