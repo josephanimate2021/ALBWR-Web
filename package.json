@@ -1,21 +1,19 @@
 {
   "name": "albwr-web",
-
   "version": "1.0.0",
   "description": "A Node.JS app that runs the albw randomizer cli executables to randomize albw with user input from the GUI without worry of using wasm.",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "start": "node index.js"
   },
   "devDependencies": {
     "vite": "latest"
   },
   "dependencies": {
-    "@webcontainer/api": "latest",
+    "@webcontainer/snapshot": "latest",
+    "express": "latest",
+    "jquery": "^3.7.1",
     "jszip": "latest",
-    "ws": "latest",
     "yaml": "latest"
   }
 }
