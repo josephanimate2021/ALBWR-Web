@@ -7,7 +7,6 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "@webcontainer/snapshot": "latest",
     "express": "latest",
     "jszip": "latest"
   }
