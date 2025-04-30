@@ -5,22 +5,24 @@
         <meta content="width=device-width, initial-scale=1" name="viewport">
         <meta charset="UTF-8">
         <link href="app.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/@xterm/xterm/css/xterm.css" rel="stylesheet">
         <link href="./img/favicon.ico" rel="icon" type="image/x-icon">
     </head>
     <body>
         <div id="main">
             <img alt="The Legend of Zelda: A Link Between Worlds Randomizer" class="logo" src="img/logo.png">
-            <select id="versionDropdown"></select>
+            <select id="presetDropdown"></select>
+            <select id="versionDropdown" onchange="loadVersions(this.value)"></select>
             <div style="max-width: 100%;">
                 <div class="top-links">
                     <a href="https://github.com/rickfay/z17-randomizer#setup" style="border-radius: 20px 0 0 0; border-left-width: 0;" target="_blank">Guides</a>
                     <a href="https://discord.gg/dmAJh2uY7M" target="_blank">Discord</a>
                     <a href="https://github.com/rickfay/z17-randomizer" target="_blank">GitHub</a>
-                    <a id="theme-toggle" style="border-radius: 0 20px 0 0; border-right-width: 0;">Theme <span style="font-size: 13px;">🗘</span></a>
+                    <a id="theme-toggle" style="border-radius: 0 20px 0 0; border-right-width: 0; cursor: pointer">Theme <span style="font-size: 13px;">🗘</span></a>
                 </div>
                 <div id="waiting-screen">
                     <img src="img/loading.gif"  alt="Randomizing..." />
-                    <div class="button">Generating! Please wait...</div>
+                    <div class="button"><span id="statusText"></span> Please wait...</div>
                 </div>
                 <form id="settings-form" action="javascript:;"></form>
             </div>
@@ -34,7 +36,11 @@
                 <br>All in-game imagery, logos, and their likenesses Copyright © Nintendo, 2013.
             </div>
         </div>
-        <script src="themes.js" type="text/javascript"></script>
-        <script src="app.js" type="module"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm/lib/xterm.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-web-links/lib/addon-web-links.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit/lib/addon-fit.js"></script>
+        <script src="appModule.js" type="module"></script>
+        <script src="appJs.js" type="text/javascript"></script>
     </body>
 </html>

@@ -39,13 +39,21 @@ body {
 
 
 #versionDropdown {
-    color: white; 
     padding: 10px; 
-    background: #00000088; 
     position: absolute; 
     right: 0; 
     top: 0; 
     border-radius: 0 0 0 10px; 
+    font-family: Helvetica, serif; 
+    font-size: 10px;
+}
+
+#presetDropdown {
+    padding: 10px; 
+    position: absolute; 
+    left: 0; 
+    top: 0; 
+    border-radius: 0 0 10px 0; 
     font-family: Helvetica, serif; 
     font-size: 10px;
 }
@@ -167,11 +175,12 @@ input[type=submit]:enabled {
 
 
 
-.setting > label input, .setting > label > select, .setting > label .range_val, .setting > label > input[type=text] {
+.setting > label input, .setting > label > select, .setting > label .range_val, .setting > label > input[type=text], .setting > label > input[type=number] {
     float: right;
 }
 
-.setting > label > input[type=text] {
+.setting > label > input[type=text],
+.setting > label > input[type=number] {
     width: 50%;
     border-style: solid;
     border-width: 1px;
@@ -212,7 +221,7 @@ input[type="range"] {
     width: 100%;
 }
 
-.range_val > input[type=text] {
+.range_val > input[type=number], .range_val > input[type=number] {
     color: black;
     padding: 0 8px;
     border: 1px solid #858585;
@@ -226,10 +235,6 @@ input[type="range"] {
 .range_val {
     display: inline-flex;
     width: 50%;
-}
-
-span.version {
-    float: right;
 }
 
 span.generate {
@@ -249,28 +254,28 @@ span.generate {
     padding: 20px 0;
 }
 
-/*.nav {*/
-/*    margin: 30px;*/
-/*    width: 800px;*/
-/*    text-align: center;*/
-/*    font-size: x-large;*/
-/*    color: white;*/
-/*    display: block;*/
-/*    flex-direction: column;*/
-/*}*/
-
-/*.nav a {*/
-/*    color: white;*/
-/*    text-decoration: none;*/
-/*    border: white 1px solid;*/
-/*    border-radius: 5px;*/
-/*    padding: 10px;*/
-/*}*/
-
-/*.nav a:hover {*/
-/*    background-color: #1f1f1f;*/
-/*    cursor: pointer;*/
-/*}*/
+.accordion {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    transition: 0.4s;
+}
+  
+.active, .accordion:hover {
+    background-color: #ccc; 
+}
+  
+.panel {
+    padding: 0 18px;
+    display: none;
+    background-color: white;
+    overflow: hidden;
+}
 
 .darkMode {
     backdrop-filter: blur(3px) brightness(0.7);
@@ -311,7 +316,8 @@ span.generate {
     .setting:hover > label {
         color: #00C8FF;
     }
-    .setting > label > input[type=text] {
+    .setting > label > input[type=text],
+    .setting > label > input[type=number] {
         background: none;
         color: #FFFFFF;
     }
@@ -323,7 +329,7 @@ span.generate {
         background: black;
         color: white;
     }
-    .range_val > input[type=text] {
+    .range_val > input[type=number], .range_val > input[type=button] {
         color: white;
         background-color: #222222;
     }
@@ -332,5 +338,27 @@ span.generate {
     }
     .checkbox:hover > label {
         color: #00C8FF;
+    }
+    .accordion {
+        background-color: #444;
+        color: #eee;
+        cursor: pointer;
+        padding: 18px;
+        border: none;
+        text-align: left;
+        outline: none;
+        font-size: 15px;
+        transition: 0.4s;
+    }
+      
+    .active, .accordion:hover {
+        background-color: gray; 
+    }
+      
+    .panel {
+        padding: 0 18px;
+        display: none;
+        background-color: black;
+        overflow: hidden;
     }
 }

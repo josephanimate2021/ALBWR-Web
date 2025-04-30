@@ -6,14 +6,9 @@
   "scripts": {
     "start": "node index.js"
   },
-  "devDependencies": {
-    "vite": "latest"
-  },
   "dependencies": {
     "@webcontainer/snapshot": "latest",
     "express": "latest",
-    "jquery": "^3.7.1",
-    "jszip": "latest",
-    "yaml": "latest"
+    "jszip": "latest"
   }
 }
