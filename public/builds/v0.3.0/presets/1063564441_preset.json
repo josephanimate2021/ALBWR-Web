@@ -1,0 +1,36 @@
+{
+    "logic": {
+      "logic_mode":                                      "AdvGlitched",
+      "randomize_dungeon_prizes":                        true,
+      "vanilla_charm":                                   false,
+      "lc_requirement":                                  6,
+      "ped_requirement":                                 "Charmed",
+      "hyrule_castle_setting":                           "Closed",
+      "nice_mode":                                       true,
+      "no_progression_enemies":                          true,
+      "skip_big_bomb_flower":                            false,
+      "reverse_sage_events":                             true,
+      "start_with_merge":                                false,
+      "bell_in_shop":                                    false,
+      "pouch_in_shop":                                   false,
+      "sword_in_shop":                                   false,
+      "boots_in_shop":                                   false,
+      "assured_weapon":                                  false,
+      "minigames_excluded":                              false,
+      "swordless_mode":                                  false,
+      "super_items":                                     true,
+      "skip_trials":                                     true,
+      "bow_of_light_in_castle":                          false,
+      "dark_rooms_lampless":                             false,
+      "maiamai_madness":                                 true,
+      "weather_vanes_activated":                         false,
+      "hint_ghost_price":                                9999
+    },
+    "options": {
+      "chest_size_matches_contents":                     false,
+      "night_mode":                                      false
+    },
+    "exclusions": {
+      "exclusions": []
+    }
+  }
