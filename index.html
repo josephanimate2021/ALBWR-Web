@@ -122,7 +122,7 @@
       <div class="modal-dialog">
         <form class="modal-content" onsubmit="archipelagoConnector(this)" action="javascript:;">
           <div class="modal-header">
-            <h5 class="modal-title">Connect To An Archipelago Server</h5>
+            <h5 class="modal-title">Connect to an Archipelago Server</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -134,7 +134,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" data-connected="false">Connect To Archipelago</button>
+            <button type="submit" class="btn btn-primary" data-connected="false">Connect to Archipelago</button>
           </div>
         </form>
       </div>
@@ -153,7 +153,7 @@
         </div>
       </div>
     </div>
-
+    <!-- Scrapped because this will be an AP only tracker for now.
     <div class="modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" id="checkSelectModal">
       <div class="modal-dialog">
         <form class="modal-content" action="javascript:;">
@@ -186,7 +186,7 @@
         </form>
       </div>
     </div>
-
+    -->
     <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
       <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center"
               id="bd-theme"
@@ -231,7 +231,7 @@
         <div class="sidebar border border-right col-md-3 col-lg-2 p-0 bg-body-tertiary">
           <div class="offcanvas-md offcanvas-end bg-body-tertiary" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
             <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="sidebarMenuLabel">ALBW Randomizer</h5>
+              <h5 class="offcanvas-title" id="sidebarMenuLabel">ALBW Randomizer Tracker</h5>
             </div>
             <div class="offcanvas-body d-md-flex flex-column p-0 pt-lg-3 overflow-y-auto">
               <div id="gameItems" style="display: none;"></div>
@@ -246,7 +246,9 @@
               </h6>
               <ul class="nav flex-column" id="trackerOptions" style="display: none;">
                 <li class="nav-item">
-                  <a id="itemsAndMap" class="nav-link d-flex align-items-center gap-2 trackerOption" href="javascript:;" onclick="switchTrackerMode('itemsAndMap', document.getElementById('tracker').getAttribute('data-cat'))">
+                  <a id="itemsAndMap" class="nav-link d-flex align-items-center gap-2 trackerOption" href="javascript:;" onclick="switchTrackerMode(
+                    'itemsAndMap', document.getElementById('tracker').getAttribute('data-cat')
+                  )">
                     <svg class="bi" viewBox="0 0 512 512">
                       <path d="M256,110.933c-18.825,0-34.133,15.309-34.133,34.133S237.175,179.2,256,179.2s34.133-15.309,34.133-34.133
                         S274.825,110.933,256,110.933z"/>
@@ -279,7 +281,9 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a id="items" class="nav-link d-flex align-items-center gap-2 trackerOption" href="javascript:;" onclick="switchTrackerMode('items', document.getElementById('tracker').getAttribute('data-cat'))">
+                  <a id="items" class="nav-link d-flex align-items-center gap-2 trackerOption" href="javascript:;" onclick="switchTrackerMode(
+                    'items', document.getElementById('tracker').getAttribute('data-cat')
+                  )">
                     <svg class="bi" viewBox="0 0 512 512">
                       <path d="M256,110.933c-18.825,0-34.133,15.309-34.133,34.133S237.175,179.2,256,179.2s34.133-15.309,34.133-34.133
                         S274.825,110.933,256,110.933z"/>
@@ -307,7 +311,9 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a id="map" class="nav-link d-flex align-items-center gap-2 trackerOption" href="javascript:;" onclick="switchTrackerMode('map', document.getElementById('tracker').getAttribute('data-cat'))">
+                  <a id="map" class="nav-link d-flex align-items-center gap-2 trackerOption" href="javascript:;" onclick="switchTrackerMode(
+                    'map', document.getElementById('tracker').getAttribute('data-cat')
+                  )">
                     <svg class="bi" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                       <path d="M4 2L0 1V14L4 15V2Z"/>
                       <path d="M16 2L12 1V14L16 15V2Z"/>
@@ -326,7 +332,7 @@
                     </svg>
                     <span id="statusKindof">Connect To Archipelago</span>
                   </a>
-                </li>
+                </li><!--
                 <li class="nav-item" title="If you are playing the ALBW randomizer without Archipelago, please take advantage of this button.">
                   <a class="nav-link d-flex align-items-center gap-2" href="javascript:document.getElementById('logsUploader').click()">
                     <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" class="bi">
@@ -344,7 +350,7 @@
                     </svg>
                     <span id="uploadStatusStuff">Upload Spoiler Log</span>
                   </a>
-                </li>
+                </li>-->
               </ul>
 
               <hr class="my-3">
@@ -361,26 +367,13 @@
               </ul>
             </div>
           </div>
-        </div>
-        <input id="logsUploader" onchange="uploadSpoilerLog(this)" type="file" style="display: none;" accept=".json,.yaml"/>
+        </div><!--
+        <input id="logsUploader" onchange="uploadSpoilerLog(this)" type="file" style="display: none;" accept=".json,.yaml"/>-->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
           <div id="alertBlock">
             <div class="alert alert-info alert-dismissible" role="alert">
-              This tracker is using a structure from a spoiler log found after generating a randomized game in
-              <a href="https://github.com/rickfay/z17-randomizer/releases/tag/v0.4.1-beta-2025-03-25" target="_blank">v0.4.1 beta</a> 
-              of the <a href="https://github.com/rickfay/z17-randomizer" target="_blank">z17 randomizer</a>
-              created by <a href="https://github.com/rickfay" target="_blank">rickfay</a> in order to help precicely keep track your progress. 
-              It is also assuming that you are playing the vanilla game of ALBW with Normal logic. If you are playing the ALBW Randomizer, 
-              please upload your spoiler log in order for this tracker to keep track of your progress in a more accurate manner.<br> 
-              If you are using normal logic in the ALBW Randomizer, may choose to track your progress based off of your spoiler log's item metrics (
-                JSON Spoiler Logs Only & <strong>BETA FEATURE</strong>
-              ) or layout after upload to keep tracking easier for some setting configurations. 
-              Otherwise, the metrics system will be used by default if you decide to upload a JSON spoiler log that uses v3 and newer of the ALBW Randomizer 
-              and you're not using the normal logic settings. YAML Spoiler logs could technically work for this purpose as well, however, 
-              you would need to create a metrics system in your yaml file based off of how you want the tracker to track your progress with the not so normal 
-              logic settings. Please keep in mind that this tracker is currently in it's active development stage. 
-              All functions of the tracker may not work as expected (Especially when an item is manually clicked on by the user).
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              This tracker is currently AP only at the moment. If I can get things to hopefully work in a manual way, 
+              then I will consider making this tracker usable in a manual way.
             </div>
           </div>
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">

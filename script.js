@@ -134,7 +134,7 @@ function switchTrackerMode(type, j, loadLayouts = ["Hyrule", "Lorule", "Dungeons
 }
 function retrievedItem(itemId, cat, confirmWithUser = true) {
     const itemInfo = trackerStuff.itemLayout[cat][itemId];
-    if (itemInfo) {
+    if (itemInfo && !confirmWithUser) {
         if (itemInfo.counts) {
             let [_, current, limit] = itemInfo.counts;
             if (current != undefined && limit != undefined) {
@@ -152,7 +152,7 @@ function retrievedItem(itemId, cat, confirmWithUser = true) {
                 itemInfo.counts[0]++;
             }
         } else itemInfo.obtained = !itemInfo.obtained;
-        if (itemInfo.locatedInChecks && confirmWithUser) {
+        /*if (itemInfo.locatedInChecks && confirmWithUser) {
             const checks = itemInfo.locatedInChecks.filter(i => {
                 const [locationType, location, check] = i.split("@");
                 return !trackerStuff.layout[locationType][location][check].completed;
@@ -191,7 +191,7 @@ function retrievedItem(itemId, cat, confirmWithUser = true) {
                 delete trackerStuff.layout[locationType][location][check].completed;
             }
             switchTrackerMode(document.getElementById('tracker').getAttribute("data-mode"), cat);
-        }
+        }*/
     }
     return itemInfo
 }
