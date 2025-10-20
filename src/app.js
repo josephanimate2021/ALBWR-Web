@@ -30,7 +30,7 @@ jQuery("#settings-form").submit(async e => {
     const instance = await WebContainer.boot();
     const builds = await (await fetch(`/builds/versions.json`)).json();
     await instance.mount(builds[versionVal].directory);
-    instance.fs.writeFile('./presets/form.json', JSON.stringify(settings));
+    instance.fs.writeFile('./presets/form.json', JSON.stringify(settings, null, "\t"));
     instance.fs.writeFile('./package.json', JSON.stringify({
         name: "z17-randomizer",
         version: versionVal.substring(1),
@@ -39,21 +39,19 @@ jQuery("#settings-form").submit(async e => {
         scripts: {
           randomize: "node randomize.js"
         }
-    }))
+    }, null, "\t"))
     instance.fs.writeFile('./randomize.js', await (await fetch('/randomizerBackend.js')).text());
     terminal.write('Uploading The ALBW Rom To The Randomizer...\r\n')
     const reader = new FileReader();
     reader.onloadend = async function(e) {
-        terminal.write('Successfully uploaded the ALBW rom! Running The Randomizer...\r\n');
-        const arrayBuffer = e.target.result;
-        const buffer = new Uint8Array(arrayBuffer);
-        const buffer2 = new Uint8Array(await (await fetch(`/builds/${versionVal}/albw-randomizer`)).arrayBuffer());
+        terminal.write('Successfully uploaded the ALBW rom! Setting up the randomizer...\r\n');
         const config = JSON.parse(await instance.fs.readFile('./config.json', 'utf8'));
-        instance.fs.writeFile(`./${config.rom}`, buffer);
-        instance.fs.writeFile('./albw-randomizer', buffer2);
+        instance.fs.writeFile(`./${config.rom}`, e.target.result);
+        instance.fs.writeFile('./albw-randomizer', await (await fetch(`/builds/${versionVal}/albw-randomizer`)).bytes());
+        instance.fs.writeFile('./config.json', JSON.stringify(config, null, "\t"));
         executeRandomizer(terminal, instance, settings)
     };
-    reader.readAsArrayBuffer(document.getElementById('rom').files[0]);
+    reader.readAsBinaryString(document.getElementById('rom').files[0]);
 })
 
 /**
@@ -409,6 +407,7 @@ async function getBuilds() {
     const buildFiles = await (await fetch('/builds/versions.json')).json();
     const info = {};
     for (const i in buildFiles) {
+        if (i == ".gitignore") continue;
         info[i] = {};
         if (buildFiles[i].directory.presets) {
             info[i].presets = [];
