@@ -6,8 +6,10 @@ import { WebLinksAddon } from '@xterm/addon-web-links';
 import { FitAddon } from '@xterm/addon-fit';
 import JSZip from 'jszip';
 
+let webContainerInstance
+
 // run the randomizer on form submit.
-jQuery("#settings-form").submit(async e => {
+/*jQuery("#settings-form").submit(async e => {
     const versionDropdown = jQuery("#versionDropdown");
     jQuery("#versionDropdown").attr("disabled", "");
     jQuery("#presetDropdown").attr("disabled", "");
@@ -52,17 +54,46 @@ jQuery("#settings-form").submit(async e => {
         executeRandomizer(terminal, instance, settings)
     };
     reader.readAsBinaryString(document.getElementById('rom').files[0]);
-})
+})*/
+
+// Wait for everything to be loaded, and then bootstrap the app
+window.addEventListener("load", function bootstrap() {
+    init();
+});
+
+function openTerminal(elemId) {
+    const fitAddon = new FitAddon();
+    const terminal = new Terminal();
+    terminal.open(document.getElementById(elemId));
+    terminal.loadAddon(new WebLinksAddon());
+    terminal.loadAddon(fitAddon);
+    fitAddon.fit();
+    window.addEventListener('resize', () => {
+        fitAddon.fit();
+    });
+    return terminal;
+}
+
+function closeTerminal(elemId) {
+    document.getElementById(elemId).innerHTML = '';
+}
 
 /**
- * Runs the generated randomizer file
+ * Executes a command within the randomizer.
  * @param {Terminal} terminal
- * @param {WebContainer} webcontainerInstance
  */
-async function executeRandomizer(terminal, webcontainerInstance, settings, requiresInput = false) {
-    const command = ['run', 'randomize'];
-    if (settings.seed != undefined) command.push(settings.seed);
-    const shellProcess = await webcontainerInstance.spawn('npm', command, {
+function executeCommand(command, terminal, webcontainerInstance, settings, requiresInput = false) {
+    const commands = command.split(" ");
+    const firstCommand = commands[0];
+    commands.splice(0, 1);
+    beginShellProcess(firstCommand, commands, settings, terminal, webcontainerInstance, requiresInput);
+}
+
+// Starts the command execution process.
+async function beginShellProcess(firstCommand, commands, settings, terminal, webcontainerInstance, requiresInput = false) {
+    if (settings?.seed != undefined) commands.push(settings.seed);
+
+    const shellProcess = await webcontainerInstance.spawn(firstCommand, commands, {
         terminal: {
             cols: terminal.cols,
             rows: terminal.rows,
@@ -83,6 +114,8 @@ async function executeRandomizer(terminal, webcontainerInstance, settings, requi
             input.write(data);
         });
     }
+
+    return shellProcess;
 }
 
 /**
@@ -134,15 +167,15 @@ function parseBoolean(h) {
 function init() {
     randomBackgrounds();
     themeToggle();
-    loadVersions('v0.4.1-beta-2025-03-26');
+    loadVersions();
 }
 
 /**
  * Loads all existing builds and then selects a one that's supplied in the paramaters. 
  * If none are supplied, then the first build that pops up is selected by default.
- * @param {string} r 
  */
-function loadVersions(r) {
+async function loadVersions(pickedVersionIndex = 0, gitInstalled = false, dirsExist = {}) {
+    const terminal = openTerminal('resultField');
     const presetDropdown = jQuery("#presetDropdown");
     presetDropdown.attr("disabled", "");
     presetDropdown.off("change");
@@ -150,38 +183,77 @@ function loadVersions(r) {
     const versionDropdown = jQuery("#versionDropdown");
     versionDropdown.off("change");
     versionDropdown.attr("disabled", "");
-    !versionDropdown.html() ? versionDropdown.html(`<option>Loading Version ${r.substring(1).split('-').join(' ')}...</option>`) : ''
-    jQuery("#statusText").html(`Getting Randomizer Settings From ${r.split('-').join(' ')}.<br>`)
-    jQuery("#settings-form").hide().html('')
+    !versionDropdown.html() ? versionDropdown.html(`<option>Loading Latest Version of the randomizer...</option>`) : ''
+    const commandExecution = (cmd) => executeCommand(cmd, terminal, webContainerInstance);
+    jQuery("#settings-form").hide().html('');
+    const preferedVersionProvider = localStorage.wantsToUseBrokenVersionsOfRando ? "gitlab" : "github";
+    const builds = await (await fetch(`/versions_${preferedVersionProvider}.json`)).json();
+    const pickedBuild = builds[pickedVersionIndex]
+    for (let i = 0; i < builds.length; i++) versionDropdown.append(
+        `<option value="${i}"${builds[i].tag_name == pickedBuild.tag_name ? ' selected' : ''}>${builds[i].name}</option>`
+    );
+    versionDropdown.on("change", d => loadVersions(jQuery(d.target).val(), true, dirsExist));
     jQuery("#waiting-screen").show();
-    getBuilds().then(d => {
-        let html = '';
-        for (const eI in d) {
-            const versionNum = eI.split("-")[0];
-            html += `<option value="${eI}"${eI == r ? ' selected' : ''}>${versionNum}${
-                eI.substring(versionNum.length).startsWith('-') ? ` -${eI.substring(versionNum.length).split("-").map(capitalizeWord).join(' ')}` : ''
-            }</option>`;
-            if (eI == r) {
-                let html2 = '';
-                for (let i = 0; i < d[eI].presets.length; i++) {
-                    const v = d[eI].presets[i];
-                    if (i == 0) {
-                        loadPreset(v);
-                        presetDropdown.on("change", e => {
-                            loadPreset(JSON.parse(decodeURIComponent(jQuery(e.target).val())))
-                        });
-                    }
-                    html2 += `<option value="${
-                        encodeURIComponent(JSON.stringify(v))
-                    }" title="${v.description || ''}">${v.presetName}</option>`;
-                }
-                presetDropdown.html(html2);
-                presetDropdown.removeAttr("disabled");
-            }
+    if (!gitInstalled) {
+        jQuery("#statusText").html(`Installing git for use in cloning the randomizer source code...<br>`)
+        webContainerInstance = await WebContainer.boot();
+        commandExecution("echo Installing git...");
+        var attemptCount = 0;
+        async function gitInstall() {
+            const shellProcess = await beginShellProcess('npm', ['install', 'isomorphic-git'], {}, terminal, webContainerInstance);
+            const exitCode = await shellProcess.exit;
+            if (exitCode == 0) {
+                commandExecution("echo Git has been installed successfuly!");
+                jQuery("#statusText").html(`Git was successfuly installed!<br>We will move on to the next step in 5 seconds.<br>`)
+                await webContainerInstance.fs.mkdir('./randomizer');
+                setTimeout(() => {
+                    closeTerminal('resultField');
+                    loadVersions(0, true, dirsExist);
+                }, 5000);
+            } else if (attemptCount < 1) {
+                commandExecution("echo Git has failed to install for some reason. Attempting install one more time.");
+                attemptCount++
+                gitInstall();
+            } else commandExecution(
+                "echo Git has failed to install 2 times in a row. It is needed in order to properly run the randomizer from a WebContainers instance. Maybe there is something going on with the code. Please report this issue to https://github.com/josephanimate2021/albwr-web/issues", 
+                terminal, 
+                webContainerInstance
+            )
         }
-        versionDropdown.on("change", d => loadVersions(jQuery(d.target).val()));
-        versionDropdown.html(html);
-    });
+        gitInstall()
+    } else if (!dirsExist[`./${pickedBuild.tag_name}`]) {
+        jQuery("#statusText").html(`Cloning the randomizer source code from<br>${pickedBuild.name}...<br>`);
+        commandExecution("echo Cloning the source code... This shouldn't take long if you have fast internet.");
+        let attemptCount = 0;
+        async function cloneSourceCode() {
+            const shellProcess = await beginShellProcess('isogit', ['clone', '--url=' + (() => {
+                return preferedVersionProvider == "github" ? pickedBuild.html_url.split("/releases")[0] : pickedBuild.commit.web_url.split("/-/")[0]
+            })(), '--dir=randomizer', '--noCheckout=true', '--noTags=true'], {}, terminal, webContainerInstance);
+            const exitCode = await shellProcess.exit;
+            if (exitCode == 0) {
+                jQuery("#statusText").html(`Getting the settings from the latest randomizer version...<br>`);
+                commandExecution('echo The source code was cloned successfuly! The randomizer is finally being set up now.');
+                setTimeout(() => {
+                    closeTerminal('resultField')
+                    loadVersions(0, true, {
+                        [`./${pickedBuild.tag_name}`]: true
+                    });
+                }, 5);
+            } else if (attemptCount < 1) {
+                commandExecution('echo Failed to clone your source code for some reason. Trying one more time...');
+                attemptCount++;
+                await webContainerInstance.fs.rm(`./${pickedBuild.tag_name}`, { recursive: true });
+                cloneSourceCode();
+            } else commandExecution(
+                "echo Git has failed to clone the source code 2 times in a row. It is needed in order to build a binary file for WebContainers to run. Maybe there is something going on with the code. Please report this issue to https://github.com/josephanimate2021/albwr-web/issues", 
+                terminal, 
+                webContainerInstance
+            )
+        }
+        cloneSourceCode();
+    } else {
+        commandExecution(`ls randomizer`);
+    }
 }
 
 /**
@@ -396,59 +468,4 @@ function capitalizeWord(word) {
     if (!word) return;
     const rest = word.substring(1);
     return word.split(rest)[0].toUpperCase() + rest;
-}
-
-// Wait for everything to be loaded, and then bootstrap the app
-window.addEventListener("load", function bootstrap() {
-    init();
-});
-
-async function getBuilds() {
-    const buildFiles = await (await fetch('/builds/versions.json')).json();
-    const info = {};
-    for (const i in buildFiles) {
-        if (i == ".gitignore") continue;
-        info[i] = {};
-        if (buildFiles[i].directory.presets) {
-            info[i].presets = [];
-            for (const k in buildFiles[i].directory.presets) {
-                for (const file in buildFiles[i].directory.presets[k]) {
-                    if (!file.endsWith(".json")) continue;
-                    const comments = [];
-                    let fileContents = buildFiles[i].directory.presets[k][file].file.contents
-                    let pt = fileContents.indexOf("// ");
-                    while (pt > -1) { // push and remove comments
-                        const line = fileContents.substring(pt).split("\r").join('').split("\n")[0]
-                        comments.push(line.substring(3));
-                        fileContents = fileContents.split(line).join("")
-                        pt = fileContents.indexOf("// ", pt + 1)
-                    }
-                    const info2 = JSON.parse(fileContents);
-                    if (!info2.settings) {
-                        info2.settings = Object.assign({}, info2)
-                        for (const i in info2) {
-                            if (info2.settings[i]) delete info2[i];
-                        }
-                    }
-                    info2.comments ||= comments;
-                    if (buildFiles[i].directory['excludableChecksList.json']) info2.exclusionOptions = JSON.parse(
-                        buildFiles[i].directory['excludableChecksList.json'].file.contents
-                    ).layout
-                    if (!info2.version) {
-                        const versionNum = i.split("-")[0];
-                        Object.assign(info2, {
-                            presetName: file.substring(0, file.lastIndexOf(".")).split("_").map(capitalizeWord).join(' '),
-                            version: `${versionNum}${
-                                i.substring(versionNum.length).startsWith('-') ? ` -${
-                                    i.substring(versionNum.length).split("-").map(capitalizeWord).join(' ')
-                                }` : ''
-                            }`
-                        });
-                    }
-                    info[i].presets.unshift(info2);
-                }
-            }
-        }
-    }
-    return info;
 }

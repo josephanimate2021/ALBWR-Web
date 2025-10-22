@@ -1,0 +1,75 @@
+{
+  "version":                                             "v0.3.0 - Dev Build #4",
+  "seed":                                                3226308723,
+  "settings": {
+    "logic": {
+      "logic_mode":                                      "AdvGlitched",
+      "randomize_dungeon_prizes":                        true,
+      "lc_requirement":                                  6,
+      "ped_requirement":                                 "Charmed",
+      "nice_mode":                                       true,
+      "no_progression_enemies":                          true,
+      "skip_big_bomb_flower":                            true,
+      "reverse_sage_events":                             true,
+      "start_with_merge":                                false,
+      "bell_in_shop":                                    true,
+      "pouch_in_shop":                                   true,
+      "sword_in_shop":                                   false,
+      "boots_in_shop":                                   false,
+      "assured_weapon":                                  false,
+      "minigames_excluded":                              true,
+      "swordless_mode":                                  false,
+      "super_items":                                     true,
+      "skip_trials":                                     true,
+      "bow_of_light_in_castle":                          false,
+      "dark_rooms_lampless":                             false,
+      "maiamai_madness":                                 true,
+      "weather_vanes_activated":                         false
+    },
+    "options": {
+      "chest_size_matches_contents":                     true,
+      "night_mode":                                      false
+    },
+    "exclusions": {}
+  },
+  "metrics": {
+    "hints": {
+      "path_hints": [
+        "It says here that Central Hyrule is on the path to Arrghus.",
+        "It says here that Southern Ruins is on the path to Margomill.",
+        "It says here that Lost Woods Region is on the path to Knucklemaster.",
+        "It says here that Dark Ruins is on the path to Yuga.",
+        "It says here that Swamp Palace is on the path to Grinexx.",
+        "It says here that Central Lorule is on the path to Moldorm.",
+        "It says here that Central Lorule is on the path to Gemesaur King."
+      ],
+      "always_hints": {
+        "Blacksmith (Lorule)":                           "Tornado Rod",
+        "Master Sword Pedestal":                         "Lost Maiamai",
+        "Bouldering Guy":                                "Silver Rupee",
+        "Great Rupee Fairy":                             "Lost Maiamai"
+      },
+      "sometimes_hints": {
+        "[TH] (8F) Fairy Room":                          "Lost Maiamai",
+        "Graveyard Ledge Cave":                          "Piece of Heart",
+        "Eastern Ruins Treasure Dungeon":                "Lost Maiamai",
+        "Blacksmith":                                    "Lost Maiamai",
+        "[Mai] Lorule Fortune-Teller Big Rock":          "Silver Rupee",
+        "[Mai] Rosso's Ore Mine Rock":                   "Lost Maiamai",
+        "Ku's Domain Fight":                             "Monster Tail",
+        "Ice Rod Cave":                                  "Red Rupee",
+        "Floating Island":                               "Tornado Rod",
+        "Death Mountain Treasure Dungeon":               "Heart Container",
+        "[TR] (B1) Big Chest (Center)":                  "Lost Maiamai",
+        "[HC] West Wing":                                "Lost Maiamai",
+        "[TR] (1F) Defeat Flamolas":                     "Compass",
+        "[LC] (3F) Bomb Trial (Behind Rock)":            "Small Key",
+        "Southern Ruins Treasure Dungeon":               "Lost Maiamai",
+        "[LC] (3F) Ball Trial (Puzzle)":                 "Small Key"
+      },
+      "bow_of_light_hint": [
+        "Eastern Ruins"
+      ]
+    }
+  }
+}
