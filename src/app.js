@@ -6,33 +6,32 @@ import { WebLinksAddon } from '@xterm/addon-web-links';
 import { FitAddon } from '@xterm/addon-fit';
 import JSZip from 'jszip';
 
-let webContainerInstance
+var webContainerInstance
 
 // run the randomizer on form submit.
-/*jQuery("#settings-form").submit(async e => {
+jQuery("#settings-form").submit(async e => {
     const versionDropdown = jQuery("#versionDropdown");
     jQuery("#versionDropdown").attr("disabled", "");
     jQuery("#presetDropdown").attr("disabled", "");
     const settingsForm = jQuery("#settings-form");
     settingsForm.hide();
     const settings = parseForm(settingsForm);
-    console.log(settings)
     const versionVal = versionDropdown.val();
     jQuery("#statusText").text("Generating!");
     jQuery("#waiting-screen").show();
-    const fitAddon = new FitAddon();
-    const terminal = new Terminal();
-    terminal.open(document.getElementById('resultField'));
-    terminal.loadAddon(new WebLinksAddon());
-    terminal.loadAddon(fitAddon);
-    fitAddon.fit();
-    window.addEventListener('resize', () => {
-        fitAddon.fit();
-    });
-    const instance = await WebContainer.boot();
-    const builds = await (await fetch(`/builds/versions.json`)).json();
-    await instance.mount(builds[versionVal].directory);
-    instance.fs.writeFile('./presets/form.json', JSON.stringify(settings, null, "\t"));
+    const terminal = openTerminal('resultField');
+    const commandExecution = async (cmd) => await executeCommand(cmd, terminal, webContainerInstance);
+    commandExecution('echo Downloading rust...');
+    await webContainerInstance.fs.writeFile("./rust_installer.sh", await (await fetch('/rust_installer.sh')).bytes())
+    commandExecution('chmod +x rust_installer.sh')
+    const shellProcess = await commandExecution("zsh ./rust_installer.sh");
+    const exitCode = await shellProcess.exit;
+    if (exitCode == 0) {
+
+    } else {
+        commandExecution("echo Rust has failed to download.")
+    }
+    /*webContainerInstance.fs.writeFile('./randomizeer/presets/form.json', JSON.stringify(settings, null, "\t"));
     instance.fs.writeFile('./package.json', JSON.stringify({
         name: "z17-randomizer",
         version: versionVal.substring(1),
@@ -53,8 +52,8 @@ let webContainerInstance
         instance.fs.writeFile('./config.json', JSON.stringify(config, null, "\t"));
         executeRandomizer(terminal, instance, settings)
     };
-    reader.readAsBinaryString(document.getElementById('rom').files[0]);
-})*/
+    reader.readAsBinaryString(document.getElementById('rom').files[0]);*/
+})
 
 // Wait for everything to be loaded, and then bootstrap the app
 window.addEventListener("load", function bootstrap() {
@@ -82,11 +81,11 @@ function closeTerminal(elemId) {
  * Executes a command within the randomizer.
  * @param {Terminal} terminal
  */
-function executeCommand(command, terminal, webcontainerInstance, settings, requiresInput = false) {
+async function executeCommand(command, terminal, webcontainerInstance, settings, requiresInput = false) {
     const commands = command.split(" ");
     const firstCommand = commands[0];
     commands.splice(0, 1);
-    beginShellProcess(firstCommand, commands, settings, terminal, webcontainerInstance, requiresInput);
+    return await beginShellProcess(firstCommand, commands, settings, terminal, webcontainerInstance, requiresInput);
 }
 
 // Starts the command execution process.
@@ -223,12 +222,13 @@ async function loadVersions(pickedVersionIndex = 0, gitInstalled = false, dirsEx
         gitInstall()
     } else if (!dirsExist[`./${pickedBuild.tag_name}`]) {
         jQuery("#statusText").html(`Cloning the randomizer source code from<br>${pickedBuild.name}...<br>`);
-        commandExecution("echo Cloning the source code... This shouldn't take long if you have fast internet.");
+        commandExecution("echo Cloning the source code...");
+        commandExecution("echo This shouldn't take long if you have fast internet.")
         let attemptCount = 0;
         async function cloneSourceCode() {
             const shellProcess = await beginShellProcess('isogit', ['clone', '--url=' + (() => {
                 return preferedVersionProvider == "github" ? pickedBuild.html_url.split("/releases")[0] : pickedBuild.commit.web_url.split("/-/")[0]
-            })(), '--dir=randomizer', '--noCheckout=true', '--noTags=true'], {}, terminal, webContainerInstance);
+            })(), '--dir=randomizer', '--singleBranch=true', `--ref=${pickedBuild.tag_name}`], {}, terminal, webContainerInstance);
             const exitCode = await shellProcess.exit;
             if (exitCode == 0) {
                 jQuery("#statusText").html(`Getting the settings from the latest randomizer version...<br>`);
@@ -238,7 +238,7 @@ async function loadVersions(pickedVersionIndex = 0, gitInstalled = false, dirsEx
                     loadVersions(0, true, {
                         [`./${pickedBuild.tag_name}`]: true
                     });
-                }, 5);
+                }, 5000);
             } else if (attemptCount < 1) {
                 commandExecution('echo Failed to clone your source code for some reason. Trying one more time...');
                 attemptCount++;
@@ -252,7 +252,35 @@ async function loadVersions(pickedVersionIndex = 0, gitInstalled = false, dirsEx
         }
         cloneSourceCode();
     } else {
-        commandExecution(`ls randomizer`);
+        const comments = [];
+        let fileContents = await webContainerInstance.fs.readFile('./randomizer/presets/Example.json', 'utf8')
+        console.log(fileContents)
+        let pt = fileContents.indexOf("// ");
+        while (pt > -1) { // push and remove comments
+            const line = fileContents.substring(pt).split("\r").join('').split("\n")[0]
+            comments.push(line.substring(3));
+            fileContents = fileContents.split(line).join("")
+            pt = fileContents.indexOf("// ", pt + 1)
+        }
+        const info2 = JSON.parse(fileContents);
+        if (!info2.settings) {
+            info2.settings = Object.assign({}, info2)
+            for (const i in info2) {
+                if (info2.settings[i]) delete info2[i];
+            }
+        }
+        info2.comments ||= comments;
+        if (!info2.version) {
+            const versionNum = i.split("-")[0];
+            Object.assign(info2, {
+                presetName: file.substring(0, file.lastIndexOf(".")).split("_").map(capitalizeWord).join(' '),
+                version: `${versionNum}${i.substring(versionNum.length).startsWith('-') ? ` -${
+                    i.substring(versionNum.length).split("-").map(capitalizeWord).join(' ')
+                }` : ''}`
+            });
+        }
+        closeTerminal('resultField');
+        loadPreset(info2);
     }
 }
 
@@ -307,7 +335,7 @@ function randomBackgrounds() {
 
 /**
  * Loads randomizer settings using the given preset data
- * @param {JSON} l
+ * @param {JSON} j
  */
 function loadPreset(j) {
     const versionDropdown = document.getElementById('versionDropdown');

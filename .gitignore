@@ -1,2 +1,5 @@
 node_modules
 package-lock.json
+public/rust_installer.sh
+public/versions_github.json
+public/versions_gitlab.json
