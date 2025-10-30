@@ -7,7 +7,7 @@
  * Maker: josephanimate2021
  */ 
 class TerminalEmulator {
-    constructor(socket) {
+    constructor(socket, element = 'terminal') {
         // variables
         const commandHistory = [];
         let cursorX, historyIndex = -1;
@@ -24,7 +24,7 @@ class TerminalEmulator {
         // loads the terminal
         term.loadAddon(fitAddon);
         term.loadAddon(webLinksAddon);
-        term.open(document.getElementById('terminal'));
+        term.open(document.getElementById(element));
         fitAddon.fit();
         window.addEventListener("resize", () => fitAddon.fit())
         // sets up a websocket so that the terminal is usable.
